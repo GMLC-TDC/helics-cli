@@ -29,7 +29,7 @@ def cli(verbose):
 
 
 @cli.command()
-@click.option("--path", type=click.Path(file_okay=False), default="./HELICSFederation")
+@click.option("--path", type=click.Path(), default="./HELICSFederation")
 @click.option("--purge/--no-purge", default=False)
 def setup(path, purge):
     """
@@ -43,13 +43,15 @@ def setup(path, purge):
             shutil.rmtree(path)
         except FileNotFoundError:
             logger.warning("Unable to delete folder, folder does not exist: %s", path)
+
     if not os.path.exists(path):
         logger.debug("Creating folder at the path provided")
-        os.mkdir(path)
+        os.makedirs(path)
     else:
         click.secho('Error: ', bold=True, nl=False)
         click.echo("The following path already exists: {path}".format(path=path), err=True)
         click.echo("Please remove the directory and try again.", err=True)
+        return None
 
     config = {
         "name":
@@ -80,6 +82,13 @@ def run(path, silent):
     """
     Run HELICS federation
     """
+    path = os.path.abspath(path)
+
+    if not os.path.exists(path):
+        click.secho("Error: ", bold=True, nl=False)
+        click.echo("Unable to find file `config.json` in path: {path}".format(path=path))
+        return None
+
     with open(path) as f:
         config = json.loads(f.read())
 
@@ -95,13 +104,43 @@ def run(path, silent):
         if not silent:
             click.echo("Running federate {name} as a background process".format(name=f["name"]))
 
-        p = subprocess.Popen(shlex.split(f["exec"]), cwd=f["directory"])
+        p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(f["directory"])))
         process_list.append(p)
 
     if not silent:
         with click.progressbar(process_list) as pl:
             for p in pl:
                 p.wait()
+
+
+@cli.command()
+@click.option("--path", type=click.Path())
+def validate(path):
+    """
+    Validate config.json
+    """
+    path = os.path.abspath(path)
+
+    if not os.path.exists(path):
+        click.secho("Error: ", bold=True, nl=False)
+        click.echo("Unable to find file `config.json` in path: {path}".format(path=path))
+        return None
+
+    with open(path) as f:
+        config = json.loads(f.read())
+
+    assert set(list(config.keys())) == set(["name", "federates"]), "Missing or additional keys found in config.json"
+
+    click.echo(" - Valid keys in config.json")
+
+    for i, f in enumerate(config["federates"]):
+        assert "name" in f.keys(), "Missing name in federate number {i}".format(i=i)
+        assert set(list(f.keys())) == set(["name", "host", "exec",
+                                           "directory"]), "Missing or additional keys found in federates {name} in config.json".format(f["name"])
+        click.echo("     - Valid keys in federate {name}".format(name=f["name"]))
+        assert f["host"] == "localhost", "Multi machine support is currently not available. Please contact the developer."
+
+    return None
 
 
 if __name__ == "__main__":
