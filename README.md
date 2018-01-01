@@ -1,4 +1,4 @@
-# helics_runner
+# helics-runner
 
 Runner for Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS).
 
