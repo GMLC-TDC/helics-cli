@@ -1,3 +1,0 @@
-"""
-HELICS setup
-"""
