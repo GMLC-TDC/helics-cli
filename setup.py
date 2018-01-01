@@ -44,6 +44,7 @@ setup(
             "sphinx-rtd-theme",
             "nbsphinx",
             "sphinx",
+            "ghpimport",
         ],
     },
 

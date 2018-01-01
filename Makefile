@@ -7,10 +7,7 @@ clean:
 	find . | grep -E "\(__pycache__|\.pyc|\.pyo$\)" | xargs rm -rf
 
 test:
-	PYTHONPATH=. py.test -vv --cov=opendssdirect tests
-
-html:
-	@cd docs; pandoc ../README.md -o readme.rst; make html
+	PYTHONPATH=. py.test -vv --cov=helicsrunner tests
 
 github: html
 	-git branch -D gh-pages
