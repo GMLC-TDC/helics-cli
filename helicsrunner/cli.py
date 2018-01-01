@@ -7,6 +7,7 @@ import json
 import os
 import shutil
 import subprocess
+import shlex
 
 import click
 
@@ -74,26 +75,34 @@ def setup(path, purge):
 
 @cli.command()
 @click.option("--path", type=click.Path(file_okay=True), default="./HELICSFederation/config.json")
-def run(path):
+@click.option("--silent", is_flag=True)
+def run(path, silent):
     """
     Run HELICS federation
     """
     with open(path) as f:
         config = json.loads(f.read())
 
-    click.echo("Running federation: {name}".format(config["name"]))
+    logger.debug("Read config: %s", config)
+
+    if not silent:
+        click.echo("Running federation: {name}".format(name=config["name"]))
 
     process_list = []
 
     for f in config["federates"]:
 
-        click.echo("Running federate {name} as a background process".format(name=f["name"])
+        if not silent:
+            click.echo("Running federate {name} as a background process".format(name=f["name"]))
+
         p = subprocess.Popen(shlex.split(f["exec"]), cwd=f["directory"])
         process_list.append(p)
 
-
-
+    if not silent:
+        with click.progressbar(process_list) as pl:
+            for p in pl:
+                p.wait()
 
 
 if __name__ == "__main__":
-    cli()
+    cli(verbose=True)
