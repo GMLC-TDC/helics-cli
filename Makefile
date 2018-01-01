@@ -9,6 +9,9 @@ clean:
 test:
 	PYTHONPATH=. py.test -vv --cov=helicsrunner tests
 
+html:
+	@cd docs; pandoc ../README.md -o readme.rst; make html
+
 github: html
 	-git branch -D gh-pages
 	-git push origin --delete gh-pages
