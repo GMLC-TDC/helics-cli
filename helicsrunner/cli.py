@@ -6,6 +6,7 @@ import logging
 import json
 import os
 import shutil
+import subprocess
 
 import click
 
@@ -27,7 +28,7 @@ def cli(verbose):
 
 
 @cli.command()
-@click.option("--path", type=click.Path(file_okay=False), default="./")
+@click.option("--path", type=click.Path(file_okay=False), default="./HELICSFederation")
 @click.option("--purge/--no-purge", default=False)
 def setup(path, purge):
     """
@@ -35,7 +36,8 @@ def setup(path, purge):
     """
     path = os.path.abspath(path)
     if purge:
-        logger.info("Deleting folder: %s", path)
+        click.secho("Warning: ", bold=True, nl=False)
+        click.echo("Deleting folder: {path}".format(path=path))
         try:
             shutil.rmtree(path)
         except FileNotFoundError:
@@ -71,11 +73,26 @@ def setup(path, purge):
 
 
 @cli.command()
-def run():
+@click.option("--path", type=click.Path(file_okay=True), default="./HELICSFederation/config.json")
+def run(path):
     """
     Run HELICS federation
     """
-    pass
+    with open(path) as f:
+        config = json.loads(f.read())
+
+    click.echo("Running federation: {name}".format(config["name"]))
+
+    process_list = []
+
+    for f in config["federates"]:
+
+        click.echo("Running federate {name} as a background process".format(name=f["name"])
+        p = subprocess.Popen(shlex.split(f["exec"]), cwd=f["directory"])
+        process_list.append(p)
+
+
+
 
 
 if __name__ == "__main__":
