@@ -84,7 +84,7 @@ Hello from Federate 2
 ### Installation
 
 ```
-pip install helicsrunner
+pip install git+git://github.com/GMLC-TDC/helics-runner.git@master
 ```
 
 
