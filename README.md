@@ -63,11 +63,22 @@ Options:
 ### Usage
 
 ```bash
-helics setup --path examples/echo-federation
+$ helics setup --path examples/echo-federation
 
-helics validate --path examples/echo-federation/config.json
+$ helics validate --path examples/echo-federation/config.json
+ - Valid keys in config.json
+     - Valid keys in federate Federate1
+     - Valid keys in federate Federate2
 
-helics run --path examples/echo-federation/config.json
+$ helics run --path examples/echo-federation/config.json
+Running federation: HELICSFederation
+Running federate Federate1 as a background process
+Running federate Federate2 as a background process
+  [##################------------------]   50%
+Hello from Federate 1
+Hello from Federate 2
+  [####################################]  100%
+
 ```
 
 ### Installation
