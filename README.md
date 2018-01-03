@@ -88,7 +88,3 @@ pip install helicsrunner
 ```
 
 
-### Thanks
-
-- Bryan Palmintier
-
