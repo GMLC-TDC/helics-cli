@@ -1,5 +1,5 @@
 """
-HELICS cli
+HELICS Runner command line interface
 """
 
 import logging
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 @click.option('--verbose/-no-verbose', default=False)
 def cli(verbose):
     """
-    HELICS cli
+    HELICS Runner command line interface
     """
     if verbose is True:
         setup_logger()
