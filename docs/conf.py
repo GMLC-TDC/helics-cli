@@ -21,7 +21,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
-from helicsrunner._version import __version__ as VERSION
+from helics_runner._version import __version__ as VERSION
 import sphinx_rtd_theme
 
 # -- General configuration ------------------------------------------------

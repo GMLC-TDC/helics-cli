@@ -7,7 +7,7 @@ clean:
 	find . | grep -E "\(__pycache__|\.pyc|\.pyo$\)" | xargs rm -rf
 
 test:
-	PYTHONPATH=. py.test -vv --cov=helicsrunner tests
+	PYTHONPATH=. py.test -vv --cov=helics_runner tests
 
 html:
 	@cd docs; make html

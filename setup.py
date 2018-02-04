@@ -9,13 +9,13 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(HERE, './README.md'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
-with open(os.path.join(HERE, 'helicsrunner', '_version.py'), encoding='utf-8') as f:
+with open(os.path.join(HERE, 'helics_runner', '_version.py'), encoding='utf-8') as f:
     VERSION = f.read()
 
 VERSION = VERSION.split()[2].strip('"').strip("'")
 
 setup(
-    name='helicsrunner',
+    name='helics_runner',
     version=VERSION,
     description='Python direct-mode interface to OpenDSS',
     long_description=LONG_DESCRIPTION,
@@ -34,7 +34,7 @@ setup(
     keywords=['helics', 'cosimulation'],
     entry_points={
         "console_scripts": [
-            "helics = helicsrunner.cli:cli",
+            "helics = helics_runner.cli:cli",
         ],
     },
     extras_require={
