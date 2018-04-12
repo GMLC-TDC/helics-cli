@@ -29,13 +29,14 @@ def cli(verbose):
 
 
 @cli.command()
-@click.option("--path", type=click.Path(), default="./HELICSFederation")
-@click.option("--purge/--no-purge", default=False)
-def setup(path, purge):
+@click.option("--name", type=click.STRING, default="HELICSFederation", help="Name of the folder that contains the config.json")
+@click.option("--path", type=click.Path(), default="./", help="Path to the folder")
+@click.option("--purge/--no-purge", default=False, help="Delete folder if it exists")
+def setup(name, path, purge):
     """
     Setup HELICS federation
     """
-    path = os.path.abspath(path)
+    path = os.path.abspath(os.path.join(path, name))
     if purge:
         click.secho("Warning: ", bold=True, nl=False)
         click.echo("Deleting folder: {path}".format(path=path))
@@ -55,7 +56,7 @@ def setup(path, purge):
 
     config = {
         "name":
-        "HELICSFederation",
+        name,
         "federates": [
             {
                 "name": "Federate1",
@@ -82,14 +83,15 @@ def run(path, silent):
     """
     Run HELICS federation
     """
-    path = os.path.abspath(path)
+    path_to_config = os.path.abspath(path)
+    path = os.path.dirname(path_to_config)
 
-    if not os.path.exists(path):
+    if not os.path.exists(path_to_config):
         click.secho("Error: ", bold=True, nl=False)
-        click.echo("Unable to find file `config.json` in path: {path}".format(path=path))
+        click.echo("Unable to find file `config.json` in path: {path_to_config}".format(path_to_config=path_to_config))
         return None
 
-    with open(path) as f:
+    with open(path_to_config) as f:
         config = json.loads(f.read())
 
     logger.debug("Read config: %s", config)
@@ -98,19 +100,34 @@ def run(path, silent):
         click.echo("Running federation: {name}".format(name=config["name"]))
 
     process_list = []
+    output_list = []
 
     for f in config["federates"]:
 
         if not silent:
             click.echo("Running federate {name} as a background process".format(name=f["name"]))
 
-        p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(f["directory"])))
+        o = open(os.path.join(path, "{}.log".format(f["name"])), "w")
+        try:
+            p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(f["directory"])), stdout=o, stderr=o)
+            p.name = f["name"]
+        except FileNotFoundError as e:
+            print("Raising error")
+            raise click.ClickException("FileNotFoundError: {}".format(e))
         process_list.append(p)
+        output_list.append(o)
 
-    if not silent:
-        with click.progressbar(process_list) as pl:
-            for p in pl:
-                p.wait()
+    click.echo("Waiting for {} processes to finish ...".format(len(process_list)))
+    for p in process_list:
+        p.wait()
+
+    for p in process_list:
+        if p.returncode != 0:
+            click.echo("Error: Process {} exited with return code {}".format(p.name, p.returncode))
+    click.echo("Done!")
+
+    for f in output_list:
+        f.close()
 
 
 @cli.command()
