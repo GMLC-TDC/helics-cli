@@ -109,10 +109,10 @@ def run(path, silent):
 
         o = open(os.path.join(path, "{}.log".format(f["name"])), "w")
         try:
-            p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(f["directory"])), stdout=o, stderr=o)
+            directory = os.path.join(path, f["directory"])
+            p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(directory)), stdout=o, stderr=o)
             p.name = f["name"]
         except FileNotFoundError as e:
-            print("Raising error")
             raise click.ClickException("FileNotFoundError: {}".format(e))
         process_list.append(p)
         output_list.append(o)
