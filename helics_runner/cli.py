@@ -117,13 +117,20 @@ def run(path, silent):
         process_list.append(p)
         output_list.append(o)
 
-    click.echo("Waiting for {} processes to finish ...".format(len(process_list)))
-    for p in process_list:
-        p.wait()
+    try:
+        click.echo("Waiting for {} processes to finish ...".format(len(process_list)))
+        for p in process_list:
+            p.wait()
+    except KeyboardInterrupt as e:
+        click.echo("")
+        click.echo("Warning: User interrupted processes. Terminating safely ...")
+        for p in process_list:
+            p.kill()
+    else:
+        for p in process_list:
+            if p.returncode != 0:
+                click.echo("Error: Process {} exited with return code {}".format(p.name, p.returncode))
 
-    for p in process_list:
-        if p.returncode != 0:
-            click.echo("Error: Process {} exited with return code {}".format(p.name, p.returncode))
     click.echo("Done!")
 
     for f in output_list:
