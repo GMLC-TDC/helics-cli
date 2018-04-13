@@ -13,6 +13,8 @@ import click
 
 from ._version import __version__
 from .log import setup_logger
+from .status_checker import CheckStatusThread
+from .exceptions import HELICSRuntimeError
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +101,13 @@ def run(path, silent):
     if not silent:
         click.echo("Running federation: {name}".format(name=config["name"]))
 
+    broker_o = open(os.path.join(path, "broker.log"), "w")
+    if config["broker"] is True:
+        broker_p = subprocess.Popen(shlex.split("helics_broker {}".format(len(config["federates"]))), cwd=os.path.abspath(os.path.expanduser(path)), stdout=broker_o, stderr=broker_o)
+    else:
+        broker_p = subprocess.Popen(shlex.split("echo 'Using internal broker'"), cwd=os.path.abspath(os.path.expanduser(path)), stdout=broker_o, stderr=broker_o)
+    broker_p.name = "broker"
+
     process_list = []
     output_list = []
 
@@ -117,24 +126,31 @@ def run(path, silent):
         process_list.append(p)
         output_list.append(o)
 
+    process_list.append(broker_p)
+    t = CheckStatusThread(process_list)
+
     try:
+        t.start()
         click.echo("Waiting for {} processes to finish ...".format(len(process_list)))
         for p in process_list:
             p.wait()
-    except KeyboardInterrupt as e:
+    except (KeyboardInterrupt, HELICSRuntimeError) as e:
         click.echo("")
         click.echo("Warning: User interrupted processes. Terminating safely ...")
         for p in process_list:
             p.kill()
-    else:
+    finally:
         for p in process_list:
             if p.returncode != 0:
                 click.echo("Error: Process {} exited with return code {}".format(p.name, p.returncode))
 
+    broker_p.wait()
     click.echo("Done!")
 
     for f in output_list:
         f.close()
+
+    broker_o.close()
 
 
 @cli.command()
