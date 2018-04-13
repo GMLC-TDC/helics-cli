@@ -59,6 +59,7 @@ def setup(name, path, purge):
     config = {
         "name":
         name,
+        "broker": False,
         "federates": [
             {
                 "name": "Federate1",
