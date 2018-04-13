@@ -142,7 +142,7 @@ def run(path, silent):
     finally:
         for p in process_list:
             if p.returncode != 0:
-                click.echo("Error: Process {} exited with return code {}".format(p.name, p.returncode))
+                logger.info("Error: Process {} exited with return code {}".format(p.name, p.returncode))
 
     broker_p.wait()
     click.echo("Done!")
