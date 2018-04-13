@@ -170,7 +170,7 @@ def validate(path):
     with open(path) as f:
         config = json.loads(f.read())
 
-    assert set(list(config.keys())) == set(["name", "federates"]), "Missing or additional keys found in config.json"
+    assert set(list(config.keys())) == set(["name", "broker", "federates"]), "Missing or additional keys found in config.json"
 
     click.echo(" - Valid keys in config.json")
 
