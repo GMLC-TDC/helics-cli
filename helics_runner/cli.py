@@ -27,6 +27,7 @@ def cli(verbose):
     HELICS Runner command line interface
     """
     if verbose is True:
+        click.secho("🇭", bold=True, nl=True)
         setup_logger()
 
 
