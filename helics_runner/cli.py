@@ -149,8 +149,8 @@ def run(path, silent):
     broker_p.wait()
     click.echo("Done!")
 
-    for f in output_list:
-        f.close()
+    for o in output_list:
+        o.close()
 
     broker_o.close()
 
