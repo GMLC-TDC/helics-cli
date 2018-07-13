@@ -83,10 +83,12 @@ def setup(name, path, purge):
 @cli.command()
 @click.option("--path", type=click.Path(file_okay=True), default="./HELICSFederation/config.json")
 @click.option("--silent", is_flag=True)
-def run(path, silent):
+@click.option("--no-log-file", is_flag=True, default=False)
+def run(path, silent, no_log_file):
     """
     Run HELICS federation
     """
+    log = not no_log_file
     path_to_config = os.path.abspath(path)
     path = os.path.dirname(path_to_config)
 
@@ -118,7 +120,10 @@ def run(path, silent):
         if not silent:
             click.echo("Running federate {name} as a background process".format(name=f["name"]))
 
-        o = open(os.path.join(path, "{}.log".format(f["name"])), "w")
+        if log is True:
+            o = open(os.path.join(path, "{}.log".format(f["name"])), "w")
+        else:
+            o = None
         try:
             directory = os.path.join(path, f["directory"])
             p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(directory)), stdout=o, stderr=o)
@@ -126,7 +131,8 @@ def run(path, silent):
         except FileNotFoundError as e:
             raise click.ClickException("FileNotFoundError: {}".format(e))
         process_list.append(p)
-        output_list.append(o)
+        if o is not None:
+            output_list.append(o)
 
     process_list.append(broker_p)
     t = CheckStatusThread(process_list)
