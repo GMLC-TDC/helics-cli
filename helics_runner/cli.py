@@ -83,12 +83,12 @@ def setup(name, path, purge):
 @cli.command()
 @click.option("--path", type=click.Path(file_okay=True), default="./HELICSFederation/config.json")
 @click.option("--silent", is_flag=True)
-@click.option("--no-log-file", is_flag=True, default=False)
-def run(path, silent, no_log_file):
+@click.option("--no-log-files", is_flag=True, default=False)
+def run(path, silent, no_log_files):
     """
     Run HELICS federation
     """
-    log = not no_log_file
+    log = not no_log_files
     path_to_config = os.path.abspath(path)
     path = os.path.dirname(path_to_config)
 
