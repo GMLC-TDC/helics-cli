@@ -126,7 +126,13 @@ def run(path, silent, no_log_files):
             o = None
         try:
             directory = os.path.join(path, f["directory"])
-            p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(directory)), stdout=o, stderr=o)
+
+            env = dict(os.environ)
+            if "env" in f:
+                for k, v in f["env"].items():
+                    env[k] = v
+            p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(directory)), stdout=o, stderr=o, env=env)
+
             p.name = f["name"]
         except FileNotFoundError as e:
             raise click.ClickException("FileNotFoundError: {}".format(e))
