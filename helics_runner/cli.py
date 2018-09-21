@@ -84,7 +84,8 @@ def setup(name, path, purge):
 @click.option("--path", type=click.Path(file_okay=True), default="./HELICSFederation/config.json")
 @click.option("--silent", is_flag=True)
 @click.option("--no-log-files", is_flag=True, default=False)
-def run(path, silent, no_log_files):
+@click.option("--broker-loglevel", type=int, default=2)
+def run(path, silent, no_log_files, broker_loglevel):
     """
     Run HELICS federation
     """
@@ -107,7 +108,7 @@ def run(path, silent, no_log_files):
 
     broker_o = open(os.path.join(path, "broker.log"), "w")
     if config["broker"] is True:
-        broker_p = subprocess.Popen(shlex.split("helics_broker {}".format(len(config["federates"]))), cwd=os.path.abspath(os.path.expanduser(path)), stdout=broker_o, stderr=broker_o)
+        broker_p = subprocess.Popen(shlex.split("helics_broker {num_fed} --loglevel={log_level}".format(num_fed=len(config["federates"]), log_level=broker_loglevel)), cwd=os.path.abspath(os.path.expanduser(path)), stdout=broker_o, stderr=broker_o)
     else:
         broker_p = subprocess.Popen(shlex.split("echo 'Using internal broker'"), cwd=os.path.abspath(os.path.expanduser(path)), stdout=broker_o, stderr=broker_o)
     broker_p.name = "broker"
