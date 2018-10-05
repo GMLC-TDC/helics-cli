@@ -3,9 +3,7 @@ import os
 import json
 import shutil
 
-import glm
-
-from ..exceptions import HELICSEnvironmentError
+from ..exceptions import HELICSRuntimeError
 from ..utils import echo, get_info, abs2rel
 from ..templates import (
     HELICSConfigGenerator,
