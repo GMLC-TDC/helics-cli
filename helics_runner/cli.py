@@ -81,7 +81,7 @@ def setup(name, path, purge):
 
 
 @cli.command()
-@click.option("--path", type=click.Path(file_okay=True), default="./HELICSFederation/config.json")
+@click.option("--path", required=True, type=click.Path(file_okay=True, exists=True), help="Path to config.json that describes how to run a federation")
 @click.option("--silent", is_flag=True)
 @click.option("--no-log-files", is_flag=True, default=False)
 @click.option("--broker-loglevel", type=int, default=2)
@@ -169,17 +169,12 @@ def run(path, silent, no_log_files, broker_loglevel):
 
 
 @cli.command()
-@click.option("--path", type=click.Path())
+@click.option("--path", required=True, type=click.Path(exists=True), help="Path to config.json file that describes how to run a federation")
 def validate(path):
     """
     Validate config.json
     """
     path = os.path.abspath(path)
-
-    if not os.path.exists(path):
-        click.secho("Error: ", bold=True, nl=False)
-        click.echo("Unable to find file `config.json` in path: {path}".format(path=path))
-        return None
 
     with open(path) as f:
         config = json.loads(f.read())
