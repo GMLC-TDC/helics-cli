@@ -88,6 +88,7 @@ class SimulationConfigurer(object):
 
         federate_configuration = v
         federate_configuration["working_directory"] = self.working_directory
+        federate_configuration["simulation_file"] = self.simulation_file
 
         c = cls(federate_configuration)
 

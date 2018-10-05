@@ -1,0 +1,250 @@
+{
+  "dataroot": "./../../HELICS-Tutorial",
+  "federates": {
+    "gridlabd": {
+      "B2/G_1": {
+        "endpoint_subscriptions": {
+          "fixed_price": {
+            "mapping": "Market_1/fixed_price",
+            "type": "double"
+          }
+        },
+        "folder": "test_system_data/gldFeeders/B2/G_1",
+        "model": "DistributionSim_B2_G_1.glm",
+        "publications": {
+          "totalLoad": {
+            "mapping": "network_node/distribution_load",
+            "type": "complex"
+          }
+        },
+        "subscriptions": {
+          "TransmissionSim/B2/Voltage": {
+            "mapping": "network_node/positive_sequence_voltage",
+            "type": "complex"
+          }
+        }
+      },
+      "B2/R_2_1": {
+        "endpoint_subscriptions": {
+          "fixed_price": {
+            "mapping": "Market_1/fixed_price",
+            "type": "double"
+          }
+        },
+        "folder": "test_system_data/gldFeeders/B2/R_2_1",
+        "model": "DistributionSim_B2_R_2_1.glm",
+        "publications": {
+          "totalLoad": {
+            "mapping": "network_node/distribution_load",
+            "type": "complex"
+          }
+        },
+        "subscriptions": {
+          "TransmissionSim/B2/Voltage": {
+            "mapping": "network_node/positive_sequence_voltage",
+            "type": "complex"
+          }
+        }
+      },
+      "B2/R_2_2": {
+        "endpoint_subscriptions": {
+          "fixed_price": {
+            "mapping": "Market_1/fixed_price",
+            "type": "double"
+          }
+        },
+        "folder": "test_system_data/gldFeeders/B2/R_2_2",
+        "model": "DistributionSim_B2_R_2_2.glm",
+        "publications": {
+          "totalLoad": {
+            "mapping": "network_node/distribution_load",
+            "type": "complex"
+          }
+        },
+        "subscriptions": {
+          "TransmissionSim/B2/Voltage": {
+            "mapping": "network_node/positive_sequence_voltage",
+            "type": "complex"
+          }
+        }
+      },
+      "B2/R_2_3": {
+        "endpoint_subscriptions": {
+          "fixed_price": {
+            "mapping": "Market_1/fixed_price",
+            "type": "double"
+          }
+        },
+        "folder": "test_system_data/gldFeeders/B2/R_2_3",
+        "model": "DistributionSim_B2_R_2_3.glm",
+        "publications": {
+          "totalLoad": {
+            "mapping": "network_node/distribution_load",
+            "type": "complex"
+          }
+        },
+        "subscriptions": {
+          "TransmissionSim/B2/Voltage": {
+            "mapping": "network_node/positive_sequence_voltage",
+            "type": "complex"
+          }
+        }
+      },
+      "B3/R_3_1": {
+        "endpoint_subscriptions": {
+          "fixed_price": {
+            "mapping": "Market_1/fixed_price",
+            "type": "double"
+          }
+        },
+        "folder": "test_system_data/gldFeeders/B3/R_3_1",
+        "model": "DistributionSim_B3_R_3_1.glm",
+        "publications": {
+          "totalLoad": {
+            "mapping": "network_node/distribution_load",
+            "type": "complex"
+          }
+        },
+        "subscriptions": {
+          "TransmissionSim/B3/Voltage": {
+            "mapping": "network_node/positive_sequence_voltage",
+            "type": "complex"
+          }
+        }
+      },
+      "B3/R_3_2": {
+        "endpoint_subscriptions": {
+          "fixed_price": {
+            "mapping": "Market_1/fixed_price",
+            "type": "double"
+          }
+        },
+        "folder": "test_system_data/gldFeeders/B3/R_3_2",
+        "model": "DistributionSim_B3_R_3_2.glm",
+        "publications": {
+          "totalLoad": {
+            "mapping": "network_node/distribution_load",
+            "type": "complex"
+          }
+        },
+        "subscriptions": {
+          "TransmissionSim/B3/Voltage": {
+            "mapping": "network_node/positive_sequence_voltage",
+            "type": "complex"
+          }
+        }
+      },
+      "B3/R_3_3": {
+        "endpoint_subscriptions": {
+          "fixed_price": {
+            "mapping": "Market_1/fixed_price",
+            "type": "double"
+          }
+        },
+        "folder": "test_system_data/gldFeeders/B3/R_3_3",
+        "model": "DistributionSim_B3_R_3_3.glm",
+        "publications": {
+          "totalLoad": {
+            "mapping": "network_node/distribution_load",
+            "type": "complex"
+          }
+        },
+        "subscriptions": {
+          "TransmissionSim/B3/Voltage": {
+            "mapping": "network_node/positive_sequence_voltage",
+            "type": "complex"
+          }
+        }
+      },
+      "B3/R_3_4": {
+        "endpoint_subscriptions": {
+          "fixed_price": {
+            "mapping": "Market_1/fixed_price",
+            "type": "double"
+          }
+        },
+        "folder": "test_system_data/gldFeeders/B3/R_3_4",
+        "model": "DistributionSim_B3_R_3_4.glm",
+        "publications": {
+          "totalLoad": {
+            "mapping": "network_node/distribution_load",
+            "type": "complex"
+          }
+        },
+        "subscriptions": {
+          "TransmissionSim/B3/Voltage": {
+            "mapping": "network_node/positive_sequence_voltage",
+            "type": "complex"
+          }
+        }
+      },
+      "B4/G_1": {
+        "endpoint_subscriptions": {
+          "fixed_price": {
+            "mapping": "Market_1/fixed_price",
+            "type": "double"
+          }
+        },
+        "folder": "test_system_data/gldFeeders/B4/G_1",
+        "model": "DistributionSim_B4_G_1.glm",
+        "publications": {
+          "totalLoad": {
+            "mapping": "network_node/distribution_load",
+            "type": "complex"
+          }
+        },
+        "subscriptions": {
+          "TransmissionSim/B4/Voltage": {
+            "mapping": "network_node/positive_sequence_voltage",
+            "type": "complex"
+          }
+        }
+      },
+      "B4/R_1_1": {
+        "endpoint_subscriptions": {
+          "fixed_price": {
+            "mapping": "Market_1/fixed_price",
+            "type": "double"
+          }
+        },
+        "folder": "test_system_data/gldFeeders/B4/R_1_1",
+        "model": "DistributionSim_B4_R_1_1.glm",
+        "publications": {
+          "totalLoad": {
+            "mapping": "network_node/distribution_load",
+            "type": "complex"
+          }
+        },
+        "subscriptions": {
+          "TransmissionSim/B4/Voltage": {
+            "mapping": "network_node/positive_sequence_voltage",
+            "type": "complex"
+          }
+        }
+      },
+      "B4/R_1_2": {
+        "endpoint_subscriptions": {
+          "fixed_price": {
+            "mapping": "Market_1/fixed_price",
+            "type": "double"
+          }
+        },
+        "folder": "test_system_data/gldFeeders/B4/R_1_2",
+        "model": "DistributionSim_B4_R_1_2.glm",
+        "publications": {
+          "totalLoad": {
+            "mapping": "network_node/distribution_load",
+            "type": "complex"
+          }
+        },
+        "subscriptions": {
+          "TransmissionSim/B4/Voltage": {
+            "mapping": "network_node/positive_sequence_voltage",
+            "type": "complex"
+          }
+        }
+      }
+    }
+  },
+  "name": "HELICSTutorialWorkspace"
+}

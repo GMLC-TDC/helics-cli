@@ -101,10 +101,12 @@ def echo(*args, sep=" ", status="info", **kwargs):
     else:
         if status == "error" or status == "exception":
             fg = "red"
-        if status == "warning":
+        elif status == "warning":
             fg = "blue"
-        if status == "debug":
+        elif status == "debug":
             fg = "yellow"
+        else:
+            fg = "green"
 
         click.echo(
             click.style("helics-cli [{}]".format(status), fg=fg, bold=True),

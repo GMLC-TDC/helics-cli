@@ -9,30 +9,44 @@ import os
 import shutil
 import subprocess
 import shlex
+from pkg_resources import iter_entry_points
 
 import click
 
 from ._version import __version__
-from .log import setup_logger
+
+# from .log import setup_logger
 from .status_checker import CheckStatusThread
 from .exceptions import HELICSRuntimeError
 
 from .simulation.configure import SimulationConfigurer
+from . import utils
 from .utils import echo
+from . import plugins
 
 logger = logging.getLogger(__name__)
 
 
+def _register():
+
+    for entry_point in iter_entry_points("helics_runner.plugins.config"):
+        name, cls = entry_point.name, entry_point
+        plugins.registered_config[name] = cls
+
+
 @click.group()
 @click.version_option(__version__, "--version")
-@click.option("--verbose/-no-verbose", default=False)
-def cli(verbose):
+@click.option("--verbose", "-v", count=True)
+@click.pass_context
+def cli(ctx, verbose):
     """
     HELICS Runner command line interface
     """
-    if verbose is True:
-        # click.secho("🇭", bold=True, nl=True)
-        setup_logger()
+    _register()
+    ctx.obj = {}
+    ctx.obj["verbose"] = verbose
+    if verbose != 0:
+        utils.VERBOSE = verbose
 
 
 @cli.command()
