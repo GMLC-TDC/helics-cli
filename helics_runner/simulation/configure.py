@@ -14,7 +14,7 @@ from ..utils import mkdir, copy_and_overwrite
 
 from .. import plugins
 
-INFO = get_info()
+# INFO = get_info()
 
 
 class SimulationConfigurer(object):
@@ -58,9 +58,7 @@ class SimulationConfigurer(object):
     def create_simulation_directory(self):
 
         self.working_directory = os.path.abspath(
-            os.path.join(
-                self.working_directory, "{}-{}".format(self.simulation["name"], INFO)
-            )
+            os.path.join(self.working_directory, "{}".format(self.simulation["name"]))
         )
         echo("Creating workspace in {}".format(self.working_directory), status="info")
         mkdir(self.working_directory)
