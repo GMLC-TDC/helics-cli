@@ -276,9 +276,8 @@ def validate(path):
     with open(path) as f:
         config = json.loads(f.read())
 
-    assert set(list(config.keys())) == set(
-        ["name", "broker", "federates"]
-    ), "Missing or additional keys found in config.json"
+    if set(list(config.keys())) == set(["name", "broker", "federates"]):
+        echo("Missing or additional keys found in config.json", status="warning")
 
     echo(" - Valid keys in config.json", status="info")
 
