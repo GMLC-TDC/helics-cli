@@ -31,7 +31,7 @@ def cli(verbose):
     HELICS Runner command line interface
     """
     if verbose is True:
-        click.secho("🇭", bold=True, nl=True)
+        # click.secho("🇭", bold=True, nl=True)
         setup_logger()
 
 
@@ -50,8 +50,7 @@ def setup(name, path, purge):
     """
     path = os.path.abspath(os.path.join(path, name))
     if purge:
-        click.secho("Warning: ", bold=True, nl=False)
-        click.echo("Deleting folder: {path}".format(path=path))
+        echo("Deleting folder: {path}".format(path=path), status="warning")
         try:
             shutil.rmtree(path)
         except FileNotFoundError:
@@ -61,11 +60,11 @@ def setup(name, path, purge):
         logger.debug("Creating folder at the path provided")
         os.makedirs(path)
     else:
-        click.secho("Error: ", bold=True, nl=False)
-        click.echo(
-            "The following path already exists: {path}".format(path=path), err=True
+        echo(
+            "The following path already exists: {path}".format(path=path),
+            status="error",
         )
-        click.echo("Please remove the directory and try again.", err=True)
+        echo("Please remove the directory and try again.", status="error")
         return None
 
     config = {
@@ -135,11 +134,11 @@ def run(path, silent, no_log_files, broker_loglevel):
     path = os.path.dirname(path_to_config)
 
     if not os.path.exists(path_to_config):
-        click.secho("Error: ", bold=True, nl=False)
-        click.echo(
+        echo(
             "Unable to find file `config.json` in path: {path_to_config}".format(
                 path_to_config=path_to_config
-            )
+            ),
+            status="error",
         )
         return None
 
@@ -149,7 +148,7 @@ def run(path, silent, no_log_files, broker_loglevel):
     logger.debug("Read config: %s", config)
 
     if not silent:
-        click.echo("Running federation: {name}".format(name=config["name"]))
+        echo("Running federation: {name}".format(name=config["name"]), status="info")
 
     broker_o = open(os.path.join(path, "broker.log"), "w")
     if config["broker"] is True:
@@ -178,8 +177,11 @@ def run(path, silent, no_log_files, broker_loglevel):
     for f in config["federates"]:
 
         if not silent:
-            click.echo(
-                "Running federate {name} as a background process".format(name=f["name"])
+            echo(
+                "Running federate {name} as a background process".format(
+                    name=f["name"]
+                ),
+                status="info",
             )
 
         if log is True:
@@ -213,25 +215,30 @@ def run(path, silent, no_log_files, broker_loglevel):
 
     try:
         t.start()
-        click.echo("Waiting for {} processes to finish ...".format(len(process_list)))
+        echo(
+            "Waiting for {} processes to finish ...".format(len(process_list)),
+            status="info",
+        )
         for p in process_list:
             p.wait()
     except (KeyboardInterrupt, HELICSRuntimeError) as e:
-        click.echo("")
-        click.echo("Warning: User interrupted processes. Terminating safely ...")
+        echo(
+            "Warning: User interrupted processes. Terminating safely ...", status="info"
+        )
         for p in process_list:
             p.kill()
     finally:
         for p in process_list:
             if p.returncode != 0:
-                logger.info(
-                    "Error: Process {} exited with return code {}".format(
+                echo(
+                    "Process {} exited with return code {}".format(
                         p.name, p.returncode
-                    )
+                    ),
+                    status="error",
                 )
 
     broker_p.wait()
-    click.echo("Done!")
+    echo("Done!", status="info")
 
     for o in output_list:
         o.close()
@@ -259,7 +266,7 @@ def validate(path):
         ["name", "broker", "federates"]
     ), "Missing or additional keys found in config.json"
 
-    click.echo(" - Valid keys in config.json")
+    echo(" - Valid keys in config.json", status="info")
 
     for i, f in enumerate(config["federates"]):
         assert "name" in f.keys(), "Missing name in federate number {i}".format(i=i)
@@ -268,7 +275,9 @@ def validate(path):
         ), "Missing or additional keys found in federates {name} in config.json".format(
             f["name"]
         )
-        click.echo("     - Valid keys in federate {name}".format(name=f["name"]))
+        echo(
+            "     - Valid keys in federate {name}".format(name=f["name"]), status="info"
+        )
         assert (
             f["host"] == "localhost"
         ), (
