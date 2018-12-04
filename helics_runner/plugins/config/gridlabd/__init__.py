@@ -186,9 +186,14 @@ class GridLABDConfig(BaseConfig):
                 "name": "{}".format(federate_name),
                 "configure": "{}.json".format(federate_name),
             },
+            "children": [],
         }
 
         data["objects"].insert(0, helics_object)
 
+        import json
+
+        with open("./test.json", "w") as f:
+            f.write(json.dumps(data, indent=4))
         with open(working_directory_model, "w") as f:
             f.write(glm.dumps(data))
