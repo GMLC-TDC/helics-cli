@@ -98,7 +98,9 @@ class GridLABDConfig(BaseConfig):
                 working_directory_resource = abs2rel(
                     working_directory_resource, working_directory_folder
                 )
-                n["attributes"]["tmyfile"] = '"{}"'.format(working_directory_resource)
+                n["attributes"]["tmyfile"] = (
+                    '"{}"'.format(working_directory_resource).strip("'").strip('"')
+                )
 
             # Fix player files
             if n["name"] == "player":
@@ -114,7 +116,9 @@ class GridLABDConfig(BaseConfig):
                 working_directory_resource = abs2rel(
                     working_directory_resource, working_directory_folder
                 )
-                n["attributes"]["file"] = '"{}"'.format(working_directory_resource)
+                n["attributes"]["file"] = (
+                    '"{}"'.format(working_directory_resource).strip("'").strip('"')
+                )
 
             # Fix recorder files
             if n["name"] in [
@@ -137,8 +141,10 @@ class GridLABDConfig(BaseConfig):
                 ) != os.path.basename(output_filename):
                     mkdir(os.path.dirname(output_filename))
 
-                n["attributes"]["file"] = abs2rel(
-                    output_filename, working_directory_folder
+                n["attributes"]["file"] = (
+                    abs2rel(output_filename, working_directory_folder)
+                    .strip("'")
+                    .strip('"')
                 )
 
         # Loop through all objects to find the network node
