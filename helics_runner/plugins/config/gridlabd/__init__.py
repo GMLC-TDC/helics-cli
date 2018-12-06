@@ -3,9 +3,54 @@ import os
 import shutil
 
 from helics_runner.plugins.config.base import BaseConfig
+from helics_runner.templates import ConfigGenerator
 from helics_runner.utils import abs2rel, echo, mkdir
 
 import glm
+
+from jinja2 import Template
+
+current_directory = os.path.dirname(os.path.realpath(__file__))
+
+with open(
+    os.path.abspath(os.path.join(current_directory, "./gridlabd-federate-config.json"))
+) as f:
+    gridlabd_config_template = Template(f.read())
+
+
+class GridLABDConfigGenerator(ConfigGenerator):
+
+    template = gridlabd_config_template
+
+    def setup(self, publications, subscriptions, **kwargs):
+        for k, v in kwargs.items():
+            self.config[k] = v
+
+        self.config["publications"] = {}
+        self.config["subscriptions"] = {}
+        for k, v in publications.items():
+            gld_object = v["mapping"].split("/")[0]
+            gld_fieldname = v["mapping"].split("/")[1]
+            helics_topic = k
+
+            try:
+                self.config["publications"][gld_object]
+            except KeyError:
+                self.config["publications"][gld_object] = {}
+
+            self.config["publications"][gld_object][gld_fieldname] = helics_topic
+
+        for k, v in subscriptions.items():
+            gld_object = v["mapping"].split("/")[0]
+            gld_fieldname = v["mapping"].split("/")[1]
+            helics_topic = k
+
+            try:
+                self.config["subscriptions"][gld_object]
+            except KeyError:
+                self.config["subscriptions"][gld_object] = {}
+
+            self.config["subscriptions"][gld_object][gld_fieldname] = helics_topic
 
 
 class GridLABDConfig(BaseConfig):
@@ -42,6 +87,17 @@ class GridLABDConfig(BaseConfig):
             )
 
             self._setup_gridlabd(original_model, working_directory_model, federate_name)
+            g = GridLABDConfigGenerator(
+                name=federate_name,
+                publications=data["publications"],
+                subscriptions=data["subscriptions"],
+            )
+            g.write(
+                os.path.join(
+                    os.path.dirname(working_directory_model),
+                    "{}.json".format(federate_name),
+                )
+            )
 
             self.runner_items.append(
                 {
@@ -197,9 +253,5 @@ class GridLABDConfig(BaseConfig):
 
         data["objects"].insert(0, helics_object)
 
-        import json
-
-        with open("./test.json", "w") as f:
-            f.write(json.dumps(data, indent=4))
         with open(working_directory_model, "w") as f:
             f.write(glm.dumps(data))

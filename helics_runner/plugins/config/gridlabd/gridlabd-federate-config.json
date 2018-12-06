@@ -1,0 +1,6 @@
+{
+    "publications" : {{ publications | default({})|tojson|safe }} ,
+    "subscriptions" : {{ subscriptions | default({})|tojson|safe }},
+    "endpoint_subscriptions" : {{ endpoint_subscriptions | default({})| tojson|safe }},
+    "core_init_string" : "1"
+}
