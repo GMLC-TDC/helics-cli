@@ -108,7 +108,7 @@ def run(path, silent, no_log_files, broker_loglevel):
 
     broker_o = open(os.path.join(path, "broker.log"), "w")
     if config["broker"] is True:
-        broker_p = subprocess.Popen(shlex.split("helics_broker {num_fed} --loglevel={log_level}".format(num_fed=len(config["federates"]), log_level=broker_loglevel)), cwd=os.path.abspath(os.path.expanduser(path)), stdout=broker_o, stderr=broker_o)
+        broker_p = subprocess.Popen(shlex.split("helics_broker -f {num_fed} --loglevel={log_level}".format(num_fed=len(config["federates"]), log_level=broker_loglevel)), cwd=os.path.abspath(os.path.expanduser(path)), stdout=broker_o, stderr=broker_o)
     else:
         broker_p = subprocess.Popen(shlex.split("echo 'Using internal broker'"), cwd=os.path.abspath(os.path.expanduser(path)), stdout=broker_o, stderr=broker_o)
     broker_p.name = "broker"
