@@ -75,14 +75,14 @@ class OpenDSSDirectConfig(BaseConfig):
             federate_name = federate_name.replace("/", "_")
             echo(f"Setting up opendssdirect for {federate_name}")
             directory = os.path.join(self.working_directory, federate_name)
-            mkdir(directory)
+            # mkdir(directory)
             if not os.path.isabs(data["folder"]):
                 data["folder"] = os.path.abspath(
                     os.path.join(os.path.dirname(self.simulation_file), data["folder"])
                 )
 
-            # TODO: not all files will be located in dataroot
-            original_model = os.path.join(data["dataroot"], data["model"])
+            # TODO: not all files will be located in `folder`
+            original_model = os.path.join(data["folder"], data["model"])
             working_directory_model = os.path.join(
                 directory, "{}.dss".format(federate_name)
             )
@@ -129,6 +129,6 @@ class OpenDSSDirectConfig(BaseConfig):
 
         # TODO: any transformations on the data
 
-        shutil.rm(working_directory_model)
+        os.remove(working_directory_model)
         with open(working_directory_model, "w") as f:
             f.write(data)
