@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 def _register():
 
-    for entry_point in iter_entry_points("helics_runner.plugins.config"):
+    for entry_point in iter_entry_points("helics_cli.plugins.config"):
         name, cls = entry_point.name, entry_point
         plugins.registered_config[name] = cls
 

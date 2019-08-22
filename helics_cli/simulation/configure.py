@@ -18,7 +18,6 @@ from .. import plugins
 
 
 class SimulationConfigurer(object):
-
     def __init__(self, simulation_file, workspace_dir=".", mock=None):
 
         self.simulation_file = os.path.abspath(simulation_file)

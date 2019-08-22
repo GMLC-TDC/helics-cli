@@ -5,7 +5,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from ..utils import abs2rel
 
 env = Environment(
-    loader=PackageLoader("helics_runner", "templates"),
+    loader=PackageLoader("helics_cli", "templates"),
     autoescape=select_autoescape(["json"]),
 )
 
@@ -14,7 +14,7 @@ helics_config_template = env.get_template("helics-federate-config.json")
 python_federate_template = env.get_template("main.py")
 python_config_template = env.get_template("python-federate-config.json")
 
-helics_runner_template = env.get_template("helics-runner-config.json")
+helics_cli_template = env.get_template("helics-runner-config.json")
 
 
 class ConfigGenerator(object):
@@ -83,7 +83,7 @@ class PythonConfigGenerator(ConfigGenerator):
 
 class HELICSRunnerGenerator(object):
 
-    template = helics_runner_template
+    template = helics_cli_template
 
     def __init__(self, name, federates, start_broker=True, **kwargs):
         self.config = {}

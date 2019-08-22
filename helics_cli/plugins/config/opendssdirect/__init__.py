@@ -2,9 +2,9 @@
 import os
 import shutil
 
-from helics_runner.plugins.config.base import BaseConfig
-from helics_runner.templates import ConfigGenerator
-from helics_runner.utils import abs2rel, echo, mkdir
+from helics_cli.plugins.config.base import BaseConfig
+from helics_cli.templates import ConfigGenerator
+from helics_cli.utils import abs2rel, echo, mkdir
 
 from jinja2 import Template
 

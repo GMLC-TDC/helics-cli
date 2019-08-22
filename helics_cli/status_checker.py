@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import threading
 import time
 import logging
@@ -9,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class CheckStatusThread(threading.Thread):
-
     def __init__(self, process_list):
         threading.Thread.__init__(self)
         self._process_list = process_list
@@ -28,7 +28,11 @@ class CheckStatusThread(threading.Thread):
                 if p.poll() is not None and p.returncode != 0:
                     self._status[p.name] = p.returncode
                     if has_failed is False:
-                        click.echo("Error: Process {} has failed, killing other processes".format(p.name))
+                        click.echo(
+                            "Error: Process {} has failed, killing other processes".format(
+                                p.name
+                            )
+                        )
                     has_failed = True
 
             all_p = [p.poll() for p in self._process_list if p.poll() is not None]
@@ -39,5 +43,3 @@ class CheckStatusThread(threading.Thread):
                     raise HELICSRuntimeError("Error has occurred")
             else:
                 continue
-
-
