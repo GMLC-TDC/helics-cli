@@ -13,7 +13,7 @@ with open(os.path.join(HERE, "./README.md"), encoding="utf-8") as f:
 with open(os.path.join(HERE, "helics_cli", "_version.py"), encoding="utf-8") as f:
     VERSION = f.read()
 
-VERSION = VERSION.split()[2].strip('"').strip("'")
+VERSION = VERSION.splitlines()[1].split()[2].strip('"').strip("'")
 
 setup(
     name="helics_cli",
