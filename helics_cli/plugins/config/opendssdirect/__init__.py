@@ -120,7 +120,7 @@ class OpenDSSDirectConfig(BaseConfig):
         original_folder = os.path.dirname(original_model)
         working_directory_folder = os.path.dirname(working_directory_model)
 
-        with open(original_model, "w") as f:
+        with open(original_model) as f:
             data = f.read()
 
         # TODO: any transformations on the data
