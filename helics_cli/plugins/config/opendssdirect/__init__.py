@@ -117,13 +117,19 @@ class OpenDSSDirectConfig(BaseConfig):
         self, original_model, working_directory_model, federate_name
     ):
 
+        # Copy opendssdirect files from the folder
+        shutil.copy(original_folder, working_directory_folder)
+
         original_folder = os.path.dirname(original_model)
         working_directory_folder = os.path.dirname(working_directory_model)
+
+        # Change opendssdirect source model file
 
         with open(original_model) as f:
             data = f.read()
 
         # TODO: any transformations on the data
 
+        shutil.rm(working_directory_model)
         with open(working_directory_model, "w") as f:
             f.write(data)
