@@ -1,0 +1,20 @@
+{
+  "coreInit": "{{ coreInit|default('1')}}",
+  "coreName": "{{ coreName }}",
+  "coreType": "{{ coreType|default('zmq') }}",
+  "inputDelay": {{ inputDelay|default(0) }},
+  "maxIterations": {{ maxIterations|default(10) }},
+  "name": "{{ name }}",
+  "observer": {{ observer|default(false)|tojson|safe }},
+  "offset": {{ offset|default(0.0) }},
+  "only_transmit_on_change": {{ only_transmit_on_change|default(false)|tojson|safe }},
+  "only_update_on_change": {{ only_update_on_change|default(false)|tojson|safe }},
+  "outputDelay": {{ outputDelay|default(0) }},
+  "period": {{ period|default(1.0) }},
+  "publications": {{ publications|tojson|safe}},
+  "rollback": {{ rollback|default(false)|tojson|safe }},
+  "source_only": {{ rollback|default(false)|tojson|safe }},
+  "subscriptions": {{subscriptions|tojson|safe}},
+  "timeDelta": {{ timeDelta|default(0.0) }},
+  "uninterruptible": {{ uninterruptible|default(false)|tojson|safe }}
+}

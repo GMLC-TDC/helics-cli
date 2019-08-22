@@ -2,6 +2,8 @@
 
 Runner for Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS).
 
+![](./docs/img/screenshot-configure-run.png)
+
 ### Documentation
 
 ```bash

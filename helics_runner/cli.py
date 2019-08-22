@@ -9,27 +9,44 @@ import os
 import shutil
 import subprocess
 import shlex
+from pkg_resources import iter_entry_points
 
 import click
 
 from ._version import __version__
-from .log import setup_logger
+
+# from .log import setup_logger
 from .status_checker import CheckStatusThread
 from .exceptions import HELICSRuntimeError
+
+from .simulation.configure import SimulationConfigurer
+from . import utils
+from .utils import echo
+from . import plugins
 
 logger = logging.getLogger(__name__)
 
 
+def _register():
+
+    for entry_point in iter_entry_points("helics_runner.plugins.config"):
+        name, cls = entry_point.name, entry_point
+        plugins.registered_config[name] = cls
+
+
 @click.group()
 @click.version_option(__version__, "--version")
-@click.option("--verbose/-no-verbose", default=False)
-def cli(verbose):
+@click.option("--verbose", "-v", count=True)
+@click.pass_context
+def cli(ctx, verbose):
     """
     HELICS Runner command line interface
     """
-    if verbose is True:
-        click.secho("🇭", bold=True, nl=True)
-        setup_logger()
+    _register()
+    ctx.obj = {}
+    ctx.obj["verbose"] = verbose
+    if verbose != 0:
+        utils.VERBOSE = verbose
 
 
 @cli.command()
@@ -47,8 +64,7 @@ def setup(name, path, purge):
     """
     path = os.path.abspath(os.path.join(path, name))
     if purge:
-        click.secho("Warning: ", bold=True, nl=False)
-        click.echo("Deleting folder: {path}".format(path=path))
+        echo("Deleting folder: {path}".format(path=path), status="warning")
         try:
             shutil.rmtree(path)
         except FileNotFoundError:
@@ -58,11 +74,11 @@ def setup(name, path, purge):
         logger.debug("Creating folder at the path provided")
         os.makedirs(path)
     else:
-        click.secho("Error: ", bold=True, nl=False)
-        click.echo(
-            "The following path already exists: {path}".format(path=path), err=True
+        echo(
+            "The following path already exists: {path}".format(path=path),
+            status="error",
         )
-        click.echo("Please remove the directory and try again.", err=True)
+        echo("Please remove the directory and try again.", status="error")
         return None
 
     config = {
@@ -88,8 +104,37 @@ def setup(name, path, purge):
 
 
 @cli.command()
+@click.pass_context
 @click.option(
-    "--path", type=click.Path(file_okay=True), default="./HELICSFederation/config.json"
+    "--simulation-file",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to file that contains the master simulation information",
+)
+@click.option(
+    "--workspace-dir",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to folder where workspace should be created",
+    default=".",
+)
+def configure(ctx, simulation_file, workspace_dir, **kwargs):
+    """
+    Set up a simulation from a simulation.json file.
+    """
+    echo("Setting up simulation from {}".format(os.path.abspath(simulation_file)))
+
+    SimulationConfigurer(simulation_file, workspace_dir)
+
+    echo("Success!")
+
+
+@cli.command()
+@click.option(
+    "--path",
+    required=True,
+    type=click.Path(file_okay=True, exists=True),
+    help="Path to config.json that describes how to run a federation",
 )
 @click.option("--silent", is_flag=True)
 @click.option("--no-log-files", is_flag=True, default=False)
@@ -103,11 +148,11 @@ def run(path, silent, no_log_files, broker_loglevel):
     path = os.path.dirname(path_to_config)
 
     if not os.path.exists(path_to_config):
-        click.secho("Error: ", bold=True, nl=False)
-        click.echo(
+        echo(
             "Unable to find file `config.json` in path: {path_to_config}".format(
                 path_to_config=path_to_config
-            )
+            ),
+            status="error",
         )
         return None
 
@@ -117,7 +162,7 @@ def run(path, silent, no_log_files, broker_loglevel):
     logger.debug("Read config: %s", config)
 
     if not silent:
-        click.echo("Running federation: {name}".format(name=config["name"]))
+        echo("Running federation: {name}".format(name=config["name"]), status="info")
 
     broker_o = open(os.path.join(path, "broker.log"), "w")
     if config["broker"] is True:
@@ -146,8 +191,11 @@ def run(path, silent, no_log_files, broker_loglevel):
     for f in config["federates"]:
 
         if not silent:
-            click.echo(
-                "Running federate {name} as a background process".format(name=f["name"])
+            echo(
+                "Running federate {name} as a background process".format(
+                    name=f["name"]
+                ),
+                status="info",
             )
 
         if log is True:
@@ -181,12 +229,16 @@ def run(path, silent, no_log_files, broker_loglevel):
 
     try:
         t.start()
-        click.echo("Waiting for {} processes to finish ...".format(len(process_list)))
+        echo(
+            "Waiting for {} processes to finish ...".format(len(process_list)),
+            status="info",
+        )
         for p in process_list:
             p.wait()
     except KeyboardInterrupt:
-        click.echo("")
-        click.echo("Warning: User interrupted processes. Terminating safely ...")
+        echo(
+            "Warning: User interrupted processes. Terminating safely ...", status="info"
+        )
         for p in process_list:
             p.kill()
     except HELICSRuntimeError as e:
@@ -197,14 +249,15 @@ def run(path, silent, no_log_files, broker_loglevel):
     finally:
         for p in process_list:
             if p.returncode != 0:
-                logger.info(
-                    "Error: Process {} exited with return code {}".format(
+                echo(
+                    "Process {} exited with return code {}".format(
                         p.name, p.returncode
-                    )
+                    ),
+                    status="error",
                 )
 
     broker_p.wait()
-    click.echo("Done!")
+    echo("Done!", status="info")
 
     for o in output_list:
         o.close()
@@ -213,28 +266,25 @@ def run(path, silent, no_log_files, broker_loglevel):
 
 
 @cli.command()
-@click.option("--path", type=click.Path())
+@click.option(
+    "--path",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to config.json file that describes how to run a federation",
+)
 def validate(path):
     """
     Validate config.json
     """
     path = os.path.abspath(path)
 
-    if not os.path.exists(path):
-        click.secho("Error: ", bold=True, nl=False)
-        click.echo(
-            "Unable to find file `config.json` in path: {path}".format(path=path)
-        )
-        return None
-
     with open(path) as f:
         config = json.loads(f.read())
 
-    assert set(list(config.keys())) == set(
-        ["name", "broker", "federates"]
-    ), "Missing or additional keys found in config.json"
+    if set(list(config.keys())) == set(["name", "broker", "federates"]):
+        echo("Missing or additional keys found in config.json", status="warning")
 
-    click.echo(" - Valid keys in config.json")
+    echo(" - Valid keys in config.json", status="info")
 
     for i, f in enumerate(config["federates"]):
         assert "name" in f.keys(), "Missing name in federate number {i}".format(i=i)
@@ -243,7 +293,9 @@ def validate(path):
         ), "Missing or additional keys found in federates {name} in config.json".format(
             f["name"]
         )
-        click.echo("     - Valid keys in federate {name}".format(name=f["name"]))
+        echo(
+            "     - Valid keys in federate {name}".format(name=f["name"]), status="info"
+        )
         assert (
             f["host"] == "localhost"
         ), "Multi machine support is currently not available. Please contact the developer."
