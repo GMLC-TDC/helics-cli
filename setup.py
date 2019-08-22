@@ -20,8 +20,8 @@ setup(
     version=VERSION,
     description="Python direct-mode interface to OpenDSS",
     long_description=LONG_DESCRIPTION,
-    url="https://github.com/GMLC-TDC/helics-runner",
-    download_url="https://github.com/GMLC-TDC/helics-runner",
+    url="https://github.com/GMLC-TDC/helics-cli",
+    download_url="https://github.com/GMLC-TDC/helics-cli",
     # Author details
     author="Dheepak Krishnamurthy",
     license="BSD-compatible",
@@ -29,9 +29,10 @@ setup(
     install_requires=["future", "six", "click"],
     keywords=["helics", "cosimulation"],
     entry_points={
-        "console_scripts": ["helics = helics_runner.cli:cli"],
+        "console_scripts": ["helics = helics_cli.cli:cli"],
         "helics_runner.plugins.config": [
             "gridlabd=helics_runner.plugins.config.gridlabd:GridLABDConfig"
+            "opendssdirect=helics_runner.plugins.config.opendssdirect:OpenDSSDirectConfig"
         ],
     },
     extras_require={
