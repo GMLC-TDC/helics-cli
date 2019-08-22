@@ -31,8 +31,8 @@ setup(
     entry_points={
         "console_scripts": ["helics = helics_cli.cli:cli"],
         "helics_cli.plugins.config": [
-            "gridlabd=helics_cli.plugins.config.gridlabd:GridLABDConfig"
-            "opendssdirect=helics_cli.plugins.config.opendssdirect:OpenDSSDirectConfig"
+            "gridlabd=helics_cli.plugins.config.gridlabd:GridLABDConfig",
+            "opendssdirect=helics_cli.plugins.config.opendssdirect:OpenDSSDirectConfig",
         ],
     },
     extras_require={
