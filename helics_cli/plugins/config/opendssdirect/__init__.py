@@ -120,7 +120,7 @@ class OpenDSSDirectConfig(BaseConfig):
         working_directory_folder = os.path.dirname(working_directory_model)
 
         # Copy opendssdirect files from the folder
-        shutil.copy(original_folder, working_directory_folder)
+        shutil.copytree(original_folder, working_directory_folder)
 
         # Change opendssdirect source model file
 
