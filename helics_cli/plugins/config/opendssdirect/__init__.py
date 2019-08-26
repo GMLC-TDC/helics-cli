@@ -8,11 +8,11 @@ from helics_cli.utils import abs2rel, echo, mkdir
 
 from jinja2 import Template
 
-current_directory = os.path.dirname(os.path.realpath(__file__))
+CURRENT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 
 with open(
     os.path.abspath(
-        os.path.join(current_directory, "./opendssdirect-federate-config.json")
+        os.path.join(CURRENT_DIRECTORY, "./opendssdirect-federate-config.json")
     )
 ) as f:
     opendssdirect_config_template = Template(f.read())
@@ -26,6 +26,9 @@ class OpenDSSDirectConfigGenerator(ConfigGenerator):
         for k, v in kwargs.items():
             self.config[k] = v
 
+        self.config["name"] = kwargs["name"]
+        self.config["total_time"] = kwargs["total_time"]
+        self.config["step_time"] = kwargs["step_time"]
         self.config["publications"] = {}
         self.config["subscriptions"] = {}
         for k, v in publications.items():
@@ -90,10 +93,14 @@ class OpenDSSDirectConfig(BaseConfig):
             self._setup_opendssdirect(
                 original_model, working_directory_model, federate_name
             )
+            working_directory_folder = os.path.dirname(working_directory_model)
             g = OpenDSSDirectConfigGenerator(
                 name=federate_name,
                 publications=data["publications"],
                 subscriptions=data["subscriptions"],
+                total_time=data["total_time"],
+                step_time=data["step_time"],
+                filename=os.path.join(working_directory_folder, data["model"]),
             )
             g.write(
                 os.path.join(
@@ -106,9 +113,7 @@ class OpenDSSDirectConfig(BaseConfig):
                 {
                     "name": federate_name,
                     "host": "localhost",
-                    "exec": "python opendssdirect_{}_federate.py {}.dss".format(
-                        feeder_type, federate_name, federate_name
-                    ),
+                    "exec": f"python opendssdirect-federate-{federate_name}.py {federate_name}.json",
                     "directory": abs2rel(directory, self.working_directory),
                 }
             )
@@ -132,3 +137,11 @@ class OpenDSSDirectConfig(BaseConfig):
         os.remove(working_directory_model)
         with open(working_directory_model, "w") as f:
             f.write(data)
+
+        original_python_file = os.path.join(
+            CURRENT_DIRECTORY, "opendssdirect-federate.py"
+        )
+        working_directory_python_file = os.path.join(
+            working_directory_folder, f"opendssdirect-federate-{federate_name}.py"
+        )
+        shutil.copyfile(original_python_file, working_directory_python_file)
