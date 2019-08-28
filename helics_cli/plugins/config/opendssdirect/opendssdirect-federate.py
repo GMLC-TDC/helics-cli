@@ -1,18 +1,44 @@
 # -*- coding: utf-8 -*-
 import opendssdirect as odd
 import helics as h
+import json
 
 PUBLICATIONS = {}
 SUBSCRIPTIONS = {}
 
 
-def get_value(key):
-    print(key)
-    return 1.0, 0.0
+def get_value(pub):
+    class_name = pub["element_type"]
+    element_name = pub["element_name"]
+    fn = pub["value"]
+    fold = pub.get("fold", "sum")
+
+    odd.Circuit.SetActiveClass(class_name)
+    odd.Circuit.SetActiveElement(element_name)
+
+    assert odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
+
+    v = getattr(odd.CktElement, fn)()
+    v = v[0 : len(v / 2)]
+    if fold == "sum":
+        v = sum(v)
+    else:
+        raise NotImplementedError(f"Unknown fold type: {fold}")
+
+    return v
 
 
-def set_value(key, value):
-    print(key, ": ", value)
+def set_value(sub, value):
+    class_name = sub["element_type"]
+    element_name = sub["element_name"]
+    fn = sub["value"]
+
+    odd.Circuit.SetActiveClass(class_name)
+    odd.Circuit.SetActiveElement(element_name)
+
+    assert odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
+
+    getattr(odd.CktElement, fn)(float(value))
 
 
 def main(filename):
@@ -32,7 +58,7 @@ def main(filename):
 
     h.helicsFederateInfoSetCoreName(fedinfo, f"{federate_name}")
     h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
-    h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
+    h.helicsFederateInfoSetCoreInitString(fedinfo, "--federates=1")
     h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, 1.0)
 
     fed = h.helicsCreateCombinationFederate(f"federate_name", fedinfo)
@@ -51,9 +77,9 @@ def main(filename):
     h.helicsFederateEnterExecutingMode(fed)
     print(f"{federate_name}: Entering execution mode")
 
-    this_time = 0.0
+    currenttime = 0.0
 
-    for request_time in range(0, TOTAL_TIME, STEP_TIME):
+    for request_time in range(0, total_time, step_time):
 
         h.helicsFederateRequestTime(fed)
 
@@ -61,8 +87,13 @@ def main(filename):
             currenttime = h.helicsFederateRequestTime(fed, request_time)
 
         for key, pub in PUBLICATIONS.items():
-            val = get_value(key)
-            h.helicsPublicationPublishDouble(pub, val)
+            val, typ = get_value(publications[key])
+            if typ == "complex":
+                h.helicsPublicationPublishComplex(pub, val[0], val[1])
+            elif typ == "double":
+                h.helicsPublicationPublishDouble(pub, val[0], val[1])
+            else:
+                raise NotImplementedError(f"Unknown type of data {typ}")
 
         for key, sub in SUBSCRIPTIONS.items():
             val = h.helicsInputGetString(sub)
@@ -71,13 +102,8 @@ def main(filename):
     h.helicsFederateFinalize(fed)
     print(f"{federate_name}: Federate finalized")
 
-    while h.helicsBrokerIsConnected(broker):
-        time.sleep(1)
-
     h.helicsFederateFree(fed)
     h.helicsCloseLibrary()
-
-    print(f"{federate_name}: Broker disconnected")
 
 
 if __name__ == "__main__":
