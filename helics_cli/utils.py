@@ -41,7 +41,7 @@ def relpath(base, path):
     if len(l1) > 0:
         p = [parent * len(l1)]
     p = p + l2
-    if len(p) is 0:
+    if len(p) == 0:
         return "."
     return os.path.join(".{}".format(os.path.sep), *p)
 
@@ -76,8 +76,11 @@ def copy_and_overwrite(from_path, to_path, ignore=_ignore):
 
 def mkdir(directory):
 
-    if not os.path.exists(directory):
-        os.mkdir(directory)
+    if os.path.exists(directory):
+        echo(f"Removing {directory}", status="warning")
+        os.remove(directory)
+
+    os.mkdir(directory)
 
 
 def echo(*args, sep=" ", status="info", **kwargs):
@@ -92,7 +95,7 @@ def echo(*args, sep=" ", status="info", **kwargs):
         try:
             extra["_filename"] = frameinfo.filename.split("/")[-1]
             extra["_lineno"] = frameinfo.lineno
-        except Exception as e:
+        except Exception:
             extra["_filename"] = "utils.py"
             extra["_lineno"] = 97
         getattr(logger, status)(string)
@@ -111,7 +114,7 @@ def echo(*args, sep=" ", status="info", **kwargs):
         click.echo(
             click.style("helics-cli [{}]".format(status), fg=fg, bold=True),
             nl=False,
-            **kwargs
+            **kwargs,
         )
         click.echo(": ", nl=False, **kwargs)
 
