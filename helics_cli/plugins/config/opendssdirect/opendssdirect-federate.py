@@ -65,11 +65,11 @@ def main(filename):
     print(f"{federate_name}: Combination federate created")
 
     for k, v in publications.items():
-        pub = h.helicsFederateRegisterPublication(fed, v["topic"], "complex", "")
+        pub = h.helicsFederateRegisterTypePublication(fed, v["topic"], "complex", "")
         PUBLICATIONS[k] = pub
 
     for k, v in subscriptions.items():
-        sub = h.helicsFederateRegisterSubscription(fed, v["topic"], "complex", "")
+        sub = h.helicsFederateRegisterSubscription(fed, v["topic"], "")
         SUBSCRIPTIONS[k] = sub
 
     h.helicsFederateEnterExecutingMode(fed)
