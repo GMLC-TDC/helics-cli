@@ -77,7 +77,7 @@ def copy_and_overwrite(from_path, to_path, ignore=_ignore):
 def mkdir(directory):
 
     if os.path.exists(directory):
-        echo(f"Removing {directory}", status="warning")
+        echo(f"Removing existing directory: {directory}", status="warning")
         shutil.rmtree(directory)
 
     os.mkdir(directory)
