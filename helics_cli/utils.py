@@ -78,7 +78,7 @@ def mkdir(directory):
 
     if os.path.exists(directory):
         echo(f"Removing {directory}", status="warning")
-        os.remove(directory)
+        shutil.rmtree(directory)
 
     os.mkdir(directory)
 
