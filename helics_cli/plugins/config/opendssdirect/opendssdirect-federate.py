@@ -61,7 +61,7 @@ def main(filename):
     h.helicsFederateInfoSetCoreInitString(fedinfo, "--federates=1")
     h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, 1.0)
 
-    fed = h.helicsCreateCombinationFederate(f"federate_name", fedinfo)
+    fed = h.helicsCreateCombinationFederate(f"{federate_name}", fedinfo)
     print(f"{federate_name}: Combination federate created")
 
     for k, v in publications.items():
