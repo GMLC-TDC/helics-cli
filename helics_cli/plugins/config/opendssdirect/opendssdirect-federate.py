@@ -19,9 +19,9 @@ def get_value(pub):
     assert odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
 
     v = getattr(odd.CktElement, fn)()
-    v = v[0 : len(v / 2)]
+    v = v[0 : int(round(len(v) / 2))]
     if fold == "sum":
-        v = sum(v)
+        v = (sum(v[0 : len(v) : 2]), sum(v[1 : len(v) : 2]))
     else:
         raise NotImplementedError(f"Unknown fold type: {fold}")
 
@@ -93,7 +93,7 @@ def main(filename):
 
         for key, sub in SUBSCRIPTIONS.items():
             val = h.helicsInputGetString(sub)
-            set_value(key, val)
+            set_value(subscriptions[key], val)
 
     h.helicsFederateFinalize(fed)
     print(f"{federate_name}: Federate finalized")
