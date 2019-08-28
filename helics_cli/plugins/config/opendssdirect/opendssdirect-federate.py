@@ -79,8 +79,6 @@ def main(filename):
 
     for request_time in range(0, total_time, step_time):
 
-        h.helicsFederateRequestTime(fed)
-
         while currenttime < request_time:
             currenttime = h.helicsFederateRequestTime(fed, request_time)
 
