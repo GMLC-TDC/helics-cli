@@ -33,7 +33,7 @@ def get_value(pub):
 def set_value(sub, value):
     class_name = sub["element_type"]
     element_name = sub["element_name"]
-    fn = sub["value"]
+    # fn = sub["value"]
 
     odd.Circuit.SetActiveClass(class_name)
     odd.Circuit.SetActiveElement(element_name)
@@ -42,7 +42,8 @@ def set_value(sub, value):
         odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
     ), f"Got {odd.CktElement.Name()} but expected {class_name}.{element_name}"
 
-    getattr(odd.CktElement, fn)(float(value))
+    odd.VSource.PU(value[0])
+    odd.VSource.AngleDeg(value[1])
 
 
 def main(filename):
@@ -86,18 +87,20 @@ def main(filename):
         while currenttime < request_time:
             currenttime = h.helicsFederateRequestTime(fed, request_time)
 
+        odd.run_command(f"Solve t={currenttime}")
+
         for key, pub in PUBLICATIONS.items():
             val = get_value(publications[key])
+            print(f"Sending {val} at time {currenttime}")
             typ = "complex"
             if typ == "complex":
                 h.helicsPublicationPublishComplex(pub, val[0], val[1])
-            elif typ == "double":
-                h.helicsPublicationPublishDouble(pub, val[0], val[1])
             else:
                 raise NotImplementedError(f"Unknown type of data {typ}")
 
         for key, sub in SUBSCRIPTIONS.items():
-            val = h.helicsInputGetString(sub)
+            val = h.helicsInputGetComplex(sub)
+            print(f"Received {val} at time {currenttime}")
             set_value(subscriptions[key], val)
 
     h.helicsFederateFinalize(fed)
