@@ -1,5 +1,5 @@
 {
-    "name": {{ name }},
+    "name": "{{ name }}",
     "total_time": {{ total_time }},
     "step_time": {{ step_time }},
     "publications" : {{ publications | default({})|tojson|safe }},
