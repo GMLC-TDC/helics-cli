@@ -16,7 +16,9 @@ def get_value(pub):
     odd.Circuit.SetActiveClass(class_name)
     odd.Circuit.SetActiveElement(element_name)
 
-    assert odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
+    assert (
+        odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
+    ), f"Got {odd.CktElement.Name()} but expected {class_name}.{element_name}"
 
     v = getattr(odd.CktElement, fn)()
     v = v[0 : int(round(len(v) / 2))]
@@ -36,7 +38,9 @@ def set_value(sub, value):
     odd.Circuit.SetActiveClass(class_name)
     odd.Circuit.SetActiveElement(element_name)
 
-    assert odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
+    assert (
+        odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
+    ), f"Got {odd.CktElement.Name()} but expected {class_name}.{element_name}"
 
     getattr(odd.CktElement, fn)(float(value))
 
@@ -83,7 +87,8 @@ def main(filename):
             currenttime = h.helicsFederateRequestTime(fed, request_time)
 
         for key, pub in PUBLICATIONS.items():
-            val, typ = get_value(publications[key])
+            val = get_value(publications[key])
+            typ = "complex"
             if typ == "complex":
                 h.helicsPublicationPublishComplex(pub, val[0], val[1])
             elif typ == "double":
