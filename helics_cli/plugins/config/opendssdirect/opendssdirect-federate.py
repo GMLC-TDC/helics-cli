@@ -42,8 +42,8 @@ def set_value(sub, value):
         odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
     ), f"Got {odd.CktElement.Name()} but expected {class_name}.{element_name}"
 
-    odd.VSource.PU(value[0])
-    odd.VSource.AngleDeg(value[1])
+    odd.Vsources.PU(value[0])
+    odd.Vsources.AngleDeg(value[1])
 
 
 def main(filename):
