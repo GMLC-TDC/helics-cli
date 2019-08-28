@@ -32,8 +32,7 @@ class OpenDSSDirectConfigGenerator(ConfigGenerator):
         self.config["publications"] = {}
         self.config["subscriptions"] = {}
         for k, v in publications.items():
-            _object = v["mapping"].split("/")[0]
-            _fieldname = v["mapping"].split("/")[1]
+            _object = f"{v['element_type']}.{v['element_name']}"
             helics_topic = k
 
             try:
@@ -41,19 +40,20 @@ class OpenDSSDirectConfigGenerator(ConfigGenerator):
             except KeyError:
                 self.config["publications"][_object] = {}
 
-            self.config["publications"][_object][_fieldname] = helics_topic
+            self.config["publications"][_object]["value"] = v["value"]
+            self.config["publications"][_object]["topic"] = helics_topic
 
         for k, v in subscriptions.items():
-            _object = v["mapping"].split("/")[0]
-            _fieldname = v["mapping"].split("/")[1]
+            _object = f"{v['element_type']}.{v['element_name']}"
             helics_topic = k
 
             try:
-                self.config["subscriptions"][_object]
+                self.config["publications"][_object]
             except KeyError:
-                self.config["subscriptions"][_object] = {}
+                self.config["publications"][_object] = {}
 
-            self.config["subscriptions"][_object][_fieldname] = helics_topic
+            self.config["publications"][_object]["value"] = v["value"]
+            self.config["publications"][_object]["topic"] = helics_topic
 
 
 class OpenDSSDirectConfig(BaseConfig):
