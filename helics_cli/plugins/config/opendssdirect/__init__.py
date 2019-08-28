@@ -48,12 +48,12 @@ class OpenDSSDirectConfigGenerator(ConfigGenerator):
             helics_topic = k
 
             try:
-                self.config["publications"][_object]
+                self.config["subscriptions"][_object]
             except KeyError:
-                self.config["publications"][_object] = {}
+                self.config["subscriptions"][_object] = {}
 
-            self.config["publications"][_object]["value"] = v["value"]
-            self.config["publications"][_object]["topic"] = helics_topic
+            self.config["subscriptions"][_object]["value"] = v["value"]
+            self.config["subscriptions"][_object]["topic"] = helics_topic
 
 
 class OpenDSSDirectConfig(BaseConfig):
