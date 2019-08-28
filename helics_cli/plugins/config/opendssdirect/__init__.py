@@ -27,13 +27,14 @@ class OpenDSSDirectConfigGenerator(ConfigGenerator):
             self.config[k] = v
 
         self.config["name"] = kwargs["name"]
+        self.config["filename"] = kwargs["filename"]
         self.config["total_time"] = kwargs["total_time"]
         self.config["step_time"] = kwargs["step_time"]
         self.config["publications"] = {}
         self.config["subscriptions"] = {}
         for k, v in publications.items():
-            _object = f"{v['element_type']}.{v['element_name']}"
             helics_topic = k
+            _object = f"{v['element_type']}.{v['element_name']}/{helics_topic}"
 
             try:
                 self.config["publications"][_object]
@@ -42,9 +43,11 @@ class OpenDSSDirectConfigGenerator(ConfigGenerator):
 
             self.config["publications"][_object]["value"] = v["value"]
             self.config["publications"][_object]["topic"] = helics_topic
+            self.config["publications"][_object]["element_name"] = v["element_name"]
+            self.config["publications"][_object]["element_type"] = v["element_type"]
 
         for k, v in subscriptions.items():
-            _object = f"{v['element_type']}.{v['element_name']}"
+            _object = f"{v['element_type']}.{v['element_name']}/{helics_topic}"
             helics_topic = k
 
             try:
@@ -54,6 +57,8 @@ class OpenDSSDirectConfigGenerator(ConfigGenerator):
 
             self.config["subscriptions"][_object]["value"] = v["value"]
             self.config["subscriptions"][_object]["topic"] = helics_topic
+            self.config["subscriptions"][_object]["element_name"] = v["element_name"]
+            self.config["subscriptions"][_object]["element_type"] = v["element_type"]
 
 
 class OpenDSSDirectConfig(BaseConfig):
