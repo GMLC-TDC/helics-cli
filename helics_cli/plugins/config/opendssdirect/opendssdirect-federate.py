@@ -24,6 +24,14 @@ def get_value(pub):
     v = v[0 : int(round(len(v) / 2))]
     if fold == "sum":
         v = (sum(v[0 : len(v) : 2]), sum(v[1 : len(v) : 2]))
+    elif fold == "avg":
+        v = (
+            sum(v[0 : len(v) : 2]) / (len(v) / 2),
+            sum(v[1 : len(v) : 2]) / (len(v) / 2),
+        )
+    elif fold == "list":
+        # return list
+        pass
     else:
         raise NotImplementedError(f"Unknown fold type: {fold}")
 
@@ -33,7 +41,7 @@ def get_value(pub):
 def set_value(sub, value):
     class_name = sub["element_type"]
     element_name = sub["element_name"]
-    # fn = sub["value"]
+    fn = sub["value"]
 
     odd.Circuit.SetActiveClass(class_name)
     odd.Circuit.SetActiveElement(element_name)
@@ -42,8 +50,11 @@ def set_value(sub, value):
         odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
     ), f"Got {odd.CktElement.Name()} but expected {class_name}.{element_name}"
 
-    odd.Vsources.PU(value[0])
-    odd.Vsources.AngleDeg(value[1])
+    if class_name == "Vsource" and element_name == "source":
+        odd.Vsources.PU(value[0])
+        odd.Vsources.AngleDeg(value[1])
+    else:
+        getattr(odd.CktElement, fn)(value)
 
 
 def main(filename):
