@@ -41,6 +41,7 @@ class OpenDSSDirectConfigGenerator(ConfigGenerator):
             except KeyError:
                 self.config["publications"][_object] = {}
 
+            self.config["publications"][_object]["fold"] = v["fold"]
             self.config["publications"][_object]["value"] = v["value"]
             self.config["publications"][_object]["topic"] = helics_topic
             self.config["publications"][_object]["element_name"] = v["element_name"]
