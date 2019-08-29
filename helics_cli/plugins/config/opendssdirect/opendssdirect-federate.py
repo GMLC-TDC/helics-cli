@@ -46,15 +46,20 @@ def set_value(sub, value):
     odd.Circuit.SetActiveClass(class_name)
     odd.Circuit.SetActiveElement(element_name)
 
-    assert (
-        odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
-    ), f"Got {odd.CktElement.Name()} but expected {class_name}.{element_name}"
-
     if class_name == "Vsource" and element_name == "source":
+        assert (
+            odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
+        ), f"Got {odd.CktElement.Name()} but expected {class_name}.{element_name}"
+
         odd.Vsources.PU(value[0])
         odd.Vsources.AngleDeg(value[1])
     else:
-        getattr(odd.CktElement, fn)(value)
+        if odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower():
+            getattr(odd.CktElement, fn)(value)
+        else:
+            print(
+                f"Warning: Unable to find CktElement {class_name}.{element_name} and unable to set value ({value}) for `{fn}`"
+            )
 
 
 def main(filename):
