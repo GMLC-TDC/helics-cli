@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-import opendssdirect as odd
-import helics as h
+import cmath
 import json
+
+import helics as h
+import opendssdirect as odd
 
 PUBLICATIONS = {}
 SUBSCRIPTIONS = {}
@@ -27,7 +29,7 @@ def get_value(pub):
     elif fold == "avg":
         vcl = [complex(x, y) for x, y in zip(v[0 : len(v) : 2], v[1 : len(v) : 2])]
         vc = sum(vcl[0 : int(len(vcl) / 2)]) / (len(vcl) / 2)
-        v = (vc.real, vc.imag)
+        v = cmath.polar(vc)
     elif fold == "list":
         # return list
         pass
