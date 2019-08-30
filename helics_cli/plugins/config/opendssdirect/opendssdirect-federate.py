@@ -14,7 +14,7 @@ def get_value(pub):
     element_name = pub["element_name"]
     fn = pub["value"]
     fold = pub.get("fold", "sum")
-    start_index = pub.get("start_index", 0)
+    start_index = pub.get("start_index", 1) - 1
     end_index = pub.get("end_index", 0)
 
     odd.Circuit.SetActiveClass(class_name)
@@ -30,15 +30,14 @@ def get_value(pub):
     v = v[start_index:end_index]
     if fold == "sum":
         v = (sum(v[start_index:end_index:2]), sum(v[start_index + 1 : end_index : 2]))
-    elif fold == "avg":
+    elif fold == "cavg":
         vcl = [
-            complex(x, y)
+            cmath.polar(complex(x, y))
             for x, y in zip(
                 v[start_index:end_index:2], v[start_index + 1 : end_index : 2]
             )
         ]
-        vc = sum(vcl) / (len(vcl))
-        v = cmath.polar(vc)
+        v = sum(c[0] for c in vcl) / len(vcl), sum(c[1] for c in vcl) / len(vcl)
     elif fold == "list":
         # return list
         pass
