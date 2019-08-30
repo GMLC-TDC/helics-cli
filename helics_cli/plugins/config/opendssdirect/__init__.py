@@ -41,11 +41,9 @@ class OpenDSSDirectConfigGenerator(ConfigGenerator):
             except KeyError:
                 self.config["publications"][_object] = {}
 
-            self.config["publications"][_object]["fold"] = v["fold"]
-            self.config["publications"][_object]["value"] = v["value"]
             self.config["publications"][_object]["topic"] = helics_topic
-            self.config["publications"][_object]["element_name"] = v["element_name"]
-            self.config["publications"][_object]["element_type"] = v["element_type"]
+            for k_in_v, v_in_v in v.items():
+                self.config["publications"][_object][k_in_v] = v_in_v
 
         for k, v in subscriptions.items():
             _object = f"{v['element_type']}.{v['element_name']}/{helics_topic}"
@@ -56,10 +54,9 @@ class OpenDSSDirectConfigGenerator(ConfigGenerator):
             except KeyError:
                 self.config["subscriptions"][_object] = {}
 
-            self.config["subscriptions"][_object]["value"] = v["value"]
             self.config["subscriptions"][_object]["topic"] = helics_topic
-            self.config["subscriptions"][_object]["element_name"] = v["element_name"]
-            self.config["subscriptions"][_object]["element_type"] = v["element_type"]
+            for k_in_v, v_in_v in v.items():
+                self.config["subscriptions"][_object][k_in_v] = v_in_v
 
 
 class OpenDSSDirectConfig(BaseConfig):
