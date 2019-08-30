@@ -29,13 +29,11 @@ def get_value(pub):
         end_index = int(round(len(v) / 2))
     v = v[start_index:end_index]
     if fold == "sum":
-        v = (sum(v[start_index:end_index:2]), sum(v[start_index + 1 : end_index : 2]))
+        v = (sum(v[0 : len(v) : 2]), sum(v[1 : len(v) : 2]))
     elif fold == "cavg":
         vcl = [
             cmath.polar(complex(x, y))
-            for x, y in zip(
-                v[start_index:end_index:2], v[start_index + 1 : end_index : 2]
-            )
+            for x, y in zip(v[0 : len(v) : 2], v[1 : len(v) : 2])
         ]
         v = sum(c[0] for c in vcl) / len(vcl), sum(c[1] for c in vcl) / len(vcl)
     elif fold == "list":
