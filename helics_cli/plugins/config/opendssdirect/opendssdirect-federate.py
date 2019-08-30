@@ -52,8 +52,9 @@ def set_value(sub, value):
             odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower()
         ), f"Got {odd.CktElement.Name()} but expected {class_name}.{element_name}"
 
-        odd.Vsources.PU(value[0] / (odd.Vsources.BasekV() * 1e-3))
-        odd.Vsources.AngleDeg(value[1])
+        if value[0] != 0:
+            odd.Vsources.PU(value[0] / (odd.Vsources.BasekV() * 1e-3))
+            odd.Vsources.AngleDeg(value[1])
     else:
         if odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower():
             getattr(odd.CktElement, fn)(value)
