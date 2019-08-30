@@ -14,6 +14,8 @@ def get_value(pub):
     element_name = pub["element_name"]
     fn = pub["value"]
     fold = pub.get("fold", "sum")
+    start_index = pub.get("start_index", 0)
+    end_index = pub.get("end_index", 0)
 
     odd.Circuit.SetActiveClass(class_name)
     odd.Circuit.SetActiveElement(element_name)
@@ -23,12 +25,19 @@ def get_value(pub):
     ), f"Got {odd.CktElement.Name()} but expected {class_name}.{element_name}"
 
     v = getattr(odd.CktElement, fn)()
-    v = v[0 : int(round(len(v) / 2))]
+    if end_index == 0:
+        end_index = int(round(len(v) / 2))
+    v = v[start_index:end_index]
     if fold == "sum":
-        v = (sum(v[0 : len(v) : 2]), sum(v[1 : len(v) : 2]))
+        v = (sum(v[start_index:end_index:2]), sum(v[start_index + 1 : end_index : 2]))
     elif fold == "avg":
-        vcl = [complex(x, y) for x, y in zip(v[0 : len(v) : 2], v[1 : len(v) : 2])]
-        vc = sum(vcl[0 : int(len(vcl) / 2)]) / (len(vcl) / 2)
+        vcl = [
+            complex(x, y)
+            for x, y in zip(
+                v[start_index:end_index:2], v[start_index + 1 : end_index : 2]
+            )
+        ]
+        vc = sum(vcl) / (len(vcl))
         v = cmath.polar(vc)
     elif fold == "list":
         # return list
