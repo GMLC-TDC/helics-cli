@@ -60,7 +60,7 @@ def set_value(sub, value):
         ), f"Got {odd.CktElement.Name()} but expected {class_name}.{element_name}"
 
         if value[0] != 0:
-            odd.Vsources.PU(value[0] / (odd.Vsources.BasekV() * 1e-3 * math.sqrt(3)))
+            odd.Vsources.PU(value[0] / (odd.Vsources.BasekV() * 1e3 * math.sqrt(3)))
             odd.Vsources.AngleDeg(value[1])
     else:
         if odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower():
