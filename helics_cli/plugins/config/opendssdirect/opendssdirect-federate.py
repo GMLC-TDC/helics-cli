@@ -25,10 +25,9 @@ def get_value(pub):
     if fold == "sum":
         v = (sum(v[0 : len(v) : 2]), sum(v[1 : len(v) : 2]))
     elif fold == "avg":
-        v = (
-            sum(v[0 : len(v) : 2]) / (len(v) / 2),
-            sum(v[1 : len(v) : 2]) / (len(v) / 2),
-        )
+        vcl = [complex(x, y) for x, y in zip(v[0 : len(v) : 2], v[1 : len(v) : 2])]
+        vc = sum(vcl[0 : int(len(vcl) / 2)]) / (len(vcl) / 2)
+        v = (vc.real, vc.imag)
     elif fold == "list":
         # return list
         pass
