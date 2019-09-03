@@ -26,8 +26,18 @@ setup(
     author="Dheepak Krishnamurthy",
     license="BSD-compatible",
     packages=find_packages(),
-    install_requires=["future", "six", "click"],
+    install_requires=["future", "six", "click", "jinja2"],
     keywords=["helics", "cosimulation"],
+    include_package_data=True,
+    package_data={
+        "helics_cli": [
+            "templates/helics-federate-config.json",
+            "templates/helics-runner-config.json",
+            "templates/python-federate-config.json",
+            "plugins/config/opendssdirect/opendssdirect-federate-config.json",
+            "plugins/config/gridlabd/gridlabd-federate-config.json",
+        ]
+    },
     entry_points={
         "console_scripts": ["helics = helics_cli.cli:cli"],
         "helics_cli.plugins.config": [
