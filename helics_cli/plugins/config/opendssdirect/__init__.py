@@ -78,9 +78,10 @@ class OpenDSSDirectConfig(BaseConfig):
                 "subtransmission",
             ], "Feeder type has to be `distribution` or `subtransmission`."
 
-            federate_name = federate_name.replace("/", "_")
             echo(f"Setting up opendssdirect for {federate_name}")
-            directory = os.path.join(self.working_directory, federate_name)
+            directory = os.path.join(
+                self.working_directory, federate_name.replace("/", "_")
+            )
             # mkdir(directory)
             if not os.path.isabs(data["folder"]):
                 data["folder"] = os.path.abspath(
@@ -90,7 +91,7 @@ class OpenDSSDirectConfig(BaseConfig):
             # TODO: not all files will be located in `folder`
             original_model = os.path.join(data["folder"], data["model"])
             working_directory_model = os.path.join(
-                directory, "{}.dss".format(federate_name)
+                directory, "{}.dss".format(federate_name.replace("/", "_"))
             )
 
             self._setup_opendssdirect(
@@ -114,7 +115,7 @@ class OpenDSSDirectConfig(BaseConfig):
 
             self.runner_items.append(
                 {
-                    "name": federate_name,
+                    "name": federate_name.replace("/", "_"),
                     "host": "localhost",
                     "exec": f"python opendssdirect-federate-{federate_name}.py {federate_name}.json",
                     "directory": abs2rel(directory, self.working_directory),
@@ -147,6 +148,7 @@ class OpenDSSDirectConfig(BaseConfig):
         original_python_file = os.path.join(
             CURRENT_DIRECTORY, "opendssdirect-federate.py"
         )
+        federate_name = federate_name.replace("/", "_")
         working_directory_python_file = os.path.join(
             working_directory_folder, f"opendssdirect-federate-{federate_name}.py"
         )
