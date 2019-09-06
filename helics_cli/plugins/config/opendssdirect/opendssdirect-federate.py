@@ -62,6 +62,13 @@ def set_value(sub, value):
         if value[0] != 0:
             odd.Vsources.PU(value[0] / (odd.Vsources.BasekV() * 1e3 * math.sqrt(3)))
             odd.Vsources.AngleDeg(value[1])
+    if class_name == "Load" and value == "Powers":
+        odd.Loads.Name(element_name)
+        assert (
+            odd.Loads.Name() == element_name
+        ), f"Got {odd.Loads.Name()} but expected {element_name}"
+        odd.Loads.kW(value[0])
+        odd.Loads.kvar(value[1])
     else:
         if odd.CktElement.Name().lower() == f"{class_name}.{element_name}".lower():
             getattr(odd.CktElement, fn)(value)
