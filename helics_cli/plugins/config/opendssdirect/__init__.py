@@ -137,7 +137,10 @@ class OpenDSSDirectConfig(BaseConfig):
 
         # TODO: any transformations on the data
 
-        os.remove(working_directory_model)
+        try:
+            os.remove(working_directory_model)
+        except FileNotFoundError:
+            pass
         with open(working_directory_model, "w") as f:
             f.write(data)
 
