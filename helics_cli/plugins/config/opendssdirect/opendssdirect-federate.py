@@ -64,9 +64,6 @@ def set_value(sub, value):
             odd.Vsources.AngleDeg(value[1])
     elif class_name == "Load" and fn == "Powers":
         odd.Loads.Name(element_name)
-        assert (
-            odd.Loads.Name() == element_name
-        ), f"Got {odd.Loads.Name()} but expected {element_name}"
         odd.Loads.kW(value[0])
         odd.Loads.kvar(value[1])
     else:
