@@ -62,7 +62,7 @@ def set_value(sub, value):
         if value[0] != 0:
             odd.Vsources.PU(value[0] / (odd.Vsources.BasekV() * 1e3 * math.sqrt(3)))
             odd.Vsources.AngleDeg(value[1])
-    if class_name == "Load" and fn == "Powers":
+    elif class_name == "Load" and fn == "Powers":
         odd.Loads.Name(element_name)
         assert (
             odd.Loads.Name() == element_name
