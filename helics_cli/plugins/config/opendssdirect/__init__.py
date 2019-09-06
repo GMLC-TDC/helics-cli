@@ -109,7 +109,7 @@ class OpenDSSDirectConfig(BaseConfig):
             g.write(
                 os.path.join(
                     os.path.dirname(working_directory_model),
-                    "{}.json".format(federate_name),
+                    "{}.json".format(federate_name.replace("/", "_")),
                 )
             )
 
