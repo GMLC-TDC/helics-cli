@@ -79,9 +79,8 @@ class OpenDSSDirectConfig(BaseConfig):
             ], "Feeder type has to be `distribution` or `subtransmission`."
 
             echo(f"Setting up opendssdirect for {federate_name}")
-            directory = os.path.join(
-                self.working_directory, federate_name.replace("/", "_")
-            )
+            fn = federate_name.replace("/", "_")
+            directory = os.path.join(self.working_directory, fn)
             # mkdir(directory)
             if not os.path.isabs(data["folder"]):
                 data["folder"] = os.path.abspath(
@@ -90,9 +89,7 @@ class OpenDSSDirectConfig(BaseConfig):
 
             # TODO: not all files will be located in `folder`
             original_model = os.path.join(data["folder"], data["model"])
-            working_directory_model = os.path.join(
-                directory, "{}.dss".format(federate_name.replace("/", "_"))
-            )
+            working_directory_model = os.path.join(directory, "{}.dss".format(fn))
 
             self._setup_opendssdirect(
                 original_model, working_directory_model, federate_name
@@ -108,16 +105,15 @@ class OpenDSSDirectConfig(BaseConfig):
             )
             g.write(
                 os.path.join(
-                    os.path.dirname(working_directory_model),
-                    "{}.json".format(federate_name.replace("/", "_")),
+                    os.path.dirname(working_directory_model), "{}.json".format(fn)
                 )
             )
 
             self.runner_items.append(
                 {
-                    "name": federate_name.replace("/", "_"),
+                    "name": fn,
                     "host": "localhost",
-                    "exec": f"python opendssdirect-federate-{federate_name}.py {federate_name}.json",
+                    "exec": f"python opendssdirect-federate-{fn}.py {fn}.json",
                     "directory": abs2rel(directory, self.working_directory),
                 }
             )
@@ -148,8 +144,8 @@ class OpenDSSDirectConfig(BaseConfig):
         original_python_file = os.path.join(
             CURRENT_DIRECTORY, "opendssdirect-federate.py"
         )
-        federate_name = federate_name.replace("/", "_")
+        fn = federate_name.replace("/", "_")
         working_directory_python_file = os.path.join(
-            working_directory_folder, f"opendssdirect-federate-{federate_name}.py"
+            working_directory_folder, f"opendssdirect-federate-{fn}.py"
         )
         shutil.copyfile(original_python_file, working_directory_python_file)
