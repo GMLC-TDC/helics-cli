@@ -4,6 +4,9 @@ Runner for Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HEL
 
 ![](./docs/img/screenshot-configure-run.png)
 
+- Supports configurations of federates using plugins
+- Allows running of federation using a runner configuration
+
 ### Documentation
 
 ```bash
