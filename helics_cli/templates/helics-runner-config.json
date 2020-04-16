@@ -1,5 +1,0 @@
-{
-  "broker": {{ start_broker | tojson | safe }},
-  "federates": {{ federates | tojson | safe }},
-  "name": "{{ name }}"
-}

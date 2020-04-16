@@ -1,5 +1,0 @@
-{
-  "name": {{ name | tojson | safe }},
-  "publications": {{ publications | tojson | safe }},
-  "subscriptions": {{ subscriptions | tojson | safe }}
-}
