@@ -152,11 +152,9 @@ proc run(path: string, silent = false): int =
 
     # Get environment variables
     var process_env = deepcopy(env)
-    var local_env = f.getOrDefault("env")
-    if local_env == nil:
-      local_env = newJObject()
-    for k, v in local_env.pairs:
-      process_env[k] = v.getStr
+    if f{"env"} != nil:
+      for k, v in f["env"].pairs:
+        process_env[k] = v.getStr
 
     # TODO: check if valid command
     let cmd = f["exec"].getStr
