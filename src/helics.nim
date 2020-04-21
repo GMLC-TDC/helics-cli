@@ -50,7 +50,7 @@ else:
     IONBF {.importc: "_IONBF", nodecl.}: cint
 
 
-proc monitor(p: Process, log_file: string) =
+proc monitor(p: Process, log_file: string): int =
 
   var l = log_file.newFileStream(fmWrite)
   var o = p.outputStream()
@@ -58,13 +58,14 @@ proc monitor(p: Process, log_file: string) =
   discard open(f, p.outputHandle(), fmRead)
   discard c_setvbuf(f, nil, IONBF, 0)
   var line = ""
-  var buffer: array[10, char]
 
   while p.peekExitCode() == -1:
     o.flush()
     discard o.readLine(line)
     l.writeLine(line)
     l.flush()
+
+  return p.peekExitCode()
 
 when defined(windows):
   const ENV_COMMAND = "set"
@@ -136,7 +137,7 @@ proc run(path: string, silent = false): int =
   var f = open(path_to_config, fmRead)
   var runner = parseJson(f.readAll())
 
-  print(&"""Running federation: {runner["name"]}""", silent = silent)
+  print(&"""Running federation: `{runner["name"].getStr}`""", silent = silent)
 
   var env = {:}.newStringTable
   for line in execProcess(ENV_COMMAND).splitLines():
@@ -144,11 +145,13 @@ proc run(path: string, silent = false): int =
     env[s[0]] = join(s[1..s.high])
 
   var processes = newSeq[Process]()
+  var process_names = newSeq[string]()
+  var threads = newSeq[FlowVar[int]]()
 
   for f in runner["federates"]:
 
     let name = f["name"].getStr
-    print(&"""Running federate {name} as a background process""", silent = silent)
+    print(&"""Running federate `{name}` as a background process""", silent = silent)
 
     var directory: string
     if f{"directory"} != nil:
@@ -166,12 +169,25 @@ proc run(path: string, silent = false): int =
     let cmd = f["exec"].getStr
     let p = startProcess(cmd, env = process_env, workingDir = directory, options = {poInteractive, poStdErrToStdOut, poEvalCommand})
 
-    spawn monitor(p, joinPath(dirname, &"""{f["name"].getStr}.log"""))
+    threads.add(spawn monitor(p, joinPath(dirname, &"""{name}.log""")))
     processes.add(p)
+    process_names.add(name)
 
-  sync()
+  var error_occured = false
+  while not all(threads, r => r.isReady):
+    for (i, t) in threads.pairs:
+      if t.isReady and ^t != 0:
+        print(&"""Something went wrong with federate `{process_names[i]}`. Please check the log files.""", sError)
+        error_occured = true
+    if error_occured:
+      for p in processes:
+        try:
+          kill(p)
+        except:
+          discard
+      break
 
-  print("Success!")
+  if not error_occured: print("Success!")
 
 
 when isMainModule:
