@@ -49,6 +49,7 @@ else:
     IOFBF {.importc: "_IOFBF", nodecl.}: cint
     IONBF {.importc: "_IONBF", nodecl.}: cint
 
+
 proc monitor(p: Process, log_file: string) =
 
   var l = log_file.newFileStream(fmWrite)
@@ -64,6 +65,11 @@ proc monitor(p: Process, log_file: string) =
     discard o.readLine(line)
     l.writeLine(line)
     l.flush()
+
+when defined(windows):
+  const ENV_COMMAND = "set"
+else:
+  const ENV_COMMAND = "env"
 
 proc validate(path: string, silent = false): int =
   var path_to_config = path
@@ -133,7 +139,7 @@ proc run(path: string, silent = false): int =
   print(&"""Running federation: {runner["name"]}""", silent = silent)
 
   var env = {:}.newStringTable
-  for line in execProcess("env").splitLines():
+  for line in execProcess(ENV_COMMAND).splitLines():
     var s = line.split("=")
     env[s[0]] = join(s[1..s.high])
 
@@ -164,6 +170,8 @@ proc run(path: string, silent = false): int =
     processes.add(p)
 
   sync()
+
+  print("Success!")
 
 
 when isMainModule:
