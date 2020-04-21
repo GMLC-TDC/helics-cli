@@ -13,6 +13,8 @@ import strutils
 import sugar
 import terminal
 import threadpool
+import streams
+import strtabs
 
 type
   Status = enum
@@ -30,20 +32,38 @@ proc print(msg: string, status = sInfo, silent = false) =
     styledEcho(fgRed, "[ERROR] ", resetStyle, msg)
 
 
+proc c_setvbuf(f: File, buf: pointer, mode: cint, size: csize_t): cint {. importc: "setvbuf", header: "<stdio.h>", tags: [] .}
+
+when NoFakeVars:
+  when defined(windows):
+    const
+      IOFBF = cint(0)
+      IONBF = cint(4)
+  else:
+    # On all systems I could find, including Linux, Mac OS X, and the BSDs
+    const
+      IOFBF = cint(0)
+      IONBF = cint(2)
+else:
+  var
+    IOFBF {.importc: "_IOFBF", nodecl.}: cint
+    IONBF {.importc: "_IONBF", nodecl.}: cint
+
 proc monitor(p: Process, log_file: string) =
-  var o: File
 
-  var l = log_file.open(fmWrite)
+  var l = log_file.newFileStream(fmWrite)
+  var o = p.outputStream()
+  var f: File
+  discard open(f, p.outputHandle(), fmRead)
+  discard c_setvbuf(f, nil, IONBF, 0)
+  var line = ""
+  var buffer: array[10, char]
 
-  assert open(o, p.outputHandle(), fmRead)
   while p.peekExitCode() == -1:
-    l.write(o.readAll())
-    sleep(250)
-
-  assert open(o, p.errorHandle(), fmRead)
-  var line: TaintedString
-  while o.readLine(line):
+    o.flush()
+    discard o.readLine(line)
     l.writeLine(line)
+    l.flush()
 
 proc validate(path: string, silent = false): int =
   var path_to_config = path
@@ -94,6 +114,11 @@ proc run(path: string, silent = false): int =
 
   print(&"""Running federation: {runner["name"]}""", silent = silent)
 
+  var env = {:}.newStringTable
+  for line in execProcess("env").splitLines():
+    var s = line.split("=")
+    env[s[0]] = join(s[1..s.high])
+
   var processes = newSeq[Process]()
 
   for f in runner["federates"]:
@@ -103,7 +128,15 @@ proc run(path: string, silent = false): int =
 
     let directory = joinPath(dirname, f["directory"].getStr)
     # TODO: check if valid command
-    let p = startProcess(f["exec"].getStr, workingDir = directory, options = {poEvalCommand})
+
+    var process_env = deepcopy(env)
+    let cmd = f["exec"].getStr
+    var local_env = f.getOrDefault("env")
+    if local_env == nil:
+      local_env = newJObject()
+    for k, v in local_env.pairs:
+      process_env[k] = v.getStr
+    let p = startProcess(cmd, env = process_env, workingDir = directory, options = {poInteractive, poStdErrToStdOut, poEvalCommand})
 
     spawn monitor(p, joinPath(dirname, &"""{f["name"].getStr}.log"""))
     processes.add(p)

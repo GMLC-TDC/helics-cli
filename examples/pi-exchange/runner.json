@@ -2,13 +2,13 @@
   "federates": [
     {
       "directory": ".",
-      "exec": "python pisender.py",
+      "exec": "python -u pisender.py",
       "host": "localhost",
       "name": "pisender"
     },
     {
       "directory": ".",
-      "exec": "python pireceiver.py",
+      "exec": "python -u pireceiver.py",
       "host": "localhost",
       "name": "pireceiver"
     }
