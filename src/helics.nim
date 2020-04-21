@@ -96,6 +96,24 @@ proc validate(path: string, silent = false): int =
     print("Runner configuration does not have a federates field.", sError)
     return 1
 
+  for f in runner["federates"]:
+
+    if not f.hasKey("name"):
+      print(&"""federate {f} is missing a `name` field""", sError)
+      return 1
+
+    if not f.hasKey("name"):
+      print(&"""federate {f["name"]} is missing a `exec` field""", sError)
+      return 1
+
+    if not f.hasKey("directory"):
+      let directory = parentDir(path_to_config)
+      print(&"""federate {f["name"]} is missing a `directory` field. Using {directory}.""", sWarn, silent = silent)
+
+    if not f.hasKey("env"):
+      print(&"""federate {f["name"]} is missing a `env` field. Using default environment.""", sWarn, silent = silent)
+
+
   print(&"No problems found in `{path_to_config}`.", silent = silent)
   return 0
 
@@ -126,16 +144,22 @@ proc run(path: string, silent = false): int =
     let name = f["name"].getStr
     print(&"""Running federate {name} as a background process""", silent = silent)
 
-    let directory = joinPath(dirname, f["directory"].getStr)
-    # TODO: check if valid command
+    var directory: string
+    if f{"directory"} != nil:
+      directory = joinPath(dirname, f["directory"].getStr())
+    else:
+      directory = dirname
 
+    # Get environment variables
     var process_env = deepcopy(env)
-    let cmd = f["exec"].getStr
     var local_env = f.getOrDefault("env")
     if local_env == nil:
       local_env = newJObject()
     for k, v in local_env.pairs:
       process_env[k] = v.getStr
+
+    # TODO: check if valid command
+    let cmd = f["exec"].getStr
     let p = startProcess(cmd, env = process_env, workingDir = directory, options = {poInteractive, poStdErrToStdOut, poEvalCommand})
 
     spawn monitor(p, joinPath(dirname, &"""{f["name"].getStr}.log"""))
