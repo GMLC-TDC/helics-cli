@@ -1,0 +1,17 @@
+{
+  "federates": [
+    {
+      "directory": ".",
+      "exec": "python pisender.py",
+      "host": "localhost",
+      "name": "pisender"
+    },
+    {
+      "directory": ".",
+      "exec": "python pireceiver.py",
+      "host": "localhost",
+      "name": "pireceiver"
+    }
+  ],
+  "name": "pi-exchange"
+}
