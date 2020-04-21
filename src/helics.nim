@@ -137,7 +137,7 @@ proc run(path: string, silent = false): int =
   var f = open(path_to_config, fmRead)
   var runner = parseJson(f.readAll())
 
-  print(&"""Running federation: `{runner["name"].getStr}`""", silent = silent)
+  print(&"""Running federation `{runner["name"].getStr}` with {runner["federates"].len} federates.""", silent = silent)
 
   var env = {:}.newStringTable
   for line in execProcess(ENV_COMMAND).splitLines():
@@ -151,7 +151,7 @@ proc run(path: string, silent = false): int =
   for f in runner["federates"]:
 
     let name = f["name"].getStr
-    print(&"""Running federate `{name}` as a background process""", silent = silent)
+    print(&"""Running federate `{name}`.""", silent = silent)
 
     var directory: string
     if f{"directory"} != nil:
@@ -186,6 +186,8 @@ proc run(path: string, silent = false): int =
         except:
           discard
       break
+
+  sync()
 
   if not error_occured: print("Success!")
 
