@@ -17,6 +17,8 @@ block:
   {.passc: "-I ./c2nim/include/helics/shared_api_library -Wall -Werror".}
   {.passl: """-Wl,-rpath,./c2nim/lib""".}
 
+import api_data
+
 ## * @file
 ##     @brief common functions for the HELICS C api
 ##

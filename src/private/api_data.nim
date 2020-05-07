@@ -9,6 +9,8 @@
 ## @brief data structures for the C-API
 ##
 
+import helics_enums
+
 ## * opaque object representing an input
 
 type

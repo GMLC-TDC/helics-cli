@@ -3,8 +3,8 @@ import time
 import helics as h
 from math import pi
 
-initstring = "-f 2 --name=mainbroker"
-fedinitstring = "--broker=mainbroker --federates=1"
+initstring = "-f 3"
+fedinitstring = "--federates=1"
 deltat = 0.01
 
 helicsversion = h.helicsGetVersion()

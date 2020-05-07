@@ -16,7 +16,7 @@ import threadpool
 import streams
 import strtabs
 
-import helics as h
+import ./helics as h
 
 proc c_setvbuf(f: File, buf: pointer, mode: cint, size: csize_t): cint {. importc: "setvbuf", header: "<stdio.h>", tags: [] .}
 
@@ -186,13 +186,9 @@ proc run(path: string, silent = false): int =
 
   if not error_occured: print("Success!")
 
-proc inject(): int =
-
-  let f = initCombinationFederate("helics-inject")
-
-  # helicsFederateFinalize(vfed)
-  # helicsFederateFree(vfed)
-  # helicsCloseLibrary()
+proc server(): int =
+  runServer()
+  return 0
 
 when isMainModule:
   import cligen
@@ -202,5 +198,5 @@ when isMainModule:
   dispatchMulti(
     [ run, noAutoEcho=true ],
     [ validate, noAutoEcho=true ],
-    [ inject, noAutoEcho=true ],
+    [ server, noAutoEcho=true ],
   )
