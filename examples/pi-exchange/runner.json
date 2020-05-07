@@ -38,7 +38,7 @@
     },
     {
       "directory": "../../",
-      "exec": "./bin/helics_cli hook --federates 6",
+      "exec": "./bin/helics hook --federates 6",
       "host": "localhost",
       "name": "hook"
     }

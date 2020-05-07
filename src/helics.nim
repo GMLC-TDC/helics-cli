@@ -198,7 +198,7 @@ proc serve(): int =
 when isMainModule:
   import cligen
   include cligen/mergeCfgEnv
-  const nd = staticRead "../helics_cli.nimble"
+  const nd = staticRead "../helics.nimble"
   clCfg.version = nd.fromNimble("version")
   dispatchMulti(
     [ run, noAutoEcho=true ],

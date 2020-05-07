@@ -6,7 +6,7 @@ description   = "HELICS command line interface"
 license       = "MIT"
 srcDir        = "src"
 binDir        = "bin"
-bin           = @["helics_cli"]
+bin           = @["helics"]
 
 # Dependencies
 
@@ -21,7 +21,7 @@ import os
 import strformat
 
 task archive, "Create archived assets":
-  let app = "helics_cli"
+  let app = "helics"
   let assets = &"{app}_{buildOS}"
   let dir = "dist"/assets
   mkDir dir
