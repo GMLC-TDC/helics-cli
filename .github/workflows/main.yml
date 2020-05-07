@@ -36,6 +36,10 @@ jobs:
     - uses: jiro4989/setup-nim-action@v1.0.2
       with:
         nim-version: ${{ env.NIM_VERSION }}
+    - name: Download dependencies
+      run: |
+        nimble install -y https://github.com/kdheepak/binary-builder-downloader
+        bbd download --package HELICS --install c2nim
     - name: Build files
       run: nimble build -d:release --opt:size -Y
     - name: Archive files
