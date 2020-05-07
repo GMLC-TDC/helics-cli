@@ -21,7 +21,7 @@ import os
 import strformat
 
 task archive, "Create archived assets":
-  let app = "helics"
+  let app = "helics_cli"
   let assets = &"{app}_{buildOS}"
   let dir = "dist"/assets
   mkDir dir
