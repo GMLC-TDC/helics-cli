@@ -19,6 +19,11 @@ router helicsrouter:
   var data = parseJson(f.readAll())
   resp $(%data), "application/json"
 
+ get "/data-flow-graph.json":
+  var f = open(joinPath(getCurrentDir(), "data_flow_graph.json"), fmRead)
+  var data = parseJson(f.readAll())
+  resp $(%data), "application/json"
+
 proc runServer*() =
   let port = Port(42069)
   let settings = newSettings(port=port)

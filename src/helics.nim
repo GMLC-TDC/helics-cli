@@ -105,13 +105,20 @@ proc runHookFederate*(nfederates: int) =
   q = helicsCreateQuery("root", "dependency_graph")
   let dependency_graph = helicsQueryExecute(q, fed, err.addr).toString()
 
+  q = helicsCreateQuery("root", "data_flow_graph")
+  let data_flow_graph = helicsQueryExecute(q, fed, err.addr).toString()
+
   var jsonfile: File
   jsonfile = open(joinPath(getCurrentDir(), "dependency-graph.json"), fmWrite)
-  jsonfile.write(parseJson(dependency_graph))
+  jsonfile.write(parseJson(dependency_graph).pretty(indent = 2))
   jsonfile.close()
 
   jsonfile = open(joinPath(getCurrentDir(), "federate-map.json"), fmWrite)
-  jsonfile.write(parseJson(federate_map))
+  jsonfile.write(parseJson(federate_map).pretty(indent = 2))
+  jsonfile.close()
+
+  jsonfile = open(joinPath(getCurrentDir(), "data_flow_graph.json"), fmWrite)
+  jsonfile.write(parseJson(dependency_graph).pretty(indent = 2))
   jsonfile.close()
 
   echo "Starting hook federate"
