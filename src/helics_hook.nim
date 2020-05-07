@@ -17,11 +17,16 @@ import threadpool
 import streams
 import strtabs
 
-when defined(macosx):
-  block:
-    {.passc: "-I ./c2nim/include/helics/shared_api_library -Wall -Werror".}
-    {.passl: """-Wl,-rpath,./c2nim/lib""".}
+const helics_install_path = getEnv("HELICS_INSTALL")
 
+static:
+  putEnv("HELICS_INSTALL", helics_install_path)
+
+when defined(linux) or defined(macosx):
+  block:
+    {.passL: """-Wl,-rpath,'""" & helics_install_path & """/lib/'""".}
+    {.passL: """-Wl,-rpath,'$ORIGIN/""" & helics_install_path & """/lib/'""".}
+    {.passL: """-Wl,-rpath,'$ORIGIN'""".}
 
 proc initCombinationFederate*(
     core_name: string,
@@ -124,6 +129,8 @@ proc runHookFederate*(nfederates: int) =
   jsonfile.close()
 
   echo "Starting hook federate"
+
+  # TODO
 
   helicsFederateEnterExecutingMode(fed, err.addr)
 
