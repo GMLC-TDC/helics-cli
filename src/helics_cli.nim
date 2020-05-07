@@ -16,7 +16,7 @@ import threadpool
 import streams
 import strtabs
 
-import ./helics as h
+import ./helics_hook
 import ./server
 
 proc c_setvbuf(f: File, buf: pointer, mode: cint, size: csize_t): cint {. importc: "setvbuf", header: "<stdio.h>", tags: [] .}
