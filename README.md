@@ -11,6 +11,8 @@ where {SUBCMD} is one of:
   help      print comprehensive or per-cmd help
   run
   validate
+  hook
+  serve
 
 helics {-h|--help} or with no args at all prints this message.
 helics --help-syntax gives general cligen syntax help.
@@ -41,4 +43,21 @@ Options:
   --version      bool    false     print version
   -p=, --path=   string  REQUIRED  set path
   -s, --silent   bool    false     set silent
+```
+
+```
+$ helics hook [required&optional-params]
+Options:
+  -h, --help                         print this cligen-erated help
+  --help-syntax                      advanced: prepend,plurals,..
+  --version          bool  false     print version
+  -f=, --federates=  int   REQUIRED  set federates
+```
+
+```
+$ helics serve [optional-params]
+Options:
+  -h, --help                  print this cligen-erated help
+  --help-syntax               advanced: prepend,plurals,..
+  --version      bool  false  print version
 ```
