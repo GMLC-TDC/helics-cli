@@ -128,9 +128,9 @@ proc runHookFederate*(nfederates: int) =
   helicsFederateEnterExecutingMode(fed, err.addr)
 
   var currenttime = 0.0
-  while currenttime <= helics_time_maxtime:
+  while currenttime < 100.0:
     echo &"Current time is {currenttime}"
-    currenttime = helicsFederateRequestTime(fed, helics_time_maxtime, err.addr)
+    currenttime = helicsFederateRequestTime(fed, 100.0, err.addr)
 
   helicsFederateFinalize(fed, err.addr)
   helicsFederateFree(fed)
