@@ -96,19 +96,10 @@ type
 type
   helics_time* = cdouble
 
-var helics_time_zero* {.importc: "helics_time_zero", header: "api-data.h".}: helics_time
-
-## !< definition of time zero-the beginning of simulation
-
-var helics_time_epsilon* {.importc: "helics_time_epsilon", header: "api-data.h".}: helics_time
-
-## !< definition of the minimum time resolution
-
-var helics_time_invalid* {.importc: "helics_time_invalid", header: "api-data.h".}: helics_time
-
-## !< definition of an invalid time that has no meaning
-
-var helics_time_maxtime* {.importc: "helics_time_maxtime", header: "api-data.h".}: helics_time
+const helics_time_zero*: helics_time = 0.0
+const helics_time_epsilon*: helics_time = 1.0e-9
+const helics_time_invalid*: helics_time = -1.785e39
+const helics_time_maxtime*: helics_time = 9223372036.854774
 
 ## !< definition of time signifying the federate has
 ##                                                              terminated or to run until the end of the simulation
@@ -119,11 +110,11 @@ var helics_time_maxtime* {.importc: "helics_time_maxtime", header: "api-data.h".
 type
   helics_bool* = cint
 
-var helics_true* {.importc: "helics_true", header: "api-data.h".}: helics_bool
+var helics_true*: helics_bool = 1
 
 ## !< indicator used for a true response
 
-var helics_false* {.importc: "helics_false", header: "api-data.h".}: helics_bool
+var helics_false*: helics_bool = 2
 
 ## !< indicator used for a false response
 ## *
@@ -173,9 +164,9 @@ type
 ##
 
 type
-  helics_complex* {.importc: "helics_complex", header: "api-data.h", bycopy.} = object
-    real* {.importc: "real".}: cdouble
-    imag* {.importc: "imag".}: cdouble
+  helics_complex* = object
+    real* : cdouble
+    imag* : cdouble
 
 
 ## *
@@ -185,16 +176,16 @@ type
 ##
 
 type
-  helics_message* {.importc: "helics_message", header: "api-data.h", bycopy.} = object
-    time* {.importc: "time".}: helics_time ## !< message time
-    data* {.importc: "data".}: cstring ## !< message data
-    length* {.importc: "length".}: int64 ## !< message length
-    messageID* {.importc: "messageID".}: int32 ## !< message identification information
-    flags* {.importc: "flags".}: int16 ## !< flags related to the message
-    original_source* {.importc: "original_source".}: cstring ## !< original source
-    source* {.importc: "source".}: cstring ## !< the most recent source
-    dest* {.importc: "dest".}: cstring ## !< the final destination
-    original_dest* {.importc: "original_dest".}: cstring ## !< the original destination of the message
+  helics_message* = object
+    time*: helics_time ## !< message time
+    data*: cstring ## !< message data
+    length*: int64 ## !< message length
+    messageID*: int32 ## !< message identification information
+    flags*: int16 ## !< flags related to the message
+    original_source*: cstring ## !< original source
+    source*: cstring ## !< the most recent source
+    dest*: cstring ## !< the final destination
+    original_dest*: cstring ## !< the original destination of the message
 
 
 ## *
@@ -205,6 +196,6 @@ type
 ##
 
 type
-  helics_error* {.importc: "helics_error", header: "api-data.h", bycopy.} = object
-    error_code* {.importc: "error_code".}: int32 ## !< an error code associated with the error
-    message* {.importc: "message".}: cstring ## !< a message associated with the error
+  helics_error* = object
+    error_code*: int32 ## !< an error code associated with the error
+    message*: cstring ## !< a message associated with the error
