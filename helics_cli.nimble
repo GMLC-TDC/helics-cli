@@ -14,6 +14,7 @@ requires "nim >= 1.2.0"
 requires "cligen"
 requires "shlex"
 requires "nimcr"
+requires "jester"
 
 import strutils
 import os

@@ -17,6 +17,7 @@ import streams
 import strtabs
 
 import ./helics as h
+import ./server
 
 proc c_setvbuf(f: File, buf: pointer, mode: cint, size: csize_t): cint {. importc: "setvbuf", header: "<stdio.h>", tags: [] .}
 
@@ -186,7 +187,11 @@ proc run(path: string, silent = false): int =
 
   if not error_occured: print("Success!")
 
-proc server(): int =
+proc hook(): int =
+  runHookFederate()
+  return 0
+
+proc serve(): int =
   runServer()
   return 0
 
@@ -198,5 +203,6 @@ when isMainModule:
   dispatchMulti(
     [ run, noAutoEcho=true ],
     [ validate, noAutoEcho=true ],
-    [ server, noAutoEcho=true ],
+    [ hook, noAutoEcho=true ],
+    [ serve, noAutoEcho=true ],
   )

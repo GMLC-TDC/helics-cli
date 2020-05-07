@@ -35,77 +35,82 @@ proc initCombinationFederate*(
   let core_init = &"{core_init_string} --federates={nfederates}"
 
   let fedinfo = helicsCreateFederateInfo()
-  helicsFederateInfoSetCoreName(fedinfo, "server", err.addr)
+  helicsFederateInfoSetCoreName(fedinfo, "hook", err.addr)
   helicsFederateInfoSetCoreTypeFromString(fedinfo, core_type, err.addr)
   helicsFederateInfoSetCoreInitString(fedinfo, core_init, err.addr)
   helicsFederateInfoSetTimeProperty(fedinfo, helics_property_time_delta.cint, delta, err.addr)
   helicsFederateInfoSetFlagOption(fedinfo, helics_flag_terminate_on_error.cint, true.cint, err.addr)
   helicsFederateInfoSetFlagOption(fedinfo, helics_handle_option_strict_type_checking.cint, true.cint, err.addr)
 
-  let f = helicsCreateCombinationFederate(core_name, fedinfo, err.addr)
+  let fed = helicsCreateCombinationFederate(core_name, fedinfo, err.addr)
+  return fed
 
-  return f
+proc toString(cs: cstring): string =
+  var s = newString(cs.len)
+  copyMem(addr(s[0]), cs, cs.len)
+  return s
 
+proc runHookFederate*() =
+  echo "Creating hook federate"
 
-proc runServer*() =
-  echo "Creating server federate"
-
-  let f = initCombinationFederate("server")
+  let fed = initCombinationFederate("hook")
 
   echo "Entering initializing mode"
 
   var err = helicsErrorInitialize()
 
-  helicsFederateEnterInitializingMode(f, err.addr)
+  helicsFederateEnterInitializingMode(fed, err.addr)
 
   echo "Querying all topics"
 
   var q: helics_query
 
   q = helicsCreateQuery("root", "federates")
-  let federate_cstring = helicsQueryExecute(q, f, err.addr)
-  var federate_string = newString(federate_cstring.len)
-  copyMem(addr(federate_string[0]), federate_cstring, federate_cstring.len)
-
-  var federates = federate_string.replace("[", "").replace("]", "").split(";")
+  var federates = helicsQueryExecute(q, fed, err.addr).toString().replace("[", "").replace("]", "").split(";")
   echo federates
 
   for name in federates:
     echo "name \"", name, "\""
 
     q = helicsCreateQuery(name, "exists")
-    echo "    exists: \"", helicsQueryExecute(q, f, err.addr), "\""
+    echo "    exists: \"", helicsQueryExecute(q, fed, err.addr), "\""
 
     q = helicsCreateQuery(name, "subscriptions")
-    echo "    subscriptions: \"", helicsQueryExecute(q, f, err.addr), "\""
+    echo "    subscriptions: \"", helicsQueryExecute(q, fed, err.addr), "\""
 
     q = helicsCreateQuery(name, "endpoints")
-    echo "    endpoints: \"", helicsQueryExecute(q, f, err.addr), "\""
+    echo "    endpoints: \"", helicsQueryExecute(q, fed, err.addr), "\""
 
     q = helicsCreateQuery(name, "inputs")
-    echo "    inputs: \"", helicsQueryExecute(q, f, err.addr), "\""
+    echo "    inputs: \"", helicsQueryExecute(q, fed, err.addr), "\""
 
     q = helicsCreateQuery(name, "publications")
-    echo "    publications: \"", helicsQueryExecute(q, f, err.addr), "\""
+    echo "    publications: \"", helicsQueryExecute(q, fed, err.addr), "\""
 
   q = helicsCreateQuery("root", "federate_map")
-  let federate_map = helicsQueryExecute(q, f, err.addr)
+  let federate_map = helicsQueryExecute(q, fed, err.addr).toString()
 
   q = helicsCreateQuery("root", "dependency_graph")
-  let dependency_graph = helicsQueryExecute(q, f, err.addr)
+  let dependency_graph = helicsQueryExecute(q, fed, err.addr).toString()
 
-  echo dependency_graph
-  echo federate_map
+  var jsonfile: File
+  jsonfile = open(joinPath(getCurrentDir(), "dependency-graph.json"), fmWrite)
+  jsonfile.write(parseJson(dependency_graph))
+  jsonfile.close()
 
-  echo "Starting server"
+  jsonfile = open(joinPath(getCurrentDir(), "federate-map.json"), fmWrite)
+  jsonfile.write(parseJson(federate_map))
+  jsonfile.close()
 
-  helicsFederateEnterExecutingMode(f, err.addr)
+  echo "Starting hook federate"
+
+  helicsFederateEnterExecutingMode(fed, err.addr)
 
   var currenttime = 0.0
   while currenttime <= 100:
     echo &"Current time is {currenttime}"
-    currenttime = helicsFederateRequestTime(f, 100, err.addr)
+    currenttime = helicsFederateRequestTime(fed, 100, err.addr)
 
-  helicsFederateFinalize(f, err.addr)
-  helicsFederateFree(f)
+  helicsFederateFinalize(fed, err.addr)
+  helicsFederateFree(fed)
   helicsCloseLibrary()

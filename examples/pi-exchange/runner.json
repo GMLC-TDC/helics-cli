@@ -14,9 +14,9 @@
     },
     {
       "directory": "../../",
-      "exec": "./bin/helics_cli server",
+      "exec": "./bin/helics_cli hook",
       "host": "localhost",
-      "name": "server"
+      "name": "hook"
     }
   ],
   "name": "pi-exchange"
