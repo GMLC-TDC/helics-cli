@@ -55,6 +55,8 @@ proc toString(cs: cstring): string =
   return s
 
 proc runHookFederate*(nfederates: int) =
+  echo "helics version: ", helicsGetVersion()
+
   echo "Creating broker"
 
   var err = helicsErrorInitialize()
@@ -118,7 +120,7 @@ proc runHookFederate*(nfederates: int) =
   jsonfile.close()
 
   jsonfile = open(joinPath(getCurrentDir(), "data_flow_graph.json"), fmWrite)
-  jsonfile.write(parseJson(dependency_graph).pretty(indent = 2))
+  jsonfile.write(parseJson(data_flow_graph).pretty(indent = 2))
   jsonfile.close()
 
   echo "Starting hook federate"
@@ -126,9 +128,9 @@ proc runHookFederate*(nfederates: int) =
   helicsFederateEnterExecutingMode(fed, err.addr)
 
   var currenttime = 0.0
-  while currenttime <= 100:
+  while currenttime <= helics_time_maxtime:
     echo &"Current time is {currenttime}"
-    currenttime = helicsFederateRequestTime(fed, 100, err.addr)
+    currenttime = helicsFederateRequestTime(fed, helics_time_maxtime, err.addr)
 
   helicsFederateFinalize(fed, err.addr)
   helicsFederateFree(fed)
