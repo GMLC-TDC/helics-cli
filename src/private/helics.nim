@@ -13,7 +13,7 @@ else:
   const helicsSharedLib* = "libhelicsSharedLib.so"
 
 block:
-  {.link: "./c2nim/lib/libhelicsSharedLib.dylib".}
+  {.link: "./c2nim/lib/" & helicsSharedLib.}
   {.passc: "-I ./c2nim/include/helics/shared_api_library -Wall -Werror".}
   {.passl: """-Wl,-rpath,./c2nim/lib""".}
 
