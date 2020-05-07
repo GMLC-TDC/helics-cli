@@ -19,6 +19,13 @@ import threadpool
 import streams
 import strtabs
 
+
+when defined(macosx):
+  block:
+    {.passc: "-I ./c2nim/include/helics/shared_api_library -Wall -Werror".}
+    {.passl: """-Wl,-rpath,./c2nim/lib""".}
+
+
 proc initCombinationFederate*(
     core_name: string,
     nfederates = 1,
@@ -74,18 +81,23 @@ proc runHookFederate*() =
 
     q = helicsCreateQuery(name, "exists")
     echo "    exists: \"", helicsQueryExecute(q, fed, err.addr), "\""
+    echo err.message
 
     q = helicsCreateQuery(name, "subscriptions")
     echo "    subscriptions: \"", helicsQueryExecute(q, fed, err.addr), "\""
+    echo err.message
 
     q = helicsCreateQuery(name, "endpoints")
     echo "    endpoints: \"", helicsQueryExecute(q, fed, err.addr), "\""
+    echo err.message
 
     q = helicsCreateQuery(name, "inputs")
     echo "    inputs: \"", helicsQueryExecute(q, fed, err.addr), "\""
+    echo err.message
 
     q = helicsCreateQuery(name, "publications")
     echo "    publications: \"", helicsQueryExecute(q, fed, err.addr), "\""
+    echo err.message
 
   q = helicsCreateQuery("root", "federate_map")
   let federate_map = helicsQueryExecute(q, fed, err.addr).toString()

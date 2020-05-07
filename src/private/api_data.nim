@@ -5,95 +5,124 @@
 ## SPDX-License-Identifier: BSD-3-Clause
 ##
 
-## * @file
-## @brief data structures for the C-API
+## *
+##  @file
+##  @brief Data structures for the C api
 ##
 
-import helics_enums
+import
+  ../helics_enums
 
-## * opaque object representing an input
+## *
+##  opaque object representing an input
+##
 
 type
   helics_input* = pointer
 
-## * opaque object representing a publication
+## *
+##  opaque object representing a publication
+##
 
 type
   helics_publication* = pointer
 
-## * opaque object representing an endpoint
+## *
+##  opaque object representing an endpoint
+##
 
 type
   helics_endpoint* = pointer
 
-## * opaque object representing a filter
+## *
+##  opaque object representing a filter
+##
 
 type
   helics_filter* = pointer
 
-## * opaque object representing a core
+## *
+##  opaque object representing a core
+##
 
 type
   helics_core* = pointer
 
-## * opaque object representing a broker
+## *
+##  opaque object representing a broker
+##
 
 type
   helics_broker* = pointer
 
-## * opaque object representing a federate
+## *
+##  opaque object representing a federate
+##
 
 type
   helics_federate* = pointer
 
-## * opaque object representing a filter info object structure
+## *
+##  opaque object representing a filter info object structure
+##
 
 type
   helics_federate_info* = pointer
 
-## * opaque object representing a query
+## *
+##  opaque object representing a query
+##
 
 type
   helics_query* = pointer
 
-## * opaque object representing a message
+## *
+##  opaque object representing a message
+##
 
 type
   helics_message_object* = pointer
 
-## * time definition used in the C interface to helics
+## *
+##  time definition used in the C interface to helics
+##
 
 type
   helics_time* = cdouble
 
-var helics_time_zero* {.importc: "helics_time_zero", header: "api-data.h".}: helics_time
+var helics_time_zero* {.importc: "helics_time_zero", dynlib: helicsSharedLib.}: helics_time
 
 ## !< definition of time zero-the beginning of simulation
 
-var helics_time_epsilon* {.importc: "helics_time_epsilon", header: "api-data.h".}: helics_time
+var helics_time_epsilon* {.importc: "helics_time_epsilon", dynlib: helicsSharedLib.}: helics_time
 
 ## !< definition of the minimum time resolution
 
-var helics_time_invalid* {.importc: "helics_time_invalid", header: "api-data.h".}: helics_time
+var helics_time_invalid* {.importc: "helics_time_invalid", dynlib: helicsSharedLib.}: helics_time
 
 ## !< definition of an invalid time that has no meaning
 
-var helics_time_maxtime* {.importc: "helics_time_maxtime", header: "api-data.h".}: helics_time
+var helics_time_maxtime* {.importc: "helics_time_maxtime", dynlib: helicsSharedLib.}: helics_time
 
-## !< definition of time signifying the federate has terminated or to run until the end of the simulation
-## * defining a boolean type for use in the helics interface
+## !< definition of time signifying the federate has
+##                                                              terminated or to run until the end of the simulation
+## *
+##  defining a boolean type for use in the helics interface
+##
 
 type
   helics_bool* = cint
 
-var helics_true* {.importc: "helics_true", header: "api-data.h".}: helics_bool
+var helics_true* {.importc: "helics_true", dynlib: helicsSharedLib.}: helics_bool
 
 ## !< indicator used for a true response
 
-var helics_false* {.importc: "helics_false", header: "api-data.h".}: helics_bool
+var helics_false* {.importc: "helics_false", dynlib: helicsSharedLib.}: helics_bool
 
 ## !< indicator used for a false response
-## * enumeration of the different iteration results
+## *
+##  enumeration of the different iteration results
+##
 
 type
   helics_iteration_request* {.size: sizeof(cint).} = enum
@@ -102,7 +131,9 @@ type
     helics_iteration_request_iterate_if_needed ## !< only return an iteration if necessary
 
 
-## * enumeration of possible return values from an iterative time request
+## *
+##  enumeration of possible return values from an iterative time request
+##
 
 type
   helics_iteration_result* {.size: sizeof(cint).} = enum
@@ -112,7 +143,9 @@ type
     helics_iteration_result_iterating ## !< the federate is iterating at current time
 
 
-## * enumeration of possible federate states
+## *
+##  enumeration of possible federate states
+##
 
 type
   helics_federate_state* {.size: sizeof(cint).} = enum
@@ -141,16 +174,17 @@ type
 
 ## *
 ##   Message_t mapped to a c compatible structure
-##  @details this will be deprecated in HELICS 2.3 and removed in HELICS 3.0
+##
+##  @details use of this structure is deprecated in HELICS 2.5 and removed in HELICS 3.0
 ##
 
 type
   helics_message* {.importc: "helics_message", header: "api-data.h", bycopy.} = object
     time* {.importc: "time".}: helics_time ## !< message time
     data* {.importc: "data".}: cstring ## !< message data
-    length* {.importc: "length".}: int64 ## !< message length
-    messageID* {.importc: "messageID".}: int32 ## !< message identification information
-    flags* {.importc: "flags".}: int16 ## !< flags related to the message
+    length* {.importc: "length".}: int64_t ## !< message length
+    messageID* {.importc: "messageID".}: int32_t ## !< message identification information
+    flags* {.importc: "flags".}: int16_t ## !< flags related to the message
     original_source* {.importc: "original_source".}: cstring ## !< original source
     source* {.importc: "source".}: cstring ## !< the most recent source
     dest* {.importc: "dest".}: cstring ## !< the final destination
@@ -160,10 +194,11 @@ type
 ## *
 ##  helics error object
 ##
-##  if error_code==0 there is no error, if error_code!=0 there is an error and message will contain a string
-##     otherwise it will be an empty string
+##  if error_code==0 there is no error, if error_code!=0 there is an error and message will contain a string,
+##  otherwise it will be an empty string
 ##
 
 type
   helics_error* {.importc: "helics_error", header: "api-data.h", bycopy.} = object
+    error_code* {.importc: "error_code".}: int32_t ## !< an error code associated with the error
     message* {.importc: "message".}: cstring ## !< a message associated with the error
