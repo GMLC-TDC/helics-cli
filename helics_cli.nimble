@@ -6,7 +6,7 @@ description   = "HELICS command line interface"
 license       = "MIT"
 srcDir        = "src"
 binDir        = "bin"
-bin           = @["helics"]
+bin           = @["helics_cli"]
 
 # Dependencies
 

@@ -7,6 +7,7 @@
       "name": "pisender"
     },
     {
+      "directory": ".",
       "exec": "python -u pireceiver.py",
       "host": "localhost",
       "name": "pireceiver"
