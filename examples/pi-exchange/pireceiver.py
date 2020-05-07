@@ -1,28 +1,29 @@
 # -*- coding: utf-8 -*-
 import helics as h
-
-fedinitstring = "--federates=1"
-deltat = 0.01
+import sys
 
 helicsversion = h.helicsGetVersion()
 
-print("PI RECEIVER: Helics version = {}".format(helicsversion))
+federate_name = f"Reciever Federate {sys.argv[1]}"
+
+print(f"{federate_name}: Helics version = {h.helicsGetVersion()}")
+
 
 # Create Federate Info object that describes the federate properties */
-print("PI RECEIVER: Creating Federate Info")
+print(f"{federate_name}: Creating Federate Info")
 fedinfo = h.helicsCreateFederateInfo()
 
 # Set Federate name
-print("PI RECEIVER: Setting Federate Info Name")
-h.helicsFederateInfoSetCoreName(fedinfo, "TestB Federate")
+print(f"{federate_name}: Setting Federate Info Name")
+h.helicsFederateInfoSetCoreName(fedinfo, federate_name)
 
 # Set core type from string
-print("PI RECEIVER: Setting Federate Info Core Type")
+print(f"{federate_name}: Setting Federate Info Core Type")
 h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
 
 # Federate init string
-print("PI RECEIVER: Setting Federate Info Init String")
-h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
+print(f"{federate_name}: Setting Federate Info Init String")
+h.helicsFederateInfoSetCoreInitString(fedinfo, "--federates=1")
 
 # Set the message interval (timedelta) for federate. Note that
 # HELICS minimum message time interval is 1 ns and by default
@@ -30,20 +31,20 @@ h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
 # setTimedelta routine is a multiplier for the default timedelta.
 
 # Set one second message interval
-print("PI RECEIVER: Setting Federate Info Time Delta")
-h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, deltat)
+print(f"{federate_name}: Setting Federate Info Time Delta")
+h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, 0.01)
 
 # Create value federate
-print("PI RECEIVER: Creating Value Federate")
-vfed = h.helicsCreateValueFederate("TestB Federate", fedinfo)
-print("PI RECEIVER: Value federate created")
+print(f"{federate_name}: Creating Value Federate")
+vfed = h.helicsCreateValueFederate(federate_name, fedinfo)
+print(f"{federate_name}: Value federate created")
 
 # Subscribe to PI SENDER's publication
-sub = h.helicsFederateRegisterSubscription(vfed, "testA", "")
-print("PI RECEIVER: Subscription registered")
+sub = h.helicsFederateRegisterSubscription(vfed, f"topic{sys.argv[1]}", "")
+print(f"{federate_name}: Subscription registered")
 
 h.helicsFederateEnterExecutingMode(vfed)
-print("PI RECEIVER: Entering execution mode")
+print(f"{federate_name}: Entering execution mode")
 
 value = 0.0
 prevtime = 0
@@ -56,13 +57,11 @@ while currenttime <= 100:
 
     value = h.helicsInputGetString(sub)
     print(
-        "PI RECEIVER: Received value = {} at time {} from PI SENDER".format(
-            value, currenttime
-        )
+        f"{federate_name}: Received value = {value} at time {currenttime} from PI SENDER"
     )
 
 h.helicsFederateFinalize(vfed)
 
 h.helicsFederateFree(vfed)
 h.helicsCloseLibrary()
-print("PI RECEIVER: Federate finalized")
+print(f"{federate_name}: Federate finalized")

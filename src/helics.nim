@@ -17,7 +17,6 @@ import threadpool
 import streams
 import strtabs
 
-
 when defined(macosx):
   block:
     {.passc: "-I ./c2nim/include/helics/shared_api_library -Wall -Werror".}
@@ -55,15 +54,18 @@ proc toString(cs: cstring): string =
   copyMem(addr(s[0]), cs, cs.len)
   return s
 
-proc runHookFederate*() =
+proc runHookFederate*(nfederates: int) =
+  echo "Creating broker"
+
+  var err = helicsErrorInitialize()
+
+  let broker = helicsCreateBroker("zmq", "", &"-f {nfederates + 1}", err.addr)
+
   echo "Creating hook federate"
 
   let fed = initCombinationFederate("hook")
 
   echo "Entering initializing mode"
-
-  var err = helicsErrorInitialize()
-
   helicsFederateEnterInitializingMode(fed, err.addr)
 
   echo "Querying all topics"
@@ -123,4 +125,8 @@ proc runHookFederate*() =
 
   helicsFederateFinalize(fed, err.addr)
   helicsFederateFree(fed)
+
+  while helicsBrokerIsConnected(broker) == helics_true:
+    sleep(250)
+
   helicsCloseLibrary()

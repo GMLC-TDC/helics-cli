@@ -187,8 +187,8 @@ proc run(path: string, silent = false): int =
 
   if not error_occured: print("Success!")
 
-proc hook(): int =
-  runHookFederate()
+proc hook(federates: int): int =
+  runHookFederate(federates)
   return 0
 
 proc serve(): int =

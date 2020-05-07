@@ -2,19 +2,43 @@
   "federates": [
     {
       "directory": ".",
-      "exec": "python -u pisender.py",
+      "exec": "python -u pisender.py 1",
       "host": "localhost",
-      "name": "pisender"
+      "name": "pisender1"
     },
     {
       "directory": ".",
-      "exec": "python -u pireceiver.py",
+      "exec": "python -u pisender.py 2",
       "host": "localhost",
-      "name": "pireceiver"
+      "name": "pisender2"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pisender.py 3",
+      "host": "localhost",
+      "name": "pisender3"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pireceiver.py 1",
+      "host": "localhost",
+      "name": "pireceiver1"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pireceiver.py 2",
+      "host": "localhost",
+      "name": "pireceiver2"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pireceiver.py 3",
+      "host": "localhost",
+      "name": "pireceiver3"
     },
     {
       "directory": "../../",
-      "exec": "./bin/helics_cli hook",
+      "exec": "./bin/helics_cli hook --federates 6",
       "host": "localhost",
       "name": "hook"
     }
