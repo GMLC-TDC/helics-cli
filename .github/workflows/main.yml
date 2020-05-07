@@ -14,9 +14,9 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-latest
-          - windows-latest
           - macos-latest
+            # - ubuntu-latest
+            # - windows-latest
     env:
       NIM_VERSION: 1.2.0
     steps:
