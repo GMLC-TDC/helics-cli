@@ -1,6 +1,4 @@
-import private/helics_enums
-import private/api_data
-import private/helics
+include private/helics
 
 import strformat
 import strutils

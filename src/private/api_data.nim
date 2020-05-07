@@ -10,8 +10,14 @@
 ##  @brief Data structures for the C api
 ##
 
-import
-  ../helics_enums
+when defined(windows):
+  const helicsSharedLib* = "helicsSharedLib.dll"
+elif defined(macosx):
+  const helicsSharedLib* = "libhelicsSharedLib.dylib"
+else:
+  const helicsSharedLib* = "libhelicsSharedLib.so"
+
+include helics_enums
 
 ## *
 ##  opaque object representing an input
@@ -90,19 +96,19 @@ type
 type
   helics_time* = cdouble
 
-var helics_time_zero* {.importc: "helics_time_zero", dynlib: helicsSharedLib.}: helics_time
+var helics_time_zero* {.importc: "helics_time_zero", header: "api-data.h".}: helics_time
 
 ## !< definition of time zero-the beginning of simulation
 
-var helics_time_epsilon* {.importc: "helics_time_epsilon", dynlib: helicsSharedLib.}: helics_time
+var helics_time_epsilon* {.importc: "helics_time_epsilon", header: "api-data.h".}: helics_time
 
 ## !< definition of the minimum time resolution
 
-var helics_time_invalid* {.importc: "helics_time_invalid", dynlib: helicsSharedLib.}: helics_time
+var helics_time_invalid* {.importc: "helics_time_invalid", header: "api-data.h".}: helics_time
 
 ## !< definition of an invalid time that has no meaning
 
-var helics_time_maxtime* {.importc: "helics_time_maxtime", dynlib: helicsSharedLib.}: helics_time
+var helics_time_maxtime* {.importc: "helics_time_maxtime", header: "api-data.h".}: helics_time
 
 ## !< definition of time signifying the federate has
 ##                                                              terminated or to run until the end of the simulation
@@ -113,11 +119,11 @@ var helics_time_maxtime* {.importc: "helics_time_maxtime", dynlib: helicsSharedL
 type
   helics_bool* = cint
 
-var helics_true* {.importc: "helics_true", dynlib: helicsSharedLib.}: helics_bool
+var helics_true* {.importc: "helics_true", header: "api-data.h".}: helics_bool
 
 ## !< indicator used for a true response
 
-var helics_false* {.importc: "helics_false", dynlib: helicsSharedLib.}: helics_bool
+var helics_false* {.importc: "helics_false", header: "api-data.h".}: helics_bool
 
 ## !< indicator used for a false response
 ## *
@@ -182,9 +188,9 @@ type
   helics_message* {.importc: "helics_message", header: "api-data.h", bycopy.} = object
     time* {.importc: "time".}: helics_time ## !< message time
     data* {.importc: "data".}: cstring ## !< message data
-    length* {.importc: "length".}: int64_t ## !< message length
-    messageID* {.importc: "messageID".}: int32_t ## !< message identification information
-    flags* {.importc: "flags".}: int16_t ## !< flags related to the message
+    length* {.importc: "length".}: int64 ## !< message length
+    messageID* {.importc: "messageID".}: int32 ## !< message identification information
+    flags* {.importc: "flags".}: int16 ## !< flags related to the message
     original_source* {.importc: "original_source".}: cstring ## !< original source
     source* {.importc: "source".}: cstring ## !< the most recent source
     dest* {.importc: "dest".}: cstring ## !< the final destination
@@ -200,5 +206,5 @@ type
 
 type
   helics_error* {.importc: "helics_error", header: "api-data.h", bycopy.} = object
-    error_code* {.importc: "error_code".}: int32_t ## !< an error code associated with the error
+    error_code* {.importc: "error_code".}: int32 ## !< an error code associated with the error
     message* {.importc: "message".}: cstring ## !< a message associated with the error

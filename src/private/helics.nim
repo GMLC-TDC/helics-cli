@@ -5,11 +5,7 @@
 ## SPDX-License-Identifier: BSD-3-Clause
 ##
 
-import
-  api-data
-
-import
-  helics_export
+include api_data
 
 ## *
 ##  @file
