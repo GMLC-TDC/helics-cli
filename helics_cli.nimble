@@ -24,7 +24,10 @@ before build:
   rmDir(binDir)
 
 after build:
-  let cli = packageName
+  when buildOS == "windows":
+    let cli = packageName & ".exe"
+  else:
+    let cli = packageName
   mvFile binDir / cli, binDir / cli.replace("_cli", "")
 
 task clean, "Clean project":
