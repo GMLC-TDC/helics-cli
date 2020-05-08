@@ -1,5 +1,3 @@
-include private/helics
-
 import strformat
 import strutils
 import httpclient
@@ -17,16 +15,7 @@ import threadpool
 import streams
 import strtabs
 
-const helics_install_path = getEnv("HELICS_INSTALL")
-
-static:
-  putEnv("HELICS_INSTALL", helics_install_path)
-
-when defined(linux) or defined(macosx):
-  block:
-    {.passL: """-Wl,-rpath,'""" & helics_install_path & """/lib/'""".}
-    {.passL: """-Wl,-rpath,'$ORIGIN/""" & helics_install_path & """/lib/'""".}
-    {.passL: """-Wl,-rpath,'$ORIGIN'""".}
+import helics
 
 proc initCombinationFederate*(
     core_name: string,
