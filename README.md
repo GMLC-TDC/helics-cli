@@ -12,7 +12,7 @@ where {SUBCMD} is one of:
   run
   validate
   hook
-  serve
+  server
 
 helics {-h|--help} or with no args at all prints this message.
 helics --help-syntax gives general cligen syntax help.
@@ -55,7 +55,7 @@ Options:
 ```
 
 ```
-$ helics serve [optional-params]
+$ helics server [optional-params]
 Options:
   -h, --help                  print this cligen-erated help
   --help-syntax               advanced: prepend,plurals,..
