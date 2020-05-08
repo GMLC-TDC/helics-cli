@@ -14,7 +14,7 @@ requires "nim >= 1.2.0"
 requires "cligen"
 requires "shlex"
 requires "jester"
-requires "https://github.com/GMLC-TDC/helics.nim"
+# requires "https://github.com/GMLC-TDC/helics.nim"
 
 import strutils
 import os

@@ -16,11 +16,10 @@ import threadpool
 import streams
 import strtabs
 
-include ./src/utils
-include ./src/validate
-include ./src/run
-include ./src/hook
-include ./src/server
+import ./src/validate as v
+import ./src/run as r
+import ./src/hook as h
+import ./src/server as s
 
 proc hook(federates: int): int =
   runHookFederate(federates)

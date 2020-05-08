@@ -15,8 +15,9 @@ import threadpool
 import streams
 import strtabs
 
+import ./utils
 
-proc runValidate(path: string, silent = false): int =
+proc runValidate*(path: string, silent = false): int =
   var path_to_config = path
   path_to_config.normalizePath()
   let dirname = parentDir(path_to_config)

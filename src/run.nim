@@ -15,7 +15,15 @@ import threadpool
 import streams
 import strtabs
 
-proc runRun(path: string, silent = false): int =
+import ./validate
+import ./utils
+
+when defined(windows):
+  const ENV_COMMAND* = "set"
+else:
+  const ENV_COMMAND* = "env"
+
+proc runRun*(path: string, silent = false): int =
   if runValidate(path, true) != 0:
     print("Runner json file is not per specification. Please check documentation for more information.", sError)
     return 1

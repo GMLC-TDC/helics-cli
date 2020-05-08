@@ -15,9 +15,9 @@ import threadpool
 import streams
 import strtabs
 
-import helics
+include ../../helics.nim/src/helics
 
-proc initCombinationFederate*(
+proc initCombinationFederate(
     core_name: string,
     nfederates = 1,
     core_type = "zmq",
