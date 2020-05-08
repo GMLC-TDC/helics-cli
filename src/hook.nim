@@ -129,7 +129,7 @@ proc runHookFederate*(nfederates: int) =
 
   echo "Starting hook federate"
 
-  # TODO
+  # TODO: get publications and subscriptions
 
   helicsFederateEnterExecutingMode(fed, err.addr)
 
