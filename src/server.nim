@@ -24,11 +24,12 @@ router helicsrouter:
   var data = parseJson(f.readAll())
   resp $(%data), "application/json"
 
-proc runServer*() =
+proc runServer*(): int =
   let port = Port(42069)
   let settings = newSettings(port=port)
   var jester = initJester(helicsrouter, settings=settings)
   jester.serve()
+  return 0
 
 when isMainModule:
-  runServer()
+  discard runServer()
