@@ -6,7 +6,8 @@ description   = "HELICS command line interface"
 license       = "MIT"
 srcDir        = "src"
 binDir        = "bin"
-bin           = @["helics_cli"]
+packageName   = "helics_cli"
+bin           = @[packageName]
 
 # Dependencies
 
@@ -21,19 +22,21 @@ import os
 import strformat
 
 task archive, "Create archived assets":
-  let app = "helics_cli"
-  let assets = &"{app}_{buildOS}"
-  let dir = "dist"/assets
-  mkDir dir
-  mvFile "bin" / app, "bin" / app.replace("_cli", "")
-  cpDir "bin", dir/"bin"
-  cpFile "LICENSE", dir/"LICENSE"
-  cpFile "README.md", dir/"README.md"
-  withDir "dist":
+  let cli = packageName
+  let assets = &"{cli}_v{version}_{buildOS}"
+  let dist = "dist"
+  let dist_dir = dist / assets
+  rmDir dist_dir
+  mkDir dist_dir
+  mvFile "bin" / cli, "bin" / cli.replace("_cli", "")
+  cpDir "bin", dist_dir/"bin"
+  cpFile "LICENSE", dist_dir/"LICENSE"
+  cpFile "README.md", dist_dir/"README.md"
+  withDir dist:
     when buildOS == "windows":
       exec &"7z a {assets}.zip {assets}"
     else:
-      exec &"""chmod +x ./{assets / "bin" / app.replace("_cli", "")}"""
+      exec &"""chmod +x ./{assets / "bin" / cli.replace("_cli", "")}"""
       exec &"tar czf {assets}.tar.gz {assets}"
 
 task changelog, "Create a changelog":
