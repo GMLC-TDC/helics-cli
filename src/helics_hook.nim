@@ -68,9 +68,19 @@ proc runHookFederate*(nfederates: int) =
 
   let broker = helicsCreateBroker("zmq", "", &"-f {nfederates + 1}", err.addr)
 
+  defer:
+    while helicsBrokerIsConnected(broker) == helics_true:
+      sleep(250)
+
+    helicsCloseLibrary()
+
   echo "Creating hook federate"
 
   let fed = initCombinationFederate("hook")
+
+  defer:
+    helicsFederateFinalize(fed, err.addr)
+    helicsFederateFree(fed)
 
   echo "Entering initializing mode"
   helicsFederateEnterInitializingMode(fed, err.addr)
@@ -138,11 +148,3 @@ proc runHookFederate*(nfederates: int) =
   while currenttime < 100.0:
     echo &"Current time is {currenttime}"
     currenttime = helicsFederateRequestTime(fed, 100.0, err.addr)
-
-  helicsFederateFinalize(fed, err.addr)
-  helicsFederateFree(fed)
-
-  while helicsBrokerIsConnected(broker) == helics_true:
-    sleep(250)
-
-  helicsCloseLibrary()
