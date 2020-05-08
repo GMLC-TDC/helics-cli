@@ -36,8 +36,10 @@ jobs:
     - uses: jiro4989/setup-nim-action@v1.0.2
       with:
         nim-version: ${{ env.NIM_VERSION }}
+    - name: Install optional dependencies
+      run: nimble install nimcr
     - name: Build files
-      run: nimble build -d:release --opt:size -Y
+      run: nimble make
     - name: Archive files
       run: nimble archive
     - name: Release
