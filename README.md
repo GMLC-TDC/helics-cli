@@ -26,9 +26,6 @@ $ helics run --help
 
 run [required&optional-params]
 Options:
-  -h, --help                       print this cligen-erated help
-  --help-syntax                    advanced: prepend,plurals,..
-  --version      bool    false     print version
   -p=, --path=   string  REQUIRED  set path
   -s, --silent   bool    false     set silent
 ```
@@ -38,9 +35,6 @@ $ helics validate --help
 
 validate [required&optional-params]
 Options:
-  -h, --help                       print this cligen-erated help
-  --help-syntax                    advanced: prepend,plurals,..
-  --version      bool    false     print version
   -p=, --path=   string  REQUIRED  set path
   -s, --silent   bool    false     set silent
 ```
@@ -48,16 +42,9 @@ Options:
 ```
 $ helics hook [required&optional-params]
 Options:
-  -h, --help                         print this cligen-erated help
-  --help-syntax                      advanced: prepend,plurals,..
-  --version          bool  false     print version
   -f=, --federates=  int   REQUIRED  set federates
 ```
 
 ```
 $ helics server [optional-params]
-Options:
-  -h, --help                  print this cligen-erated help
-  --help-syntax               advanced: prepend,plurals,..
-  --version      bool  false  print version
 ```
