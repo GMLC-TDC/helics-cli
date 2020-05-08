@@ -50,6 +50,7 @@ task archive, "Create archived assets":
     else:
       exec &"""chmod +x ./{assets / binDir / cli}"""
       exec &"tar czf {assets}.tar.gz {assets}"
+  rmDir dist_dir
 
 task changelog, "Create a changelog":
   exec("./scripts/changelog.nim")

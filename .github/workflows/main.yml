@@ -42,6 +42,11 @@ jobs:
       run: nimble release
     - name: Archive files
       run: nimble archive
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: helics
+        path: dist/*
     - name: Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
