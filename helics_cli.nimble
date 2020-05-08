@@ -4,7 +4,6 @@ version       = "0.2.1"
 author        = "Dheepak Krishnamurthy"
 description   = "HELICS command line interface"
 license       = "MIT"
-srcDir        = "src"
 binDir        = "bin"
 packageName   = "helics_cli"
 bin           = @[packageName]
@@ -21,10 +20,10 @@ import strutils
 import os
 import strformat
 
-task before_build, "Run before build":
+before build:
   rmDir(binDir)
 
-task after_build, "Run after build":
+after build:
   let cli = packageName
   mvFile binDir / cli, binDir / cli.replace("_cli", "")
 
@@ -52,14 +51,10 @@ task archive, "Create archived assets":
 task changelog, "Create a changelog":
   exec("./scripts/changelog.nim")
 
-task debug, "Clean, build":
+task debug, "Clean and build debug":
   exec "nimble clean"
-  exec "nimble before_build"
   exec "nimble build"
-  exec "nimble after_build"
 
-task make, "Clean, build":
+task release, "Clean and build release":
   exec "nimble clean"
-  exec "nimble before_build"
   exec "nimble build -d:release --opt:size -Y"
-  exec "nimble after_build"

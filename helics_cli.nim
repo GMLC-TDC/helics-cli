@@ -16,8 +16,8 @@ import threadpool
 import streams
 import strtabs
 
-import ./helics_hook
-import ./server
+import ./src/helics_hook
+import ./src/server
 
 proc c_setvbuf(f: File, buf: pointer, mode: cint, size: csize_t): cint {. importc: "setvbuf", header: "<stdio.h>", tags: [] .}
 
@@ -198,7 +198,7 @@ proc serve(): int =
 when isMainModule:
   import cligen
   include cligen/mergeCfgEnv
-  const nd = staticRead "../helics_cli.nimble"
+  const nd = staticRead "./helics_cli.nimble"
   clCfg.version = nd.fromNimble("version")
   dispatchMulti(
     [ run, noAutoEcho=true ],
