@@ -37,9 +37,9 @@ jobs:
       with:
         nim-version: ${{ env.NIM_VERSION }}
     - name: Install optional dependencies
-      run: nimble install nimcr
+      run: nimble install nimcr -y
     - name: Build files
-      run: nimble make
+      run: nimble release
     - name: Archive files
       run: nimble archive
     - name: Release
