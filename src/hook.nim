@@ -15,7 +15,7 @@ import threadpool
 import streams
 import strtabs
 
-include ../../helics.nim/src/helics
+import helics
 
 proc initCombinationFederate(
     core_name: string,
