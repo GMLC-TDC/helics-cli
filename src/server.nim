@@ -20,7 +20,7 @@ router helicsrouter:
   resp $(%data), "application/json"
 
  get "/data-flow-graph.json":
-  var f = open(joinPath(getCurrentDir(), "data_flow_graph.json"), fmRead)
+  var f = open(joinPath(getCurrentDir(), "data-flow-graph.json"), fmRead)
   var data = parseJson(f.readAll())
   resp $(%data), "application/json"
 

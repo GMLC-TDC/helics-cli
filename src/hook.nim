@@ -17,6 +17,25 @@ import strtabs
 
 import helics
 
+const helics_install_path = getEnv("HELICS_INSTALL")
+
+static:
+  putEnv("HELICS_INSTALL", helics_install_path)
+
+when defined(linux):
+  block:
+    {.passL: """-Wl,-rpath,'""" & helics_install_path & """/lib/'""".}
+    {.passL: """-Wl,-rpath,'$ORIGIN""" & helics_install_path & """/lib/'""".}
+    {.passL: """-Wl,-rpath,'$ORIGIN'""".}
+
+when defined(macosx):
+  block:
+    {.passL: """-Wl,-rpath,'""" & helics_install_path & """/lib/'""".}
+    {.passL: """-Wl,-rpath,'@loader_path""" & helics_install_path & """/lib/'""".}
+    {.passL: """-Wl,-rpath,'@loader_path'""".}
+    {.passL: """-Wl,-rpath,'@executable_path""" & helics_install_path & """/lib/'""".}
+    {.passL: """-Wl,-rpath,'@executable_path'""".}
+
 proc initCombinationFederate(
     core_name: string,
     nfederates = 1,
@@ -27,7 +46,7 @@ proc initCombinationFederate(
     log_level = 7,
     strict_type_checking = true,
     terminate_on_error = true,
-  ): helics_federate =
+  ): HelicsFederate =
 
   var err = helicsErrorInitialize()
   let core_init = &"{core_init_string} --federates={nfederates}"
@@ -58,7 +77,7 @@ proc runHookFederate*(nfederates: int) =
   let broker = helicsCreateBroker("zmq", "", &"-f {nfederates + 1}", err.addr)
 
   defer:
-    while helicsBrokerIsConnected(broker) == helics_true:
+    while helicsBrokerIsConnected(broker) == 1:
       sleep(250)
 
     helicsCloseLibrary()
@@ -76,7 +95,7 @@ proc runHookFederate*(nfederates: int) =
 
   echo "Querying all topics"
 
-  var q: helics_query
+  var q: HelicsQuery
 
   q = helicsCreateQuery("root", "federates")
   var federates = helicsQueryExecute(q, fed, err.addr).toString().replace("[", "").replace("]", "").split(";")
@@ -123,13 +142,13 @@ proc runHookFederate*(nfederates: int) =
   jsonfile.write(parseJson(federate_map).pretty(indent = 2))
   jsonfile.close()
 
-  jsonfile = open(joinPath(getCurrentDir(), "data_flow_graph.json"), fmWrite)
+  jsonfile = open(joinPath(getCurrentDir(), "data-flow-graph.json"), fmWrite)
   jsonfile.write(parseJson(data_flow_graph).pretty(indent = 2))
   jsonfile.close()
 
   echo "Starting hook federate"
 
-  # TODO: get publications and subscriptions
+  # TODO: subscribe to all topics
 
   helicsFederateEnterExecutingMode(fed, err.addr)
 
