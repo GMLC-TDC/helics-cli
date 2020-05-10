@@ -9,27 +9,16 @@ federate_name = f"Receiver Federate {sys.argv[1]}"
 print(f"{federate_name}: Helics version = {h.helicsGetVersion()}")
 
 
-print(f"{federate_name}: Creating Federate Info")
 fedinfo = h.helicsCreateFederateInfo()
-
-print(f"{federate_name}: Setting Federate Info Name")
 h.helicsFederateInfoSetCoreName(fedinfo, federate_name)
-
-print(f"{federate_name}: Setting Federate Info Core Type")
 h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
-
-print(f"{federate_name}: Setting Federate Info Init String")
 h.helicsFederateInfoSetCoreInitString(fedinfo, "--federates=1")
-
-print(f"{federate_name}: Setting Federate Info Time Delta")
 h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, 0.01)
 
-print(f"{federate_name}: Creating Value Federate")
 vfed = h.helicsCreateValueFederate(federate_name, fedinfo)
 print(f"{federate_name}: Value federate created")
 
-sub = h.helicsFederateRegisterSubscription(vfed, f"topic{sys.argv[1]}", "")
-print(f"{federate_name}: Subscription registered")
+sub = h.helicsFederateRegisterSubscription(vfed, f"globaltopic{sys.argv[1]}", "")
 
 h.helicsFederateEnterExecutingMode(vfed)
 print(f"{federate_name}: Entering execution mode")
