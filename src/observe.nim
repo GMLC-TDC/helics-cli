@@ -46,7 +46,7 @@ proc initCombinationFederate(
   let core_init = &"{core_init_string} --federates={nfederates}"
 
   let fedinfo = helicsCreateFederateInfo()
-  helicsFederateInfoSetCoreName(fedinfo, "__observer__", err.addr)
+  helicsFederateInfoSetCoreName(fedinfo, core_name, err.addr)
   helicsFederateInfoSetCoreTypeFromString(fedinfo, core_type, err.addr)
   helicsFederateInfoSetCoreInitString(fedinfo, core_init, err.addr)
   helicsFederateInfoSetTimeProperty(fedinfo, helics_property_time_delta.cint, delta, err.addr)
@@ -76,9 +76,9 @@ proc runObserverFederate*(nfederates: int) =
 
     helicsCloseLibrary()
 
-  echo "Creating hook federate"
+  echo "Creating observer federate"
 
-  let fed = initCombinationFederate("hook")
+  let fed = initCombinationFederate("__observer__")
 
   defer:
     helicsFederateFinalize(fed, err.addr)
@@ -140,7 +140,7 @@ proc runObserverFederate*(nfederates: int) =
   jsonfile.write(parseJson(data_flow_graph).pretty(indent = 2))
   jsonfile.close()
 
-  echo "Starting hook federate"
+  echo "Starting observer federate"
 
   # TODO: subscribe to all topics
 

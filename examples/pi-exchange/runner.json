@@ -38,9 +38,9 @@
     },
     {
       "directory": "../../",
-      "exec": "./bin/helics hook --federates 6",
+      "exec": "./bin/helics observe --federates 6",
       "host": "localhost",
-      "name": "hook"
+      "name": "observer"
     }
   ],
   "name": "pi-exchange"
