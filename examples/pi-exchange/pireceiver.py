@@ -4,7 +4,7 @@ import helics as h
 
 helicsversion = h.helicsGetVersion()
 
-federate_name = f"Receiver Federate {sys.argv[1]}"
+federate_name = f"ReceiverFederate{sys.argv[1]}"
 
 print(f"{federate_name}: Helics version = {h.helicsGetVersion()}")
 

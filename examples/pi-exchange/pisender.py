@@ -5,7 +5,7 @@ import sys
 from math import pi
 import helics as h
 
-federate_name = f"Sender Federate {sys.argv[1]}"
+federate_name = f"SenderFederate{sys.argv[1]}"
 
 print(f"{federate_name}: Helics version = {h.helicsGetVersion()}")
 

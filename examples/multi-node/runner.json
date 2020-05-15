@@ -1,0 +1,29 @@
+{
+  "federates": [
+    {
+      "directory": ".",
+      "exec": "python -u Test_Federate_p1u.py",
+      "host": "localhost",
+      "name": "Test_Federate_p1u"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u Test_Federate_p1uhs.py",
+      "host": "localhost",
+      "name": "Test_Federate_p1uhs"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u Test_Federate_sub_trans.py",
+      "host": "localhost",
+      "name": "Test_Federate_sub_trans"
+    },
+    {
+      "directory": "../../",
+      "exec": "./bin/helics observe --federates 3",
+      "host": "localhost",
+      "name": "observer"
+    }
+  ],
+  "name": "IterationFederation"
+}
