@@ -18,11 +18,11 @@ import strtabs
 
 import ./src/validate as v
 import ./src/run as r
-import ./src/hook as h
+import ./src/observe as o
 import ./src/server as s
 
-proc hook(federates: int): int =
-  runHookFederate(federates)
+proc observe(federates: int): int =
+  runObserverFederate(federates)
   return 0
 
 proc validate(path: string, silent = false): int =
@@ -42,6 +42,6 @@ when isMainModule:
   dispatchMulti(
     [ run, noAutoEcho=true ],
     [ validate, noAutoEcho=true ],
-    [ hook, noAutoEcho=true ],
+    [ observe, noAutoEcho=true ],
     [ server, noAutoEcho=true ],
   )

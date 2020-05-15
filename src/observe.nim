@@ -24,17 +24,17 @@ static:
 
 when defined(linux):
   block:
-    {.passL: """-Wl,-rpath,'""" & helics_install_path & """/lib/'""".}
-    {.passL: """-Wl,-rpath,'$ORIGIN""" & helics_install_path & """/lib/'""".}
+    {.passL: """-Wl,-rpath,'""" & helics_install_path & """./lib/'""".}
     {.passL: """-Wl,-rpath,'$ORIGIN'""".}
+    {.passL: """-Wl,-rpath,'$ORIGIN/../lib/'""".}
 
 when defined(macosx):
   block:
-    {.passL: """-Wl,-rpath,'""" & helics_install_path & """/lib/'""".}
-    {.passL: """-Wl,-rpath,'@loader_path""" & helics_install_path & """/lib/'""".}
+    {.passL: """-Wl,-rpath,'""" & helics_install_path & """./lib/'""".}
     {.passL: """-Wl,-rpath,'@loader_path'""".}
-    {.passL: """-Wl,-rpath,'@executable_path""" & helics_install_path & """/lib/'""".}
+    {.passL: """-Wl,-rpath,'@loader_path/../lib/'""".}
     {.passL: """-Wl,-rpath,'@executable_path'""".}
+    {.passL: """-Wl,-rpath,'@executable_path/../lib/'""".}
 
 proc initCombinationFederate(
     core_name: string,
@@ -52,7 +52,7 @@ proc initCombinationFederate(
   let core_init = &"{core_init_string} --federates={nfederates}"
 
   let fedinfo = helicsCreateFederateInfo()
-  helicsFederateInfoSetCoreName(fedinfo, "hook", err.addr)
+  helicsFederateInfoSetCoreName(fedinfo, "__observer__", err.addr)
   helicsFederateInfoSetCoreTypeFromString(fedinfo, core_type, err.addr)
   helicsFederateInfoSetCoreInitString(fedinfo, core_init, err.addr)
   helicsFederateInfoSetTimeProperty(fedinfo, helics_property_time_delta.cint, delta, err.addr)
@@ -67,7 +67,7 @@ proc toString(cs: cstring): string =
   copyMem(addr(s[0]), cs, cs.len)
   return s
 
-proc runHookFederate*(nfederates: int) =
+proc runObserverFederate*(nfederates: int) =
   echo "helics version: ", helicsGetVersion()
 
   echo "Creating broker"

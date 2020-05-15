@@ -11,7 +11,7 @@ where {SUBCMD} is one of:
   help      print comprehensive or per-cmd help
   run
   validate
-  hook
+  observe
   server
 
 helics {-h|--help} or with no args at all prints this message.
@@ -40,7 +40,7 @@ Options:
 ```
 
 ```
-$ helics hook [required&optional-params]
+$ helics observe [required&optional-params]
 Options:
   -f=, --federates=  int   REQUIRED  set federates
 ```
