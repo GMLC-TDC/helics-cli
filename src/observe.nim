@@ -25,16 +25,10 @@ static:
 when defined(linux):
   block:
     {.passL: """-Wl,-rpath,'""" & helics_install_path & """./lib/'""".}
-    {.passL: """-Wl,-rpath,'$ORIGIN'""".}
-    {.passL: """-Wl,-rpath,'$ORIGIN/../lib/'""".}
 
 when defined(macosx):
   block:
     {.passL: """-Wl,-rpath,'""" & helics_install_path & """./lib/'""".}
-    {.passL: """-Wl,-rpath,'@loader_path'""".}
-    {.passL: """-Wl,-rpath,'@loader_path/../lib/'""".}
-    {.passL: """-Wl,-rpath,'@executable_path'""".}
-    {.passL: """-Wl,-rpath,'@executable_path/../lib/'""".}
 
 proc initCombinationFederate(
     core_name: string,
