@@ -49,9 +49,9 @@ proc initCombinationFederate(
   helicsFederateInfoSetCoreName(fedinfo, core_name, err.addr)
   helicsFederateInfoSetCoreTypeFromString(fedinfo, core_type, err.addr)
   helicsFederateInfoSetCoreInitString(fedinfo, core_init, err.addr)
-  helicsFederateInfoSetTimeProperty(fedinfo, helics_property_time_delta.cint, delta, err.addr)
-  helicsFederateInfoSetFlagOption(fedinfo, helics_flag_terminate_on_error.cint, true.cint, err.addr)
-  helicsFederateInfoSetFlagOption(fedinfo, helics_handle_option_strict_type_checking.cint, true.cint, err.addr)
+  helicsFederateInfoSetTimeProperty(fedinfo, HELICS_PROPERTY_TIME_DELTA.cint, delta, err.addr)
+  helicsFederateInfoSetFlagOption(fedinfo, HELICS_FLAG_TERMINATE_ON_ERROR.cint, true.cint, err.addr)
+  helicsFederateInfoSetFlagOption(fedinfo, HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING.cint, true.cint, err.addr)
 
   let fed = helicsCreateCombinationFederate(core_name, fedinfo, err.addr)
   return fed
