@@ -38,7 +38,9 @@ when isMainModule:
   import cligen
   include cligen/mergeCfgEnv
   const nd = staticRead "./helics_cli.nimble"
-  clCfg.version = nd.fromNimble("version")
+  const gv = staticExec("git rev-parse --short HEAD")
+  const gb = staticExec("git rev-parse --abbrev-ref HEAD")
+  clCfg.version = nd.fromNimble("version") & "-" & gb & "-" & gv
   dispatchMulti(
     [ run, noAutoEcho=true ],
     [ validate, noAutoEcho=true ],
