@@ -40,8 +40,6 @@ jobs:
       run: nimble install nimcr -y
     - name: Build files
       run: nimble release
-    - name: Archive files
-      run: nimble archive
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
@@ -54,3 +52,24 @@ jobs:
         files: 'dist/*'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  build-linux-arm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build files
+        uses: docker://nonylene/nim-crosscompile
+        with:
+          entrypoint: /bin/nimble
+          args: release --os:linux --cpu:arm -Y
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: helics
+          path: dist/*
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: 'dist/*'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
