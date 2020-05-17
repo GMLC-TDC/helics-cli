@@ -30,12 +30,9 @@ after build:
     let cli = packageName
   mvFile binDir / cli, binDir / cli.replace("_cli", "")
 
-task clean, "Clean project":
-  rmDir(nimCacheDir())
-
-task archive, "Create archived assets":
+proc package(packageOs: string, packageCpu: string) =
   let cli = packageName.replace("_cli", "")
-  let assets = &"{cli}-v{version}-{buildOS}-{buildCpu}"
+  let assets = &"{cli}-v{version}-{packageOs}-{packageCpu}"
   let dist = "dist"
   let dist_dir = dist/assets
   rmDir dist_dir
@@ -44,12 +41,15 @@ task archive, "Create archived assets":
   cpFile "LICENSE", dist_dir/"LICENSE"
   cpFile "README.md", dist_dir/"README.md"
   withDir dist:
-    when buildOS == "windows":
+    when buildOs == "windows":
       exec &"7z a {assets}.zip {assets}"
     else:
       exec &"""chmod +x ./{assets / binDir / cli}"""
       exec &"tar czf {assets}.tar.gz {assets}"
   rmDir dist_dir
+
+task clean, "Clean project":
+  rmDir(nimCacheDir())
 
 task changelog, "Create a changelog":
   exec("./scripts/changelog.nim")
@@ -61,4 +61,9 @@ task debug, "Clean and build debug":
 task release, "Clean and build release":
   exec "nimble clean"
   exec &"nimble build --os:{buildOS} --cpu:{buildCpu} -d:release --opt:size -Y"
-  exec &"nimble archive --os:{buildOS} --cpu:{buildCpu}"
+  package(buildOS, buildCpu)
+
+task releasearm, "Clean and build release":
+  exec "nimble clean"
+  exec &"nimble build --os:{buildOS} --cpu:arm -d:release --opt:size -Y"
+  package(buildOs, "arm")

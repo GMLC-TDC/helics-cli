@@ -60,7 +60,7 @@ jobs:
         uses: docker://nonylene/nim-crosscompile
         with:
           entrypoint: /bin/nimble
-          args: release --os:linux --cpu:arm -Y
+          args: releasearm
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
