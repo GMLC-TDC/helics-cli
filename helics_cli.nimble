@@ -35,7 +35,7 @@ task clean, "Clean project":
 
 task archive, "Create archived assets":
   let cli = packageName.replace("_cli", "")
-  let assets = &"{cli}-v{version}-{buildOS}"
+  let assets = &"{cli}-v{version}-{buildOS}-{buildCpu}"
   let dist = "dist"
   let dist_dir = dist/assets
   rmDir dist_dir
@@ -61,4 +61,4 @@ task debug, "Clean and build debug":
 task release, "Clean and build release":
   exec "nimble clean"
   exec &"nimble build --os:{buildOS} --cpu:{buildCpu} -d:release --opt:size -Y"
-  exec "nimble archive"
+  exec &"nimble archive --os:{buildOS} --cpu:{buildCpu}"
