@@ -49,9 +49,6 @@ proc toString(cs: cstring): string =
   return s
 
 proc runObserverFederate*(nfederates: int): int =
-  if dynlibHandle.isNil:
-    echo "Cannot load helics library. Set HELICS_INSTALL environment variable or check documentation."
-    return 1
   echo "helics version: ", helicsGetVersion()
 
   echo "Creating broker"

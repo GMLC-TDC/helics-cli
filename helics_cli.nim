@@ -22,8 +22,7 @@ import ./src/observe as o
 import ./src/server as s
 
 proc observe(federates: int): int =
-  runObserverFederate(federates)
-  return 0
+  return runObserverFederate(federates)
 
 proc validate(path: string, silent = false): int =
   return runValidate(path, silent)
