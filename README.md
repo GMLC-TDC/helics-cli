@@ -1,5 +1,13 @@
 # helics-cli ![CI](https://github.com/GMLC-TDC/helics-cli/workflows/CI/badge.svg)
 
+### Install
+
+Check out the latest [releases](https://github.com/GMLC-TDC/helics-cli/releases/latest) and download
+a precompiled binary for the platform of your choice.
+
+Unzip the file and move the `helics` binary to the `bin` folder in your HELICS installation of choice.
+Alternatively, you can set `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH`.
+
 ### Documentation
 
 ```
@@ -48,3 +56,9 @@ Options:
 ```
 $ helics server [optional-params]
 ```
+
+### Build from source
+
+- Install [nim](https://nim-lang.org/install.html).
+- Run `nimble build`.
+- Run `./bin/helics --version`.
