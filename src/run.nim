@@ -1,5 +1,3 @@
-
-from os import sleep
 import httpclient
 import json
 import mimetypes
@@ -73,6 +71,7 @@ proc runRun*(path: string, silent = false): int =
 
   var error_occured = false
   while not all(threads, r => r.isReady):
+    os.sleep(250)
     for (i, t) in threads.pairs:
       if t.isReady and ^t != 0:
         print(&"""Something went wrong with federate `{process_names[i]}`. Please check the log files.""", sError)
