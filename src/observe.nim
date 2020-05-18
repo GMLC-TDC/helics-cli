@@ -17,19 +17,6 @@ import strtabs
 
 import helics
 
-const helics_install_path = getEnv("HELICS_INSTALL")
-
-static:
-  putEnv("HELICS_INSTALL", helics_install_path)
-
-when defined(linux):
-  block:
-    {.passL: """-Wl,-rpath,'""" & helics_install_path & """./lib/'""".}
-
-when defined(macosx):
-  block:
-    {.passL: """-Wl,-rpath,'""" & helics_install_path & """./lib/'""".}
-
 proc initCombinationFederate(
     core_name: string,
     nfederates = 1,
@@ -61,7 +48,10 @@ proc toString(cs: cstring): string =
   copyMem(addr(s[0]), cs, cs.len)
   return s
 
-proc runObserverFederate*(nfederates: int) =
+proc runObserverFederate*(nfederates: int): int =
+  if dynlibHandle.isNil:
+    echo "Cannot load helics library. Set HELICS_INSTALL environment variable or check documentation."
+    return 1
   echo "helics version: ", helicsGetVersion()
 
   echo "Creating broker"
@@ -72,7 +62,7 @@ proc runObserverFederate*(nfederates: int) =
 
   defer:
     while helicsBrokerIsConnected(broker) == 1:
-      sleep(250)
+      os.sleep(250)
 
     helicsCloseLibrary()
 
@@ -94,6 +84,7 @@ proc runObserverFederate*(nfederates: int) =
   q = helicsCreateQuery("root", "federates")
   var federates = helicsQueryExecute(q, fed, err.addr).toString().replace("[", "").replace("]", "").split(";")
   echo federates
+  helicsQueryFree(q)
 
   for name in federates:
     echo "name \"", name, "\""
@@ -101,31 +92,39 @@ proc runObserverFederate*(nfederates: int) =
     q = helicsCreateQuery(name, "exists")
     echo "    exists: \"", helicsQueryExecute(q, fed, err.addr), "\""
     echo err.message
+    helicsQueryFree(q)
 
     q = helicsCreateQuery(name, "subscriptions")
     echo "    subscriptions: \"", helicsQueryExecute(q, fed, err.addr), "\""
     echo err.message
+    helicsQueryFree(q)
 
     q = helicsCreateQuery(name, "endpoints")
     echo "    endpoints: \"", helicsQueryExecute(q, fed, err.addr), "\""
     echo err.message
+    helicsQueryFree(q)
 
     q = helicsCreateQuery(name, "inputs")
     echo "    inputs: \"", helicsQueryExecute(q, fed, err.addr), "\""
     echo err.message
+    helicsQueryFree(q)
 
     q = helicsCreateQuery(name, "publications")
     echo "    publications: \"", helicsQueryExecute(q, fed, err.addr), "\""
     echo err.message
+    helicsQueryFree(q)
 
   q = helicsCreateQuery("root", "federate_map")
   let federate_map = helicsQueryExecute(q, fed, err.addr).toString()
+  helicsQueryFree(q)
 
   q = helicsCreateQuery("root", "dependency_graph")
   let dependency_graph = helicsQueryExecute(q, fed, err.addr).toString()
+  helicsQueryFree(q)
 
   q = helicsCreateQuery("root", "data_flow_graph")
   let data_flow_graph = helicsQueryExecute(q, fed, err.addr).toString()
+  helicsQueryFree(q)
 
   var jsonfile: File
   jsonfile = open(joinPath(getCurrentDir(), "dependency-graph.json"), fmWrite)
@@ -150,3 +149,5 @@ proc runObserverFederate*(nfederates: int) =
   while currenttime < 100.0:
     echo &"Current time is {currenttime}"
     currenttime = helicsFederateRequestTime(fed, 100.0, err.addr)
+
+  return 0
