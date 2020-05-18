@@ -1,13 +1,5 @@
 name: CI
-
-on:
-  push:
-    branches: [ master ]
-    tags:
-    - 'v*'
-  pull_request:
-    branches: [ master ]
-
+on: [push]
 jobs:
   build:
     runs-on: ${{ matrix.os }}
