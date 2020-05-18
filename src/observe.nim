@@ -17,6 +17,19 @@ import strtabs
 
 import helics
 
+const HELICS_INSTALL_PATH = getEnv("HELICS_INSTALL")
+
+static:
+  putEnv("HELICS_INSTALL", HELICS_INSTALL_PATH)
+
+when defined(linux):
+  block:
+    {.passL: """-Wl,-rpath,'""" & HELICS_INSTALL_PATH & """./lib/'""".}
+
+when defined(macosx):
+  block:
+    {.passL: """-Wl,-rpath,'""" & HELICS_INSTALL_PATH & """./lib/'""".}
+
 proc initCombinationFederate(
     core_name: string,
     nfederates = 1,
