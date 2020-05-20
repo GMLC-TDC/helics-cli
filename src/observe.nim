@@ -1,19 +1,9 @@
 import strformat
 import strutils
-import httpclient
 import json
-import mimetypes
 import os
-import osproc
-import sequtils
-import shlex
 import strformat
 import strutils
-import sugar
-import terminal
-import threadpool
-import streams
-import strtabs
 
 import helics
 
@@ -24,11 +14,11 @@ static:
 
 when defined(linux):
   block:
-    {.passL: """-Wl,-rpath,'""" & HELICS_INSTALL_PATH & """./lib/'""".}
+    {.passl: """-Wl,-rpath,'""" & HELICS_INSTALL_PATH & """./lib/'""".}
 
 when defined(macosx):
   block:
-    {.passL: """-Wl,-rpath,'""" & HELICS_INSTALL_PATH & """./lib/'""".}
+    {.passl: """-Wl,-rpath,'""" & HELICS_INSTALL_PATH & """./lib/'""".}
 
 proc initCombinationFederate(
     core_name: string,
@@ -50,8 +40,8 @@ proc initCombinationFederate(
   helicsFederateInfoSetCoreTypeFromString(fedinfo, core_type, err.addr)
   helicsFederateInfoSetCoreInitString(fedinfo, core_init, err.addr)
   helicsFederateInfoSetTimeProperty(fedinfo, HELICS_PROPERTY_TIME_DELTA.cint, delta, err.addr)
-  helicsFederateInfoSetFlagOption(fedinfo, HELICS_FLAG_TERMINATE_ON_ERROR.cint, true.cint, err.addr)
-  helicsFederateInfoSetFlagOption(fedinfo, HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING.cint, true.cint, err.addr)
+  helicsFederateInfoSetFlagOption(fedinfo, HELICS_FLAG_TERMINATE_ON_ERROR.cint, true, err.addr)
+  helicsFederateInfoSetFlagOption(fedinfo, HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING.cint, true, err.addr)
 
   let fed = helicsCreateCombinationFederate(core_name, fedinfo, err.addr)
   return fed
@@ -71,7 +61,7 @@ proc runObserverFederate*(nfederates: int): int =
   let broker = helicsCreateBroker("zmq", "", &"-f {nfederates + 1}", err.addr)
 
   defer:
-    while helicsBrokerIsConnected(broker) == 1:
+    while helicsBrokerIsConnected(broker) == true:
       os.sleep(250)
 
     helicsCloseLibrary()
