@@ -1,0 +1,853 @@
+[
+  {
+    "name": "Gridlab-d_1",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  },  {
+  "name": "Gridlab-d_1",
+  "granted": 3,
+  "requested": 4
+},
+  {
+    "name": "Gridlab-d_2",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Gridlab-d_3",
+    "granted": 3,
+    "requested": 4
+  },
+  {
+    "name": "Griddyn",
+    "granted": 3.1,
+    "requested": 2
+  },
+  {
+    "name": "hvac_controller_1",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_2",
+    "granted": 3,
+    "requested": "Inf"
+  },
+  {
+    "name": "hvac_controller_3",
+    "granted": 3,
+    "requested": "Inf"
+  }
+]

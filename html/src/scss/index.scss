@@ -1,0 +1,16 @@
+body {
+  padding-top: 5rem;
+}
+
+#controls button {
+  margin: 0.25em auto;
+}
+
+.helics-table-container {
+  max-width: 75em;
+}
+
+@import "~bootstrap/scss/bootstrap";
+@import "~bootstrap-table/src/bootstrap-table";
+
+@import "~bootstrap-darkmode/darktheme";
