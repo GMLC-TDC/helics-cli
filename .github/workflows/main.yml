@@ -11,7 +11,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
     env:
-      NIM_VERSION: '1.2.0'
+      NIM_VERSION: 'stable'
     steps:
     - uses: actions/checkout@master
     - uses: jiro4989/setup-nim-action@v1
