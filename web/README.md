@@ -9,7 +9,7 @@ library, compatible with modern browsers.
 `npm` is required to install dependencies and build the package. All other dependencies will be automatically retrieved 
 and compiled on-the-fly. 
 
-To build the HELICS-cli Web Interface, navigate to the html directory within the HELICS-cli repository and execute the 
+To build the HELICS-cli Web Interface, navigate to the `web` directory within the HELICS-cli repository and execute the 
 following commands: 
 - `npm install` 
 - `npm run build`
