@@ -25,7 +25,7 @@ router helicsrouter:
   resp $(%data), "application/json"
 
 proc runServer*(): int =
-  let port = Port(42069)
+  let port = Port(8000)
   let settings = newSettings(port=port)
   var jester = initJester(helicsrouter, settings=settings)
   jester.serve()
