@@ -4,6 +4,8 @@ import json
 import os
 import strformat
 import strutils
+import sequtils
+import db_sqlite
 
 import helics
 
@@ -52,6 +54,18 @@ proc toString(cs: cstring): string =
   return s
 
 proc runObserverFederate*(nfederates: int): int =
+  let db = open("helics.db", "", "", "")
+  defer:
+    db.close()
+
+  db.exec(sql"DROP TABLE IF EXISTS meta_data")
+  db.exec(sql"""CREATE TABLE meta_data (
+                   name  text,
+                   value text
+                )""")
+
+  db.exec(sql"INSERT INTO meta_data(name, value) VALUES (?, ?);", "version", helicsGetVersion())
+
   echo "helics version: ", helicsGetVersion()
 
   echo "Creating broker"
@@ -59,6 +73,7 @@ proc runObserverFederate*(nfederates: int): int =
   var err = helicsErrorInitialize()
 
   let broker = helicsCreateBroker("zmq", "", &"-f {nfederates + 1}", err.addr)
+  db.exec(sql"INSERT INTO meta_data(name, value) VALUES (?, ?);", "nfederates", nfederates)
 
   defer:
     while helicsBrokerIsConnected(broker) == true:
@@ -83,8 +98,9 @@ proc runObserverFederate*(nfederates: int): int =
 
   q = helicsCreateQuery("root", "federates")
   var federates = helicsQueryExecute(q, fed, err.addr).toString().replace("[", "").replace("]", "").split(";")
-  echo federates
   helicsQueryFree(q)
+
+  db.exec(sql"INSERT INTO meta_data(name, value) VALUES (?, ?);", "federates", federates.filterIt(not it.startswith("__")).join(","))
 
   for name in federates:
     echo "name \"", name, "\""
