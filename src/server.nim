@@ -7,7 +7,10 @@ import os
 
 router helicsrouter:
  get "/":
-   resp readFile(joinPath(getCurrentDir(), "/web/dist/index.html"))
+  if fileExists(joinPath(getCurrentDir(), "/web/dist/index.html")):
+    resp readFile(joinPath(getCurrentDir(), "/web/dist/index.html"))
+  else:
+    resp readFile(joinPath(getCurrentDir(), "/web/notfound.html"))
 
  get "/api/federate-time":
   var f = open(joinPath(getCurrentDir(), "/web/src/json/federate-time.json"), fmRead)
