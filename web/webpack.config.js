@@ -11,7 +11,9 @@ module.exports = {
     output: {
         filename: '[name].bundle.js',
         chunkFilename: '[name].bundle.js',
-        path: path.resolve(__dirname, 'dist')
+        path: path.resolve(__dirname, 'dist'),
+        libraryTarget: 'var',
+        library: 'EntryPoint'
     },
     optimization: {
         chunkIds: 'named',
@@ -30,7 +32,7 @@ module.exports = {
         new webpack.ProvidePlugin({
             jQuery: 'jquery',
             $: 'jquery',
-            jquery: 'jquery',
+            jquery: 'jquery'
         })
     ],
     module: {
