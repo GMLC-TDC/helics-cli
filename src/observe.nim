@@ -6,6 +6,7 @@ import strformat
 import strutils
 import sequtils
 import db_sqlite
+import ./database
 
 import helics
 
@@ -54,26 +55,17 @@ proc toString(cs: cstring): string =
   return s
 
 proc runObserverFederate*(nfederates: int): int =
-  let db = open("helics.db", "", "", "")
-  defer:
-    db.close()
 
-  db.exec(sql"DROP TABLE IF EXISTS meta_data")
-  db.exec(sql"""CREATE TABLE meta_data (
-                   name  text,
-                   value text
-                )""")
+  var db = initializeDatabase("helics.db")
 
-  db.exec(sql"INSERT INTO meta_data(name, value) VALUES (?, ?);", "version", helicsGetVersion())
-
-  echo "helics version: ", helicsGetVersion()
-
+  db.insertMetaData("version", $(helicsGetVersion()))
   echo "Creating broker"
 
   var err = helicsErrorInitialize()
 
   let broker = helicsCreateBroker("zmq", "", &"-f {nfederates + 1}", err.addr)
-  db.exec(sql"INSERT INTO meta_data(name, value) VALUES (?, ?);", "nfederates", nfederates)
+
+  db.insertMetaData("nfederates", nfederates)
 
   defer:
     while helicsBrokerIsConnected(broker) == true:
@@ -100,7 +92,7 @@ proc runObserverFederate*(nfederates: int): int =
   var federates = helicsQueryExecute(q, fed, err.addr).toString().replace("[", "").replace("]", "").split(";")
   helicsQueryFree(q)
 
-  db.exec(sql"INSERT INTO meta_data(name, value) VALUES (?, ?);", "federates", federates.filterIt(not it.startswith("__")).join(","))
+  db.insertMetaData("federates", federates.filterIt(not it.startswith("__")).join(","))
 
   for name in federates:
     echo "name \"", name, "\""
@@ -165,5 +157,7 @@ proc runObserverFederate*(nfederates: int): int =
   while currenttime < 100.0:
     echo &"Current time is {currenttime}"
     currenttime = helicsFederateRequestTime(fed, 100.0, err.addr)
+
+  db.close()
 
   return 0
