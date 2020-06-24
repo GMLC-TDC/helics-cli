@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.3.3"
+version       = "0.4.0"
 author        = "Dheepak Krishnamurthy"
 description   = "HELICS command line interface"
 license       = "MIT"
