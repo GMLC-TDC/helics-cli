@@ -21,25 +21,30 @@ when defined(windows):
 else:
   const ENV_COMMAND* = "env"
 
+proc getEnv(): StringTableRef =
+  var env = {:}.newStringTable
+  when not defined(windows):
+    for line in execProcess(ENV_COMMAND).splitLines():
+      var s = line.split("=")
+      env[s[0]] = join(s[1..s.high])
+  return env
+
+
 proc runRun*(path: string, silent = false): int =
   if runValidate(path, true) != 0:
     print("Runner json file is not per specification. Please check documentation for more information.", sError)
     return 1
 
-  var path_to_config = path
-  path_to_config.normalizePath()
-  let dirname = parentDir(path_to_config)
+  var config_path = path
+  config_path.normalizePath()
+  let dirname = parentDir(config_path)
 
-  var f = open(path_to_config, fmRead)
+  var f = open(config_path, fmRead)
   var runner = parseJson(f.readAll())
 
   print(&"""Running federation `{runner["name"].getStr}` with {runner["federates"].len} federates.""", silent = silent)
 
-  var env = {:}.newStringTable
-  for line in execProcess(ENV_COMMAND).splitLines():
-    var s = line.split("=")
-    env[s[0]] = join(s[1..s.high])
-
+  let env =  getEnv()
   var processes = newSeq[Process]()
   var process_names = newSeq[string]()
   var threads = newSeq[FlowVar[int]]()
