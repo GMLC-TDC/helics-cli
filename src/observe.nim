@@ -10,20 +10,8 @@ import ./database
 
 import helics
 
-const HELICS_INSTALL_PATH = getEnv("HELICS_INSTALL")
-
-static:
-  putEnv("HELICS_INSTALL", HELICS_INSTALL_PATH)
-
-when defined(linux):
-  block:
-    {.passl: """-Wl,-rpath,'""" & HELICS_INSTALL_PATH & """./lib/'""".}
-
-when defined(macosx):
-  block:
-    {.passl: """-Wl,-rpath,'""" & HELICS_INSTALL_PATH & """./lib/'""".}
-
 proc initCombinationFederate(
+    l: HelicsLibrary,
     core_name: string,
     nfederates = 1,
     core_type = "zmq",
@@ -35,18 +23,18 @@ proc initCombinationFederate(
     terminate_on_error = true,
   ): HelicsFederate =
 
-  var err = helicsErrorInitialize()
+  var err = l.helicsErrorInitialize()
   let core_init = &"{core_init_string} --federates={nfederates}"
 
-  let fedinfo = helicsCreateFederateInfo()
-  helicsFederateInfoSetCoreName(fedinfo, core_name, err.addr)
-  helicsFederateInfoSetCoreTypeFromString(fedinfo, core_type, err.addr)
-  helicsFederateInfoSetCoreInitString(fedinfo, core_init, err.addr)
-  helicsFederateInfoSetTimeProperty(fedinfo, HELICS_PROPERTY_TIME_DELTA.cint, delta, err.addr)
-  helicsFederateInfoSetFlagOption(fedinfo, HELICS_FLAG_TERMINATE_ON_ERROR.cint, true, err.addr)
-  helicsFederateInfoSetFlagOption(fedinfo, HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING.cint, true, err.addr)
+  let fedinfo = l.helicsCreateFederateInfo()
+  l.helicsFederateInfoSetCoreName(fedinfo, core_name)
+  l.helicsFederateInfoSetCoreTypeFromString(fedinfo, core_type)
+  l.helicsFederateInfoSetCoreInitString(fedinfo, core_init)
+  l.helicsFederateInfoSetTimeProperty(fedinfo, HELICS_PROPERTY_TIME_DELTA.int, delta)
+  l.helicsFederateInfoSetFlagOption(fedinfo, HELICS_FLAG_TERMINATE_ON_ERROR.int, true)
+  l.helicsFederateInfoSetFlagOption(fedinfo, HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING.cint, true)
 
-  let fed = helicsCreateCombinationFederate(core_name, fedinfo, err.addr)
+  let fed = l.helicsCreateCombinationFederate(core_name, fedinfo)
   return fed
 
 proc toString(cs: cstring): string =
@@ -55,84 +43,78 @@ proc toString(cs: cstring): string =
   return s
 
 proc runObserverFederate*(nfederates: int): int =
+  let l = loadHelicsLibrary("libhelicsSharedLib(|.2.5.2|.2.5.1|.2.5.0).dylib")
 
   var db = initializeDatabase("helics.db")
 
-  db.insertMetaData("version", $(helicsGetVersion()))
+  db.insertMetaData("version", $(l.helicsGetVersion()))
   echo "Creating broker"
 
-  var err = helicsErrorInitialize()
-
-  let broker = helicsCreateBroker("zmq", "", &"-f {nfederates + 1}", err.addr)
+  let broker = l.helicsCreateBroker("zmq", "", &"-f {nfederates + 1}")
 
   db.insertMetaData("nfederates", nfederates)
 
   defer:
-    while helicsBrokerIsConnected(broker) == true:
+    while l.helicsBrokerIsConnected(broker) == true:
       os.sleep(250)
 
-    helicsCloseLibrary()
+    l.helicsCloseLibrary()
 
   echo "Creating observer federate"
 
-  let fed = initCombinationFederate("__observer__")
+  let fed = initCombinationFederate(l, "__observer__")
 
   defer:
-    helicsFederateFinalize(fed, err.addr)
-    helicsFederateFree(fed)
+    l.helicsFederateFinalize(fed)
+    l.helicsFederateFree(fed)
 
   echo "Entering initializing mode"
-  helicsFederateEnterInitializingMode(fed, err.addr)
+  l.helicsFederateEnterInitializingMode(fed)
 
   echo "Querying all topics"
 
   var q: HelicsQuery
 
-  q = helicsCreateQuery("root", "federates")
-  var federates = helicsQueryExecute(q, fed, err.addr).toString().replace("[", "").replace("]", "").split(";")
-  helicsQueryFree(q)
+  q = l.helicsCreateQuery("root", "federates")
+  var federates = l.helicsQueryExecute(q, fed).toString().replace("[", "").replace("]", "").split(";")
+  l.helicsQueryFree(q)
 
   db.insertMetaData("federates", federates.filterIt(not it.startswith("__")).join(","))
 
   for name in federates:
     echo "name \"", name, "\""
 
-    q = helicsCreateQuery(name, "exists")
-    echo "    exists: \"", helicsQueryExecute(q, fed, err.addr), "\""
-    echo err.message
-    helicsQueryFree(q)
+    q = l.helicsCreateQuery(name, "exists")
+    echo "    exists: \"", l.helicsQueryExecute(q, fed), "\""
+    l.helicsQueryFree(q)
 
-    q = helicsCreateQuery(name, "subscriptions")
-    echo "    subscriptions: \"", helicsQueryExecute(q, fed, err.addr), "\""
-    echo err.message
-    helicsQueryFree(q)
+    q = l.helicsCreateQuery(name, "subscriptions")
+    echo "    subscriptions: \"", l.helicsQueryExecute(q, fed), "\""
+    l.helicsQueryFree(q)
 
-    q = helicsCreateQuery(name, "endpoints")
-    echo "    endpoints: \"", helicsQueryExecute(q, fed, err.addr), "\""
-    echo err.message
-    helicsQueryFree(q)
+    q = l.helicsCreateQuery(name, "endpoints")
+    echo "    endpoints: \"", l.helicsQueryExecute(q, fed), "\""
+    l.helicsQueryFree(q)
 
-    q = helicsCreateQuery(name, "inputs")
-    echo "    inputs: \"", helicsQueryExecute(q, fed, err.addr), "\""
-    echo err.message
-    helicsQueryFree(q)
+    q = l.helicsCreateQuery(name, "inputs")
+    echo "    inputs: \"", l.helicsQueryExecute(q, fed), "\""
+    l.helicsQueryFree(q)
 
-    q = helicsCreateQuery(name, "publications")
-    echo "    publications: \"", helicsQueryExecute(q, fed, err.addr), "\""
-    echo err.message
-    helicsQueryFree(q)
+    q = l.helicsCreateQuery(name, "publications")
+    echo "    publications: \"", l.helicsQueryExecute(q, fed), "\""
+    l.helicsQueryFree(q)
 
-  q = helicsCreateQuery("root", "federate_map")
-  let federate_map = helicsQueryExecute(q, fed, err.addr).toString()
-  helicsQueryFree(q)
+  q = l.helicsCreateQuery("root", "federate_map")
+  let federate_map = l.helicsQueryExecute(q, fed).toString()
+  l.helicsQueryFree(q)
 
-  q = helicsCreateQuery("root", "dependency_graph")
-  let dependency_graph = helicsQueryExecute(q, fed, err.addr).toString()
-  helicsQueryFree(q)
+  q = l.helicsCreateQuery("root", "dependency_graph")
+  let dependency_graph = l.helicsQueryExecute(q, fed).toString()
+  l.helicsQueryFree(q)
 
-  q = helicsCreateQuery("root", "data_flow_graph")
-  let data_flow_graph = helicsQueryExecute(q, fed, err.addr).toString()
-  helicsQueryFree(q)
+  q = l.helicsCreateQuery("root", "data_flow_graph")
+  let data_flow_graph = l.helicsQueryExecute(q, fed).toString()
+  l.helicsQueryFree(q)
 
   var jsonfile: File
   jsonfile = open(joinPath(getCurrentDir(), "dependency-graph.json"), fmWrite)
@@ -151,12 +133,12 @@ proc runObserverFederate*(nfederates: int): int =
 
   # TODO: subscribe to all topics
 
-  helicsFederateEnterExecutingMode(fed, err.addr)
+  l.helicsFederateEnterExecutingMode(fed)
 
   var currenttime = 0.0
   while currenttime < 100.0:
     echo &"Current time is {currenttime}"
-    currenttime = helicsFederateRequestTime(fed, 100.0, err.addr)
+    currenttime = l.helicsFederateRequestTime(fed, 100.0)
 
   db.close()
 
