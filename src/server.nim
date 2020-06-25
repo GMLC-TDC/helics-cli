@@ -1,9 +1,11 @@
 import jester
 import json
-# import db_sqlite
+import db_sqlite
 import os
+import strutils
+import browsers
 
-# var federates: seq[string] = @[]
+let db = open(joinPath(getCurrentDir(), "/database/helics_cli.db"), "","","")
 
 router helicsrouter:
  get "/":
@@ -13,24 +15,20 @@ router helicsrouter:
     resp readFile(joinPath(getCurrentDir(), "/web/notfound.html"))
 
  get "/api/federate-time":
-  var f = open(joinPath(getCurrentDir(), "/web/src/json/federate-time.json"), fmRead)
-  var data = parseJson(f.readAll())
-  resp $(%data), "application/json"
+  var localJsonArray = %* []
+  for row in db.fastRows(sql"SELECT name, granted, requested FROM Federates"):
+    localJsonArray.add(%* {"name": row[0], "granted": row[1], "requested": row[2]})
+  var response = ""
+  toUgly(response, localJsonArray)
+  resp response, "application/json"
 
  get "/api/publication-data":
-  var f = open(joinPath(getCurrentDir(), "/web/src/json/publication-data.json"), fmRead)
-  var data = parseJson(f.readAll())
-  resp $(%data), "application/json"
-
-#  get "/api/dependency-graph":
-#   var f = open(joinPath(getCurrentDir(), "/web/src/json/dependency-graph.json"), fmRead)
-#   var data = parseJson(f.readAll())
-#   resp $(%data), "application/json"
-
-#  get "/api/data-flow-graph":
-#   var f = open(joinPath(getCurrentDir(), "/web/src/json/data-flow-graph.json"), fmRead)
-#   var data = parseJson(f.readAll())
-#   resp $(%data), "application/json"
+  var localJsonArray = %* []
+  for row in db.fastRows(sql"SELECT key, sender, pub_time, pub_value, new FROM Publications"):
+    localJsonArray.add(%* {"key": row[0], "sender": row[1], "pub_time": row[2], "pub_value": row[3], "new": parseBool(row[4])})
+  var response = ""
+  toUgly(response, localJsonArray)
+  resp response, "application/json"
 
  put "/api/FastForwardFederation":
   resp Http200, ""
@@ -45,6 +43,7 @@ proc runServer*(): int =
   let port = Port(8000)
   let settings = newSettings(port=port,staticDir="./web/dist")
   var jester = initJester(helicsrouter, settings=settings)
+  openDefaultBrowser("http://127.0.0.1:8000")
   jester.serve()
   return 0
 

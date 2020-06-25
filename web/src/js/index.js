@@ -45,7 +45,6 @@ $('#fastForwardFederation').on('click', () => signal('FastForwardFederation', re
 $('#stopFederation').on('click', () => signal('StopFederation', reloadCharts()));
 $('#signalFederation').on('click', () => signal('SignalFederation', reloadCharts(), $('#nextTimeStep').val()));
 
-
 // Bootstrap-table cell highlighting logic.
 let cellStyle = function (value) {
     if (value === true)

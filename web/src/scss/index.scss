@@ -1,8 +1,12 @@
+html {
+  overflow-y: scroll;
+}
+
 body {
   padding-top: 5rem;
 }
 
-#controls button {
+.btn-controls {
   margin: 0.25em auto;
 }
 
