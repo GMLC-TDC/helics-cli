@@ -15,6 +15,7 @@ requires "cligen"
 requires "shlex"
 requires "jester"
 requires "https://github.com/GMLC-TDC/helics.nim#head"
+requires "https://github.com/kdheepak/binary-builder-downloader#head"
 
 import strutils
 import os

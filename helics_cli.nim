@@ -20,6 +20,7 @@ import ./src/validate as v
 import ./src/run as r
 import ./src/observe as o
 import ./src/server as s
+import ./src/download as d
 
 proc observe(federates: int): int =
   return runObserverFederate(federates)
@@ -33,6 +34,9 @@ proc run(path: string, silent = false): int =
 proc server(): int =
   return runServer()
 
+proc download(install_path = "./helics_install"): int =
+  return runDownload(install_path)
+
 when isMainModule:
   import cligen
   include cligen/mergeCfgEnv
@@ -41,8 +45,9 @@ when isMainModule:
   const gb = staticExec("git rev-parse --abbrev-ref HEAD")
   clCfg.version = nd.fromNimble("version") & "-" & gb & "-" & gv
   dispatchMulti(
-    [ run, noAutoEcho=true ],
-    [ validate, noAutoEcho=true ],
+    [ download, noAutoEcho=true ],
     [ observe, noAutoEcho=true ],
+    [ run, noAutoEcho=true ],
     [ server, noAutoEcho=true ],
+    [ validate, noAutoEcho=true ],
   )
