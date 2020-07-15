@@ -1,4 +1,5 @@
 {
+    "broker": false,
     "federates": [
         {
             "directory": "~/GitRepos/helics-runner/examples/echo-federation",
