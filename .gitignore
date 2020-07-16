@@ -5,4 +5,4 @@
 bin/*
 dist/*
 *.log
-c2nim/*
+helics_install/*

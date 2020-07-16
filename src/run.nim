@@ -16,29 +16,19 @@ import strtabs
 import ./validate
 import ./utils
 
-when defined(windows):
-  const ENV_COMMAND* = "set"
-else:
-  const ENV_COMMAND* = "env"
-
 proc runRun*(path: string, silent = false): int =
   if runValidate(path, true) != 0:
     print("Runner json file is not per specification. Please check documentation for more information.", sError)
     return 1
 
-  var path_to_config = path
-  path_to_config.normalizePath()
-  let dirname = parentDir(path_to_config)
+  var config_path = path
+  config_path.normalizePath()
+  let dirname = parentDir(config_path)
 
-  var f = open(path_to_config, fmRead)
+  var f = open(config_path, fmRead)
   var runner = parseJson(f.readAll())
 
   print(&"""Running federation `{runner["name"].getStr}` with {runner["federates"].len} federates.""", silent = silent)
-
-  var env = {:}.newStringTable
-  for line in execProcess(ENV_COMMAND).splitLines():
-    var s = line.split("=")
-    env[s[0]] = join(s[1..s.high])
 
   var processes = newSeq[Process]()
   var process_names = newSeq[string]()
@@ -55,15 +45,9 @@ proc runRun*(path: string, silent = false): int =
     else:
       directory = dirname
 
-    # Get environment variables
-    var process_env = deepcopy(env)
-    if f{"env"} != nil:
-      for k, v in f["env"].pairs:
-        process_env[k] = v.getStr
-
     # TODO: check if valid command
     let cmd = f["exec"].getStr
-    let p = startProcess(cmd, env = process_env, workingDir = directory, options = {poInteractive, poStdErrToStdOut, poEvalCommand})
+    let p = startProcess(cmd, workingDir = directory, options = {poInteractive, poStdErrToStdOut, poEvalCommand})
 
     threads.add(spawn monitor(p, joinPath(dirname, &"""{name}.log""")))
     processes.add(p)

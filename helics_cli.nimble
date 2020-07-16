@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.3.3"
+version       = "0.4.1"
 author        = "Dheepak Krishnamurthy"
 description   = "HELICS command line interface"
 license       = "MIT"
@@ -14,7 +14,7 @@ requires "nim >= 1.2.0"
 requires "cligen"
 requires "shlex"
 requires "jester"
-requires "https://github.com/GMLC-TDC/helics.nim"
+requires "https://github.com/GMLC-TDC/helics.nim#head"
 
 import strutils
 import os
