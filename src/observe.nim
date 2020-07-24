@@ -8,6 +8,14 @@ import sequtils
 import db_sqlite
 import ./database
 
+const EXT  =
+  when defined(windows):
+    "dll"
+  elif defined(macosx):
+    "dylib"
+  elif defined(linux):
+    "so"
+
 import helics
 
 proc initCombinationFederate(
@@ -43,7 +51,7 @@ proc toString(cs: cstring): string =
   return s
 
 proc runObserverFederate*(nfederates: int): int =
-  let l = loadHelicsLibrary("libhelicsSharedLib(|.2.5.2|.2.5.1|.2.5.0).dylib")
+  let l = loadHelicsLibrary(&"libhelicsSharedLib(|.2.5.2|.2.5.1|.2.5.0).{EXT}")
 
   var db = initializeDatabase("helics.db")
 
