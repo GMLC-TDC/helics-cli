@@ -7,6 +7,7 @@ import strutils
 import sequtils
 import db_sqlite
 import ./database
+import ./utils
 
 import helics
 
@@ -43,9 +44,11 @@ proc toString(cs: cstring): string =
   return s
 
 proc runObserverFederate*(nfederates: int): int =
-  let l = loadHelicsLibrary("libhelicsSharedLib(|.2.5.2|.2.5.1|.2.5.0).dylib")
+  print("Loading HELICS Library", sInfo)
+  let l = loadHelicsLibrary("libhelicsSharedLib(|d)(|.2.5.2|.2.5.1|.2.5.0).(dylib|so|dll)")
 
-  var db = initializeDatabase("helics.db")
+  print("Initializing database", sInfo)
+  var db = initializeDatabase("database/helics_cli.db")
 
   db.insertMetaData("version", $(l.helicsGetVersion()))
   echo "Creating broker"
