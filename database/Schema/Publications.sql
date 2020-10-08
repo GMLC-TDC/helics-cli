@@ -4,5 +4,5 @@ CREATE TABLE Publications
     sender    VARCHAR(128),
     pub_time  DECIMAL(32),
     pub_value DECIMAL(32),
-    new       BOOLEAN DEFAULT FALSE
+    new_value BOOLEAN DEFAULT FALSE
 )

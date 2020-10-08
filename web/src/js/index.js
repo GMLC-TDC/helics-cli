@@ -11,10 +11,10 @@ import {
     faPlay,
     faPause,
     faStop,
-    faAngleDoubleRight
+    faAngleDoubleRight, faQuestion
 } from "@fortawesome/fontawesome-free-solid"
 
-library.add(faSync, faCaretSquareDown, faPlay, faPause, faStop, faAngleDoubleRight);
+library.add(faSync, faCaretSquareDown, faPlay, faPause, faStop, faAngleDoubleRight, faQuestion);
 dom.watch();
 
 // Style imports

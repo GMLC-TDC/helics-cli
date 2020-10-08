@@ -14,6 +14,16 @@ body {
   max-width: 75em;
 }
 
+.helics-float-container {
+  padding: 1em;
+}
+
+.helics-float-child {
+  width: 25em;
+  //float: left;
+  padding: 0.25em;
+}
+
 @import "~bootstrap/scss/bootstrap";
 @import "~bootstrap-table/src/bootstrap-table";
 

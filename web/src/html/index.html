@@ -60,8 +60,8 @@
     <!-- Tab Body Content -->
     <div class="tab-content" id="nav-tabContent">
         <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-            <button type="button" class="btn btn-primary btn-controls" id="loadFile">Load Configuration File</button>
-            <br/>
+            <!--            <button type="button" class="btn btn-primary btn-controls" id="loadFile">Load Configuration File</button>-->
+            <!--            <br/>-->
             <button type="button" class="btn btn-primary btn-controls" id="fastForwardFederation">
                 <i class="fa fa-angle-double-right" aria-hidden="true"></i>
                 Run To End
@@ -121,8 +121,11 @@
                 </table>
             </div>
         </div>
-        <div class="tab-pane fade" id="nav-debug" role="tabpanel" aria-labelledby="nav-debug-tab">
+        <div class="tab-pane fade helics-float-container" id="nav-debug" role="tabpanel"
+             aria-labelledby="nav-debug-tab">
             <!-- TODO: high-precision time -->
+            <br/>
+            <!-- TODO: current/granted time -->
             <br/>
             <label for="nextTimeStep">Next Time Step:</label> <input id="nextTimeStep">
             <button type="button" class="btn btn-primary btn-controls" id="signalFederation">
@@ -132,17 +135,36 @@
             </button>
 
             <h3>HELICS Query:</h3>
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Dropdown button
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <a class="dropdown-item" href="#">Something else here</a>
-                </div>
+            <div class="form-group helics-float-child">
+                <label for="queryTargetSelect">Query Target</label>
+                <select class="form-control" id="queryTargetSelect">
+                    <option>Federation Core</option>
+                    <option>Named Federate</option>
+                </select>
             </div>
 
+            <div class="form-group helics-float-child">
+                <label for="queryTargetName">Target Name</label>
+                <select class="form-control" id="queryTargetName">
+                    <option>Federate A (temp)</option>
+                    <option>Federate B (temp)</option>
+                    <option>Federate C (temp)</option>
+                </select>
+            </div>
+
+            <div class="form-group helics-float-child">
+                <label for="queryTargetTopic">Target Topic</label>
+                <select class="form-control" id="queryTargetTopic">
+                    <option>Global Time</option>
+                    <option>Federate State</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-controls" id="sendQuery">
+                <i class="fa fa-question" aria-hidden="true"></i>
+                Query
+            </button>
+            <!-- TODO: generate content div for each query and store output on screen (close button, save button, etc.) -->
         </div>
         <!--    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>-->
     </div>

@@ -24,7 +24,7 @@ router helicsrouter:
 
  get "/api/publication-data":
   var localJsonArray = %* []
-  for row in db.fastRows(sql"SELECT key, sender, pub_time, pub_value, new FROM Publications"):
+  for row in db.fastRows(sql"SELECT key, sender, pub_time, pub_value, new_value FROM Publications"):
     localJsonArray.add(%* {"key": row[0], "sender": row[1], "pub_time": row[2], "pub_value": row[3], "new": parseBool(row[4])})
   var response = ""
   toUgly(response, localJsonArray)

@@ -11,7 +11,7 @@ print(f"{federate_name}: Helics version = {h.helicsGetVersion()}")
 
 fedinfo = h.helicsCreateFederateInfo()
 
-h.helicsFederateInfoSetCoreName(fedinfo, federate_name)
+h.helicsFederateInfoSetCoreName(fedinfo, federate_name + "Core")
 h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
 h.helicsFederateInfoSetCoreInitString(fedinfo, "--federates=1")
 h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, 0.01)
