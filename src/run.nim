@@ -41,7 +41,10 @@ proc runRun*(path: string, silent = false): int =
 
     var directory: string
     if f{"directory"} != nil:
-      directory = joinPath(dirname, f["directory"].getStr())
+      if f{"directory"}.getStr.isAbsolute:
+        directory = absolutePath(f["directory"].getStr())
+      else:
+        directory = joinPath(dirname, f["directory"].getStr())
     else:
       directory = dirname
 
