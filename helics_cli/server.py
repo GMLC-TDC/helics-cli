@@ -3,7 +3,7 @@ import pathlib
 import sqlite3
 import os
 import flask
-from flask import jsonify
+from flask import jsonify, send_from_directory
 
 DATABASE_DIRECTORY = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent / "database"
 WEB_DIRECTORY = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent / "web"
@@ -11,8 +11,6 @@ WEB_DIRECTORY = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 app.config["PORT"] = 8000
-
-db = sqlite3.connect(str(DATABASE_DIRECTORY / "helics-cli.db"))
 
 
 @app.route("/", methods=["GET"])
@@ -25,8 +23,14 @@ def index():
             return f.read()
 
 
+@app.route("/<path:path>")
+def send_js(path):
+    return send_from_directory(str(WEB_DIRECTORY / "dist"), path)
+
+
 @app.route("/api/federate-time", methods=["GET"])
 def federate_time():
+    db = sqlite3.connect(str(DATABASE_DIRECTORY / "helics-cli.db"))
     arr = []
     for row in db.execute("SELECT name, granted, requested FROM Federates"):
         arr.append({"name": row[0], "granted": row[1], "requested": row[2]})
@@ -35,6 +39,7 @@ def federate_time():
 
 @app.route("/api/publication-data", methods=["GET"])
 def publication_data():
+    db = sqlite3.connect(str(DATABASE_DIRECTORY / "helics-cli.db"))
     arr = []
     for row in db.execute("SELECT key, sender, pub_time, pub_value, new_value FROM Publications"):
         arr.append({"key": row[0], "sender": row[1], "pub_time": row[2], "pub_value": row[3], "new": bool(row[4])})
@@ -56,4 +61,4 @@ def signal_federation():
     return jsonify(success=True)
 
 
-app.run()
+app.run(port=8000)
