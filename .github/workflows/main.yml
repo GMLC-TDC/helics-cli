@@ -1,56 +1,41 @@
 name: CI
-on: [push]
+
+on: [push, pull_request]
+
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
-    env:
-      NIM_VERSION: 'stable'
+        os: [ macOS-latest, ubuntu-latest, windows-latest ]
+        python-version: [ '3.8' ]
     steps:
-    - uses: actions/checkout@v1
-    - uses: jiro4989/setup-nim-action@v1
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        nim-version: ${{ env.NIM_VERSION }}
-    - name: Install optional dependencies
-      run: nimble install nimcr -y
-    - name: Build files
-      run: nimble release
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: helics
-        path: dist/*
-    - name: Release
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
-      with:
-        files: 'dist/*'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  build-linux-arm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Build files
-        uses: docker://nonylene/nim-crosscompile
-        with:
-          entrypoint: /bin/nimble
-          args: releasearm
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: helics
-          path: dist/*
-      - name: Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
-        with:
-          files: 'dist/*'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install -U pip install wheel setuptools cffi
+    - name: Download dependencies
+      run: |
+        python setup.py download
+        pip install -e ".[tests,docs]"
+    # - name: Run pytests
+    #   run: |
+    #     pip install pytest pytest-ordering pytest-cov
+    #     pytest -vvv
+    # - name: Generate coverage report
+    #   run: |
+    #     pytest --cov=./ --cov-report=xml:unit.coverage.xml
+    # - name: Upload unit test coverage to Codecov
+    #   uses: codecov/codecov-action@v1
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     file: ./unit.coverage.xml
+    #     flags: unit
+    #     env_vars: PYTHON
+    #     name: codecov-unit
+    #     fail_ci_if_error: false
