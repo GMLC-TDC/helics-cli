@@ -1,0 +1,15 @@
+insert into Federates
+values ('Gridlab-d_1', 3, 4),
+       ('Gridlab-d_2', 3, 4),
+       ('Gridlab-d_3', 3, 4),
+       ('Griddyn', 3.1, 2),
+       ('hvac_controller_1', 3, 'Inf'),
+       ('hvac_controller_2', 3, 'Inf'),
+       ('hvac_controller_3', 3, 'Inf'),
+       ('Gridlab-d_1', 3, 4),
+       ('Gridlab-d_2', 3, 4),
+       ('Gridlab-d_3', 3, 4),
+       ('Griddyn', 3.1, 2),
+       ('hvac_controller_1', 3, 'Inf'),
+       ('hvac_controller_2', 3, 'Inf'),
+       ('hvac_controller_3', 3, 'Inf')

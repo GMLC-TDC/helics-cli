@@ -1,0 +1,43 @@
+{
+  "name": "helics-cli-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "build-dev": "webpack --mode=development"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "BSD 3-Clause",
+  "browserslist": [
+    "last 2 versions",
+    "> 1%"
+  ],
+  "dependencies": {
+    "bootstrap": "^4.5.0",
+    "bootstrap-table": "^1.16.0",
+    "jquery": "^3.5.1",
+    "popper.js": "^1.16.1"
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-free-solid": "^5.0.13",
+    "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "amcharts": "^3.14.5",
+    "autoprefixer": "^9.8.0",
+    "bootstrap-darkmode": "^0.6.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^6.0.2",
+    "css-loader": "^3.5.3",
+    "dark-mode-switch": "^1.0.0",
+    "exports-loader": "^0.7.0",
+    "html-webpack-plugin": "^4.3.0",
+    "http-server": "^0.12.3",
+    "node-sass": "^4.14.1",
+    "postcss-loader": "^3.0.0",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.2.1",
+    "webpack": "^5.0.0-beta.17",
+    "webpack-cli": "^3.3.11"
+  }
+}

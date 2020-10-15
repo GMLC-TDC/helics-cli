@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex">
+    <title>HELICS Visualization</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">HELICS Visualization Tools</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!--        <ul class="navbar-nav mr-auto">-->
+        <!--            <li class="nav-item">-->
+        <!--                <a class="nav-link" href="index.html">Home</a>-->
+        <!--            </li>-->
+        <!--            <li class="nav-item dropdown">-->
+        <!--                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+        <!--                    Dropdown-->
+        <!--                </a>-->
+        <!--                <div class="dropdown-menu" aria-labelledby="navbarDropdown">-->
+        <!--                    <a class="dropdown-item" href="#">Action</a>-->
+        <!--                    <a class="dropdown-item" href="#">Another action</a>-->
+        <!--                    <div class="dropdown-divider"></div>-->
+        <!--                    <a class="dropdown-item" href="#">Something else here</a>-->
+        <!--                </div>-->
+        <!--            </li>-->
+        <!--            <li class="nav-item">-->
+        <!--                <a class="nav-link disabled" href="#">Disabled</a>-->
+        <!--            </li>-->
+        <!--        </ul>-->
+        <!--                <form class="form-inline my-2 my-lg-0">-->
+        <!--                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">-->
+        <!--                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+        <!--                </form>-->
+        <div class="custom-control custom-switch navbar-text ml-auto">
+            <input type="checkbox" class="custom-control-input" id="darkSwitch"/>
+            <label class="custom-control-label" for="darkSwitch">Dark Mode</label>
+        </div>
+    </div>
+</nav>
+
+
+<main role="main" class="container">
+    <!-- Tab Navigation Content -->
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab"
+               aria-controls="nav-home" aria-selected="true">Home</a>
+            <a class="nav-item nav-link" id="nav-debug-tab" data-toggle="tab" href="#nav-debug" role="tab"
+               aria-controls="nav-debug" aria-selected="false">Debug</a>
+        </div>
+    </nav>
+
+    <br/>
+    <!-- Tab Body Content -->
+    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+            <!--            <button type="button" class="btn btn-primary btn-controls" id="loadFile">Load Configuration File</button>-->
+            <!--            <br/>-->
+            <button type="button" class="btn btn-primary btn-controls" id="fastForwardFederation">
+                <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                Run To End
+            </button>
+            <button type="button" class="btn btn-primary btn-controls" id="stopFederation">
+                <i class="fa fa-stop" aria-hidden="true"></i>
+                Stop Simulation
+            </button>
+
+            <div id="federateList" class="helics-table-container">
+                <h3>Federate Configuration</h3>
+                <table
+                        id="federateListTable"
+                        data-toggle="table"
+                        data-flat="true"
+                        data-search="true"
+                        data-show-refresh="true"
+                        data-show-pagination-switch="true"
+                        data-pagination="true"
+                        data-page-list="[10, 25, 50, 100, all]"
+                        data-side-pagination="client"
+                        class="table table-bordered table-striped table-responsive-sm"
+                        data-url="api/federate-time">
+                    <thead>
+                    <tr>
+                        <th data-field="name" data-sortable="true">Federate Name</th>
+                        <th data-field="granted" data-sortable="true">Last Granted Time</th>
+                        <th data-field="requested" data-sortable="true">Next Requested Time</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div id="publicationList" class="helics-table-container">
+                <h3>Publications</h3>
+                <table
+                        id="publicationListTable"
+                        data-toggle="table"
+                        data-flat="true"
+                        data-search="true"
+                        data-show-refresh="true"
+                        data-show-pagination-switch="true"
+                        data-pagination="true"
+                        data-page-list="[10, 25, 50, 100, all]"
+                        data-side-pagination="client"
+                        class="table table-bordered table-striped table-responsive-sm"
+                        data-url="api/publication-data">
+                    <thead>
+                    <tr>
+                        <th data-field="key" data-sortable="true">Key</th>
+                        <th data-field="sender" data-sortable="true">Sender</th>
+                        <th data-field="pub_time" data-sortable="true">Publication Time</th>
+                        <th data-field="pub_value" data-sortable="true">Value</th>
+                        <th data-field="new" data-sortable="true" data-cell-style="cellStyle">Value Updated</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade helics-float-container" id="nav-debug" role="tabpanel"
+             aria-labelledby="nav-debug-tab">
+            <!-- TODO: high-precision time -->
+            <br/>
+            <!-- TODO: current/granted time -->
+            <br/>
+            <label for="nextTimeStep">Next Time Step:</label> <input id="nextTimeStep">
+            <button type="button" class="btn btn-primary btn-controls" id="signalFederation">
+                <i class="fa fa-play" aria-hidden="true"></i>
+                <i class="fa fa-pause" aria-hidden="true"></i>
+                Run to Time
+            </button>
+
+            <h3>HELICS Query:</h3>
+            <div class="form-group helics-float-child">
+                <label for="queryTargetSelect">Query Target</label>
+                <select class="form-control" id="queryTargetSelect">
+                    <option>Federation Core</option>
+                    <option>Named Federate</option>
+                </select>
+            </div>
+
+            <div class="form-group helics-float-child">
+                <label for="queryTargetName">Target Name</label>
+                <select class="form-control" id="queryTargetName">
+                    <option>Federate A (temp)</option>
+                    <option>Federate B (temp)</option>
+                    <option>Federate C (temp)</option>
+                </select>
+            </div>
+
+            <div class="form-group helics-float-child">
+                <label for="queryTargetTopic">Target Topic</label>
+                <select class="form-control" id="queryTargetTopic">
+                    <option>Global Time</option>
+                    <option>Federate State</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-controls" id="sendQuery">
+                <i class="fa fa-question" aria-hidden="true"></i>
+                Query
+            </button>
+            <!-- TODO: generate content div for each query and store output on screen (close button, save button, etc.) -->
+        </div>
+        <!--    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>-->
+    </div>
+</main>
+</body>
+</html>

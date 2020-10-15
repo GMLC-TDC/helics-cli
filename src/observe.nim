@@ -5,16 +5,10 @@ import os
 import strformat
 import strutils
 import sequtils
+import sugar
 import db_sqlite
 import ./database
-
-const EXT  =
-  when defined(windows):
-    "dll"
-  elif defined(macosx):
-    "dylib"
-  elif defined(linux):
-    "so"
+import ./utils
 
 import helics
 
@@ -25,7 +19,7 @@ proc initCombinationFederate(
     core_type = "zmq",
     core_init_string = "",
     broker_init_string = "",
-    delta = 0.0,
+    delta = 0.5,
     log_level = 7,
     strict_type_checking = true,
     terminate_on_error = true,
@@ -35,7 +29,7 @@ proc initCombinationFederate(
   let core_init = &"{core_init_string} --federates={nfederates}"
 
   let fedinfo = l.helicsCreateFederateInfo()
-  l.helicsFederateInfoSetCoreName(fedinfo, core_name)
+  l.helicsFederateInfoSetCoreName(fedinfo, &"{core_name}Core")
   l.helicsFederateInfoSetCoreTypeFromString(fedinfo, core_type)
   l.helicsFederateInfoSetCoreInitString(fedinfo, core_init)
   l.helicsFederateInfoSetTimeProperty(fedinfo, HELICS_PROPERTY_TIME_DELTA.int, delta)
@@ -50,15 +44,59 @@ proc toString(cs: cstring): string =
   copyMem(addr(s[0]), cs, cs.len)
   return s
 
-proc runObserverFederate*(nfederates: int): int =
-  let l = loadHelicsLibrary(&"libhelicsSharedLib(|.2.5.2|.2.5.1|.2.5.0).{EXT}")
+proc writeDbData(l: HelicsLibrary, db: DbConn, fed: HelicsFederate, sublist: seq[tuple[name: string, input: HelicsInput]]) = 
+  var q: HelicsQuery
 
-  var db = initializeDatabase("helics.db")
+  q = l.helicsCreateQuery("root", "federates")
+  var federates = l.helicsQueryExecute(q, fed).toString().replace("[", "").replace("]", "").split(";")
+  l.helicsQueryFree(q)
+
+  var response = ""
+  for name in federates:
+    echo "name \"", name, "\""
+
+    q = l.helicsCreateQuery(name, "exists")
+    response = l.helicsQueryExecute(q, fed)
+    echo "    exists: \"", response, "\""
+    l.helicsQueryFree(q)
+
+    q = l.helicsCreateQuery(name, "current_time")
+    response = l.helicsQueryExecute(q, fed)
+    let currentTimeJson = parseJson(response)
+    let grantedTime = currentTimeJson{"granted_time"}.getFloat()
+    let requestedTime = currentTimeJson{"requested_time"}.getFloat()
+    echo &"    time: \"{response} => grant: {grantedTime}, request: {requestedTime} \""
+    l.helicsQueryFree(q)
+
+    db.exec(sql"INSERT INTO Federates(name, granted, requested) VALUES (?,?,?);", name, grantedTime, requestedTime)
+
+    q = l.helicsCreateQuery(name, "publications")
+    var publications = l.helicsQueryExecute(q, fed).toString().replace("[", "").replace("]", "").split(";")
+    l.helicsQueryFree(q)
+
+    for pub in publications:
+      let sub = sublist.filter(x => x.name == pub)
+      if(sub.len > 1):
+        echo "ERROR: multiple subscriptions to same publication."
+      elif not isEmptyOrWhitespace(pub) and sub.len == 1:
+        # TODO: find requested time and insert
+        let value = l.helicsInputGetDouble(sub[0].input)
+
+        db.exec(sql"UPDATE Publications SET new_value=0;")
+        db.exec(sql"INSERT INTO Publications(key, sender, pub_time, pub_value, new_value) VALUES (?,?,?,?,?);", 
+        pub, name, grantedTime, value, 1)
+
+proc runObserverFederate*(nfederates: int): int =
+  print("Loading HELICS Library", sInfo)
+  let l = loadHelicsLibrary("libhelicsSharedLib(|d)(|.2.5.2|.2.5.1|.2.5.0).(dylib|so|dll)")
+
+  print("Initializing database", sInfo)
+  var db = initializeDatabase("database/helics_cli.db")
 
   db.insertMetaData("version", $(l.helicsGetVersion()))
   echo "Creating broker"
 
-  let broker = l.helicsCreateBroker("zmq", "", &"-f {nfederates + 1}")
+  let broker = l.helicsCreateBroker("zmq", "CoreBroker", &"-f {nfederates + 1}")
 
   db.insertMetaData("nfederates", nfederates)
 
@@ -89,64 +127,52 @@ proc runObserverFederate*(nfederates: int): int =
 
   db.insertMetaData("federates", federates.filterIt(not it.startswith("__")).join(","))
 
-  for name in federates:
-    echo "name \"", name, "\""
+  # Subscribe to all topics
+  q = l.helicsCreateQuery("root", "publications")
 
-    q = l.helicsCreateQuery(name, "exists")
-    echo "    exists: \"", l.helicsQueryExecute(q, fed), "\""
-    l.helicsQueryFree(q)
-
-    q = l.helicsCreateQuery(name, "subscriptions")
-    echo "    subscriptions: \"", l.helicsQueryExecute(q, fed), "\""
-    l.helicsQueryFree(q)
-
-    q = l.helicsCreateQuery(name, "endpoints")
-    echo "    endpoints: \"", l.helicsQueryExecute(q, fed), "\""
-    l.helicsQueryFree(q)
-
-    q = l.helicsCreateQuery(name, "inputs")
-    echo "    inputs: \"", l.helicsQueryExecute(q, fed), "\""
-    l.helicsQueryFree(q)
-
-    q = l.helicsCreateQuery(name, "publications")
-    echo "    publications: \"", l.helicsQueryExecute(q, fed), "\""
-    l.helicsQueryFree(q)
-
-  q = l.helicsCreateQuery("root", "federate_map")
-  let federate_map = l.helicsQueryExecute(q, fed).toString()
+  let pubBuffer = l.helicsQueryExecute(q, fed).toString()
+  echo &"Pubs: {pubBuffer}"
+  var publications = pubBuffer.replace("[", "").replace("]", "").split(";")
   l.helicsQueryFree(q)
 
-  q = l.helicsCreateQuery("root", "dependency_graph")
-  let dependency_graph = l.helicsQueryExecute(q, fed).toString()
-  l.helicsQueryFree(q)
-
-  q = l.helicsCreateQuery("root", "data_flow_graph")
-  let data_flow_graph = l.helicsQueryExecute(q, fed).toString()
-  l.helicsQueryFree(q)
-
-  var jsonfile: File
-  jsonfile = open(joinPath(getCurrentDir(), "dependency-graph.json"), fmWrite)
-  jsonfile.write(parseJson(dependency_graph).pretty(indent = 2))
-  jsonfile.close()
-
-  jsonfile = open(joinPath(getCurrentDir(), "federate-map.json"), fmWrite)
-  jsonfile.write(parseJson(federate_map).pretty(indent = 2))
-  jsonfile.close()
-
-  jsonfile = open(joinPath(getCurrentDir(), "data-flow-graph.json"), fmWrite)
-  jsonfile.write(parseJson(data_flow_graph).pretty(indent = 2))
-  jsonfile.close()
-
+  var sublist = newSeq[tuple[name: string, input: HelicsInput]]()
+  for pub in publications:
+    sublist.insert((name: pub, input: l.helicsFederateRegisterSubscription(fed, pub, "")))
+ 
   echo "Starting observer federate"
 
-  # TODO: subscribe to all topics
 
   l.helicsFederateEnterExecutingMode(fed)
 
+  q = l.helicsCreateQuery("root", "brokers")
+  var response = l.helicsQueryExecute(q, fed)
+  echo "    output: \"", response, "\""
+  l.helicsQueryFree(q)
+
+  # q = l.helicsCreateQuery("root", "data_flow_graph")
+  # response = l.helicsQueryExecute(q, fed)
+  # echo "    data_flow_graph: \"", response, "\""
+  # l.helicsQueryFree(q)
+
   var currenttime = 0.0
-  while currenttime < 100.0:
-    echo &"Current time is {currenttime}"
-    currenttime = l.helicsFederateRequestTime(fed, 100.0)
+  var first = true
+  block observe:
+    while true:
+      echo &"Current time is {currenttime}"
+      currenttime = l.helicsFederateRequestTime(fed, 9223372036.0)
+      echo &"Granted time {currenttime}, calling DB Write"
+      if first == true:
+        first = false
+        q = l.helicsCreateQuery("root", "data_flow_graph")
+        var response = l.helicsQueryExecute(q, fed)
+        echo "    data_flow_graph: \"", response, "\""
+        l.helicsQueryFree(q)
+
+      writeDbData(l, db, fed, sublist)
+      echo &"End of DB Write"
+      if currenttime >= 9223372036.0: # TODO: replace hard coded helics_time_maxtime with proper value.
+        break observe
+
 
   db.close()
 
