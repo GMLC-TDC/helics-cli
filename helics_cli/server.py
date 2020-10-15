@@ -3,12 +3,14 @@ import pathlib
 import sqlite3
 import os
 import flask
-from flask import jsonify, send_from_directory
+from flask import jsonify
 
 DATABASE_DIRECTORY = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent / "database"
 WEB_DIRECTORY = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent / "web"
 
-app = flask.Flask(__name__)
+app = flask.Flask(__name__,
+                  static_url_path='',
+                  static_folder=str(WEB_DIRECTORY / 'dist'))
 app.config["DEBUG"] = True
 app.config["PORT"] = 8000
 
@@ -19,13 +21,8 @@ def index():
         with open(str(WEB_DIRECTORY / "dist/index.html")) as f:
             return f.read()
     else:
-        with open(str(WEB_DIRECTORY / "dist/notfound.html")) as f:
+        with open(str(WEB_DIRECTORY / "notfound.html")) as f:
             return f.read()
-
-
-@app.route("/<path:path>")
-def send_js(path):
-    return send_from_directory(str(WEB_DIRECTORY / "dist"), path)
 
 
 @app.route("/api/federate-time", methods=["GET"])
