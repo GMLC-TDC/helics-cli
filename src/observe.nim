@@ -68,9 +68,7 @@ proc writeDbData(l: HelicsLibrary, db: DbConn, fed: HelicsFederate, sublist: seq
     echo &"    time: \"{response} => grant: {grantedTime}, request: {requestedTime} \""
     l.helicsQueryFree(q)
 
-    # TODO: find requested time and insert
     db.exec(sql"INSERT INTO Federates(name, granted, requested) VALUES (?,?,?);", name, grantedTime, requestedTime)
-
 
     q = l.helicsCreateQuery(name, "publications")
     var publications = l.helicsQueryExecute(q, fed).toString().replace("[", "").replace("]", "").split(";")

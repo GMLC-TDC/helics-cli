@@ -34,16 +34,16 @@ function signal(endpoint, callback = null, value = null) {
         url: "/api/" + endpoint,
         type: "PUT",
     }
-    if (value !== null) messagePackage.data = value;
     if (callback !== null) messagePackage.success = callback;
+    if (value !== null) messagePackage.data = value;
 
     $.ajax(messagePackage);
 }
 
 // Button click handler events.
-$('#fastForwardFederation').on('click', () => signal('FastForwardFederation', reloadCharts()));
-$('#stopFederation').on('click', () => signal('StopFederation', reloadCharts()));
-$('#signalFederation').on('click', () => signal('SignalFederation', reloadCharts(), $('#nextTimeStep').val()));
+$('#fastForwardFederation').on('click', () => signal('FastForwardFederation', reloadCharts));
+$('#stopFederation').on('click', () => signal('StopFederation', reloadCharts));
+$('#signalFederation').on('click', () => signal('SignalFederation', reloadCharts, $('#nextTimeStep').val()));
 
 // Bootstrap-table cell highlighting logic.
 let cellStyle = function (value) {
