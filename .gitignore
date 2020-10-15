@@ -6,3 +6,5 @@ bin/*
 dist/*
 *.log
 helics_install/*
+
+database/helics-cli.db

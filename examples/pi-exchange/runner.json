@@ -38,7 +38,7 @@
     },
     {
       "directory": "../../",
-      "exec": "./bin/helics observe --federates 6",
+      "exec": "helics observe --n-federates 6",
       "host": "localhost",
       "name": "observer"
     }
