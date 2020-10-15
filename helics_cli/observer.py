@@ -14,7 +14,7 @@ def init_combination_federate(
     core_type="zmq",
     core_init="",
     broker_init="",
-    time_delta=0.5,
+    time_delta=1.0,
     log_level=7,
     strict_type_checking=True,
     terminate_on_error=True,
@@ -47,6 +47,8 @@ def write_database_data(db, fed: h.HelicsFederate, subscriptions=[]):
             data = json.loads(data)
             granted_time = data["granted_time"]
             requested_time = data["requested_time"]
+            if data["allow"] > 9223372036:
+                break
         except Exception:
             granted_time = 0.0
             requested_time = 0.0
@@ -56,10 +58,10 @@ def write_database_data(db, fed: h.HelicsFederate, subscriptions=[]):
         publications = fed.query(name, "publications").replace("[", "").replace("]", "").split(";")
 
         for pub_str in publications:
-            subs = [s for s in subscriptions if s.name == pub_str]
-            if subs.len > 1:
+            subs = [s for s in subscriptions if s.key == pub_str]
+            if len(subs) > 1:
                 print("ERROR: multiple subscriptions to same publication.")
-            elif len(pub_str) > 0:
+            elif len(pub_str) > 0 and len(subs) == 1:
                 db.execute("UPDATE Publications SET new_value=0;")
                 db.execute(
                     "INSERT INTO Publications(key, sender, pub_time, pub_value, new_value) VALUES (?,?,?,?,?);",
@@ -70,6 +72,17 @@ def write_database_data(db, fed: h.HelicsFederate, subscriptions=[]):
 
 
 def run(n_federates: int):
+    try:
+        _run(n_federates)
+    except h.HelicsException:
+        h.helicsCloseLibrary()
+        return 1
+    finally:
+        h.helicsCloseLibrary()
+    return 0
+
+
+def _run(n_federates: int):
     print("Loading HELICS Library")
 
     print("Initializing database")
@@ -108,12 +121,13 @@ def run(n_federates: int):
     current_time = 0.0
     while True:
         print(f"Current time is {current_time}")
-        current_time = fed.request_time(9223372036.0)
+        current_time = fed.request_next_step()
         print(f"Granted time {current_time}, calling DB Write")
         write_database_data(db, fed, subscriptions)
-        if current_time >= 9223372036.0:
+        if current_time >= 9223372036.3:
             break
 
+    print("Finished observe.")
     db.close()
 
     while h.helicsBrokerIsConnected(broker):

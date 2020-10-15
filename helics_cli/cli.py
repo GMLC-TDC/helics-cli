@@ -118,7 +118,10 @@ def run(path, silent, no_log_files, broker_loglevel):
         )
     else:
         broker_p = subprocess.Popen(
-            shlex.split("echo 'Using internal broker'"), cwd=os.path.abspath(os.path.expanduser(path)), stdout=broker_o, stderr=broker_o,
+            shlex.split("""python -c 'print("Not starting broker.")'"""),
+            cwd=os.path.abspath(os.path.expanduser(path)),
+            stdout=broker_o,
+            stderr=broker_o,
         )
     broker_p.name = "broker"
 
@@ -221,8 +224,7 @@ def validate(path):
     "--n-federates", required=True, type=click.INT, help="Number of federates to observe",
 )
 def observe(n_federates: int) -> int:
-    observer.run(n_federates)
-    return 0
+    return observer.run(n_federates)
 
 
 if __name__ == "__main__":
