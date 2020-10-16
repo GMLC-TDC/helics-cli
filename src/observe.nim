@@ -44,7 +44,7 @@ proc toString(cs: cstring): string =
   copyMem(addr(s[0]), cs, cs.len)
   return s
 
-proc writeDbData(l: HelicsLibrary, db: DbConn, fed: HelicsFederate, sublist: seq[tuple[name: string, input: HelicsInput]]) = 
+proc writeDbData(l: HelicsLibrary, db: DbConn, fed: HelicsFederate, sublist: seq[tuple[name: string, input: HelicsInput]]) =
   var q: HelicsQuery
 
   q = l.helicsCreateQuery("root", "federates")
@@ -83,12 +83,12 @@ proc writeDbData(l: HelicsLibrary, db: DbConn, fed: HelicsFederate, sublist: seq
         let value = l.helicsInputGetDouble(sub[0].input)
 
         db.exec(sql"UPDATE Publications SET new_value=0;")
-        db.exec(sql"INSERT INTO Publications(key, sender, pub_time, pub_value, new_value) VALUES (?,?,?,?,?);", 
+        db.exec(sql"INSERT INTO Publications(key, sender, pub_time, pub_value, new_value) VALUES (?,?,?,?,?);",
         pub, name, grantedTime, value, 1)
 
 proc runObserverFederate*(nfederates: int): int =
   print("Loading HELICS Library", sInfo)
-  let l = loadHelicsLibrary("libhelicsSharedLib(|d)(|.2.5.2|.2.5.1|.2.5.0).(dylib|so|dll)")
+  let l = loadHelicsLibrary("libhelicsSharedLib(|d)(|.2.6.0|.2.5.2|.2.5.1|.2.5.0).(dylib|so|dll)")
 
   print("Initializing database", sInfo)
   var db = initializeDatabase("database/helics_cli.db")
@@ -138,7 +138,7 @@ proc runObserverFederate*(nfederates: int): int =
   var sublist = newSeq[tuple[name: string, input: HelicsInput]]()
   for pub in publications:
     sublist.insert((name: pub, input: l.helicsFederateRegisterSubscription(fed, pub, "")))
- 
+
   echo "Starting observer federate"
 
 
