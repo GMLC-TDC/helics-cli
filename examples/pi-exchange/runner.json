@@ -38,7 +38,7 @@
     },
     {
       "directory": "../../",
-      "exec": "helics observe --n-federates 6",
+      "exec": "python -u -m helics_cli.cli observe --n-federates 6",
       "host": "localhost",
       "name": "observer"
     }

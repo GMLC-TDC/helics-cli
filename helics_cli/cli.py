@@ -108,6 +108,9 @@ def run(path, silent, no_log_files, broker_loglevel):
     if not silent:
         echo("Running federation: {name}".format(name=config["name"]), status="info")
 
+    process_list = []
+    output_list = []
+
     broker_o = open(os.path.join(path, "broker.log"), "w")
     if "broker" in config.keys() and config["broker"] is True:
         broker_p = subprocess.Popen(
@@ -116,6 +119,8 @@ def run(path, silent, no_log_files, broker_loglevel):
             stdout=broker_o,
             stderr=broker_o,
         )
+        process_list.append(broker_p)
+        output_list.append(broker_o)
     else:
         broker_p = subprocess.Popen(
             shlex.split("""python -c 'print("Not starting broker.")'"""),
@@ -125,11 +130,7 @@ def run(path, silent, no_log_files, broker_loglevel):
         )
     broker_p.name = "broker"
 
-    process_list = []
-    output_list = []
-
     for f in config["federates"]:
-
         if not silent:
             echo(
                 "Running federate {name} as a background process".format(name=f["name"]), status="info",
@@ -155,7 +156,6 @@ def run(path, silent, no_log_files, broker_loglevel):
         if o is not None:
             output_list.append(o)
 
-    process_list.append(broker_p)
     t = CheckStatusThread(process_list)
 
     try:
@@ -176,7 +176,7 @@ def run(path, silent, no_log_files, broker_loglevel):
             p.kill()
     finally:
         for p in process_list:
-            if p.returncode != 0:
+            if p.returncode != 0 and p.returncode is not None:
                 echo(
                     "Process {} exited with return code {}".format(p.name, p.returncode), status="error",
                 )
@@ -228,4 +228,4 @@ def observe(n_federates: int) -> int:
 
 
 if __name__ == "__main__":
-    cli(verbose=True)
+    cli()

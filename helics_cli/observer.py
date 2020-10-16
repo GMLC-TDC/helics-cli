@@ -29,7 +29,7 @@ def init_combination_federate(
     fedinfo.broker_init = broker_init
     fedinfo.property[h.HELICS_PROPERTY_TIME_DELTA] = time_delta
     fedinfo.flag[h.HELICS_FLAG_TERMINATE_ON_ERROR] = True
-    # fedinfo.flag[h.HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING] = True
+    h.helicsFederateInfoSetFlagOption(fedinfo, h.HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING, True)
 
     fed = h.helicsCreateCombinationFederate(core_name, fedinfo)
     return fed
@@ -93,7 +93,7 @@ def _run(n_federates: int):
     metadata["n_federates"] = n_federates
 
     print("Creating broker")
-    broker = h.helicsCreateBroker("zmq", "CoreBroker", f"-f {n_federates + 1}")
+    broker = h.helicsCreateBroker("zmq", "", f"-f{n_federates + 1} --loglevel=7")
 
     print("Creating observer federate")
 
@@ -113,8 +113,12 @@ def _run(n_federates: int):
     for pub in publications:
         subscriptions.append(fed.register_subscription(pub))
 
+    print(publications)
+    print(subscriptions)
+
     fed.enter_executing_mode()
 
+    print("entered executing mode")
     brokers = fed.query("root", "brokers")
     print(brokers)
 
