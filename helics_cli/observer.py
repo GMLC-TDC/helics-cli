@@ -29,6 +29,9 @@ def init_combination_federate(
     fedinfo.broker_init = broker_init
     fedinfo.property[h.HELICS_PROPERTY_TIME_DELTA] = time_delta
     fedinfo.flag[h.HELICS_FLAG_TERMINATE_ON_ERROR] = True
+
+    # fedinfo.flag[h.HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING] = True
+
     h.helicsFederateInfoSetFlagOption(fedinfo, h.HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING, True)
 
     fed = h.helicsCreateCombinationFederate(core_name, fedinfo)
@@ -37,11 +40,16 @@ def init_combination_federate(
 
 def write_database_data(db, fed: h.HelicsFederate, subscriptions=[]):
 
+    print("Making query ...")
     federates = fed.query("root", "federates").replace("[", "").replace("]", "").split(";")
 
     for name in federates:
-        logging.debug(fed.query(name, "exists"))
+        print(f"Query for exists: {name}")
 
+        if fed.query(name, "state") == "disconnected":
+            continue
+
+        print(f"Query for current_time: {name}")
         data = fed.query(name, "current_time")
         try:
             data = json.loads(data)
@@ -55,6 +63,9 @@ def write_database_data(db, fed: h.HelicsFederate, subscriptions=[]):
 
         db.execute("INSERT INTO Federates(name, granted, requested) VALUES (?,?,?);", (name, granted_time, requested_time))
 
+        if fed.query(name, "state") == "disconnected":
+            continue
+        print(f"Query for publications: {name}")
         publications = fed.query(name, "publications").replace("[", "").replace("]", "").split(";")
 
         for pub_str in publications:
@@ -100,11 +111,24 @@ def _run(n_federates: int):
     fed = init_combination_federate("__observer__")
 
     print("Entering initializing mode")
-    fed.enter_initializing_mode()
 
-    print("Querying all topics")
+    # TODO: replace with time barrier
+
+    time.sleep(5)
 
     federates = fed.query("root", "federates").replace("[", "").replace("]", "").split(";")
+    federates = [name for name in federates if name != "__observer__"]
+
+    print("federates: ", federates)
+
+    while not all(fed.query(name, "isinit") == "true" for name in federates if name != "__observer__"):
+        print(f"Waiting for all federates ({federates}) to join ...")
+        print(all(fed.query(name, "isinit") == "true" for name in federates))
+        time.sleep(1)
+
+    # Assuming all federates have connected.
+
+    print("Querying all topics")
 
     metadata["federates"] = ",".join([f for f in federates if not f.startswith("__")])
 
@@ -113,8 +137,7 @@ def _run(n_federates: int):
     for pub in publications:
         subscriptions.append(fed.register_subscription(pub))
 
-    print(publications)
-    print(subscriptions)
+    fed.enter_initializing_mode()
 
     fed.enter_executing_mode()
 
@@ -128,15 +151,25 @@ def _run(n_federates: int):
         current_time = fed.request_next_step()
         print(f"Granted time {current_time}, calling DB Write")
         write_database_data(db, fed, subscriptions)
-        if current_time >= 9223372036.3:
+        print("State ...")
+        if all(fed.query(name, "state") == "disconnected" for name in federates if name != "__observer__") or current_time >= 9223372036.3:
             break
 
     print("Finished observe.")
+    print("Closing database ...")
     db.close()
 
-    while h.helicsBrokerIsConnected(broker):
-        time.sleep(250)
+    print("Finalizing federate ...")
+    fed.finalize()
+    print("Deleting federate ...")
+    del fed
 
+    print("Broker disconnect ...")
+    broker.disconnect()
+    print("Waiting for broker to disconnect ...")
+    broker.wait_for_disconnect()
+
+    print("Closing helics library ...")
     h.helicsCloseLibrary()
 
     return 0

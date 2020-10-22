@@ -35,12 +35,6 @@
       "exec": "python -u pireceiver.py 3",
       "host": "localhost",
       "name": "pireceiver3"
-    },
-    {
-      "directory": "../../",
-      "exec": "python -u -m helics_cli.cli observe --n-federates 6",
-      "host": "localhost",
-      "name": "observer"
     }
   ],
   "name": "pi-exchange"
