@@ -2,7 +2,9 @@
 import pathlib
 import sqlite3
 import os
+import webbrowser
 import flask
+from helics_cli.database import initialize_database
 from flask import jsonify
 
 DATABASE_DIRECTORY = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent / "database"
@@ -58,4 +60,12 @@ def signal_federation():
     return jsonify(success=True)
 
 
-app.run(port=8000)
+def startup(web: bool):
+    initialize_database(str(DATABASE_DIRECTORY / "helics-cli.db"))
+    app.run(port=8000)
+    if web:
+        webbrowser.open_new("127.0.0.1:8000")
+
+
+if __name__ == "__main__":
+    startup(True)

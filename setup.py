@@ -24,20 +24,19 @@ setup(
     download_url="https://github.com/GMLC-TDC/helics-cli",
     author="Dheepak Krishnamurthy",
     license="BSD-compatible",
-    packages=find_packages(),
-    install_requires=["future", "six", "click", "jinja2", "helics==2.6.0.post0.dev0", "flask"],
+    packages=["web"] + find_packages(),
+    install_requires=["future", "six", "click", "jinja2", "helics", "flask"],
     keywords=["helics", "cosimulation"],
     include_package_data=True,
-    package_data={"helics_cli": []},
     entry_points={"console_scripts": ["helics = helics_cli.cli:cli"]},
     extras_require={
         "tests": ["pytest", "pytest-ordering", "pytest-cov"],
-        "docs": ["mkdocs", "inari[mkdocs]", "mkdocs-material", "black", "pygments", "pymdown-extensions"],
+        "docs": ["mkdocs", "inari[mkdocs]", "mkdocs-material", "black", "pygments", "pymdown-extensions"]
     },
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    zip_safe=True,
+    zip_safe=False,
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         # How mature is this project? Common values are

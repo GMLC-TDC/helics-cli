@@ -22,6 +22,8 @@ from . import observer
 from . import utils
 from .utils import echo
 
+from .server import startup
+
 logger = logging.getLogger(__name__)
 
 
@@ -226,6 +228,12 @@ def validate(path):
 def observe(n_federates: int) -> int:
     return observer.run(n_federates)
 
+@cli.command()
+@click.option(
+    "--web", required=False, type=click.BOOL, help="Open browser on startup",
+)
+def server(web: bool):
+    startup(web)
 
 if __name__ == "__main__":
     cli()
