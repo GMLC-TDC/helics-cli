@@ -36,6 +36,11 @@ def federate_time():
         arr.append({"name": row[0], "granted": row[1], "requested": row[2]})
     return jsonify(arr)
 
+@app.route("/api/named-federate-target-name", methods=["GET"])
+def named_federate_target_name():
+    arr = ["Named Federate Target 1", "Named Federate Target 2", "Named Federate Target 3", "Named Federate Target 4"]
+    return jsonify(arr)
+#     return jsonify(success=True)
 
 @app.route("/api/publication-data", methods=["GET"])
 def publication_data():
@@ -43,6 +48,22 @@ def publication_data():
     arr = []
     for row in db.execute("SELECT key, sender, pub_time, pub_value, new_value FROM Publications"):
         arr.append({"key": row[0], "sender": row[1], "pub_time": row[2], "pub_value": row[3], "new": bool(row[4])})
+    return jsonify(arr)
+
+# TODO Message Table in home
+@app.route("/api/message-data", methods=["GET"])
+def message_data():
+    db = sqlite3.connect(str(DATABASE_DIRECTORY / "helics-cli.db"))
+
+    ## Start Mock
+    arr = []
+    for i in range(5):
+        arr.append({"fieldOne": "TODO " + str(i),"fieldTwo": "TODO " + str(i),"fieldThree": "TODO " + str(i),"fieldFour": "TODO " + str(i),"fieldFive": "TODO " + str(i)})
+    ## End Mock
+
+#     arr = []
+#     for row in db.execute("SELECT key, sender, pub_time, pub_value, new_value FROM Publications"):
+#         arr.append({"key": row[0], "sender": row[1], "pub_time": row[2], "pub_value": row[3], "new": bool(row[4])})
     return jsonify(arr)
 
 
