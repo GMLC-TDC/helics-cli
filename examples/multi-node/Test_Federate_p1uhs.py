@@ -5,7 +5,8 @@ import sys
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
-logger.setLoggingLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
+# logger.setLoggingLevel(logging.DEBUG)
 
 
 def pub_and_sub_calc(sub_voltage, pub_load, iters):
@@ -56,7 +57,7 @@ def run_p1uhs_federate(fed_name, broker_address=None):
     print("Value federate created")
 
     # Register the publications #
-    pub_name = "Circuit.feeder_p1u.{fed_name}.p1ux.TotalPower.E"
+    pub_name = f"Circuit.feeder_p1u.{fed_name}.p1ux.TotalPower.E"
     pub_load = h.helicsFederateRegisterGlobalTypePublication(
         vfed, pub_name, "double", "kW"
     )
@@ -119,9 +120,6 @@ def run_p1uhs_federate(fed_name, broker_address=None):
 
 
 if __name__ == "__main__":
-    fed_name = sys.argv[1]
-    broker_address = None
-
-    if len(sys.argv) > 1:
-        broker_address = sys.argv[2]
+    fed_name = sys.argv[1] if len(sys.argv) >= 2 else "Test_Federate_p1uhs"
+    broker_address = sys.argv[2] if len(sys.argv) >= 3 else None
     run_p1uhs_federate(fed_name, broker_address)

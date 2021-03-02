@@ -5,7 +5,10 @@ import sys
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
-logger.setLoggingLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
+
+
+# logger.setLoggingLevel(logging.DEBUG)
 
 
 def pub_and_sub_calc(supply_voltage, last_loads, sub_loads, pub_voltages):
@@ -128,7 +131,7 @@ def run_p1u_federate(fed_name, broker_address, feeders):
 
             h.helicsPublicationPublishDouble(pub_load, sum(last_loads))
             logger.info(
-                "feeder loads {last_loads} at time {currenttime} after {iters} iters"
+                f"feeder loads {last_loads} at time {currenttime} after {iters} iters"
             )
             t += 1
 
@@ -145,14 +148,8 @@ def run_p1u_federate(fed_name, broker_address, feeders):
 
 
 if __name__ == "__main__":
-
-    fed_name = sys.argv[1]
-    broker_address = None
-    feeders = ["p1uhs0"]
-
-    if len(sys.argv) > 1:
-        broker_address = sys.argv[2]
-    if len(sys.argv) > 2:
-        feeders = sys.argv[3:]
+    fed_name = sys.argv[1] if len(sys.argv) >= 2 else "Test_Federate_p1u"
+    broker_address = sys.argv[2] if len(sys.argv) >= 3 else None
+    feeders = sys.argv[3:] if len(sys.argv) >= 4 else ["p1uhs0"]
 
     run_p1u_federate(fed_name, broker_address, feeders)
