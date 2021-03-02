@@ -12,7 +12,7 @@ logger.setLevel(logging.DEBUG)
 # logger.setLoggingLevel(logging.DEBUG)
 
 
-def run_sub_trans(feeders, broker_address):
+def run_sub_trans(fed_name, feeders, broker_address):
     fedinitstring = "--federates=1"
     if broker_address is not None:
         fedinitstring = f"{fedinitstring} --broker_address=tcp://{broker_address}"
@@ -50,14 +50,10 @@ def run_sub_trans(feeders, broker_address):
 
     pubs = []
     subs = []
-    for feeder in feeders.split(" "):
+    for feeder in feeders:
         pub_name = f"{feeder}.voltage"
         logger.info(f"{fed_name}: registering {pub_name}")
-        pubs.append(
-            h.helicsFederateRegisterGlobalTypePublication(
-                vfed, pub_name, "double", "pu"
-            )
-        )
+        pubs.append(h.helicsFederateRegisterGlobalTypePublication(vfed, pub_name, "double", "pu"))
         logger.info(f"{fed_name}: publication {pub_name} registered")
         sub_name = f"Circuit.{feeder}.TotalPower.E"
         subs.append(h.helicsFederateRegisterSubscription(vfed, sub_name, "kW"))
@@ -68,7 +64,7 @@ def run_sub_trans(feeders, broker_address):
     logger.info(f"{fed_name} Entering executing mode")
 
     # start execution loop
-    n_feeders = len(feeders.split(" "))
+    n_feeders = len(feeders)
     currenttime = 0
     desiredtime = 0.0
     t = 0.0
@@ -82,9 +78,7 @@ def run_sub_trans(feeders, broker_address):
                 h.helicsPublicationPublishDouble(p, 1.01)
             for i in range(n_feeders):
                 value = h.helicsInputGetDouble(subs[i])
-                logger.info(
-                    f"Circuit {feeders[i]} active power demand: {value} kW at time: {currenttime}."
-                )
+                logger.info(f"Circuit {feeders[i]} active power demand: {value} kW at time: {currenttime}.")
             t += 1
 
     # all other federates should have finished, so now you can close the broker
@@ -102,5 +96,6 @@ def run_sub_trans(feeders, broker_address):
 if __name__ == "__main__":
     fed_name = sys.argv[1] if len(sys.argv) >= 2 else "Test_Federate_sub_trans"
     broker_address = sys.argv[2] if len(sys.argv) >= 3 else None
+    feeders = ["full_network"]
 
-    run_sub_trans(fed_name, broker_address)
+    run_sub_trans(fed_name, feeders, broker_address)

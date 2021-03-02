@@ -58,9 +58,7 @@ def run_p1uhs_federate(fed_name, broker_address=None):
 
     # Register the publications #
     pub_name = f"Circuit.feeder_p1u.{fed_name}.p1ux.TotalPower.E"
-    pub_load = h.helicsFederateRegisterGlobalTypePublication(
-        vfed, pub_name, "double", "kW"
-    )
+    pub_load = h.helicsFederateRegisterGlobalTypePublication(vfed, pub_name, "double", "kW")
     print(f"{fed_name}: publication {pub_name} registered")
 
     # Register subscriptions #
@@ -92,19 +90,13 @@ def run_p1uhs_federate(fed_name, broker_address=None):
 
             while iteration_state == h.helics_iteration_result_iterating:
                 supply_voltage, load = pub_and_sub_calc(sub_voltage, pub_load, iters)
-                currenttime, iteration_state = h.helicsFederateRequestTimeIterative(
-                    vfed, desiredtime, h.helics_iteration_request_iterate_if_needed
-                )
+                currenttime, iteration_state = h.helicsFederateRequestTimeIterative(vfed, desiredtime, h.helics_iteration_request_iterate_if_needed)
                 if abs(last_voltage - supply_voltage) < 1e-20:
                     iteration_state = -1
                 iters += 1
                 last_voltage = supply_voltage
 
-            logging.info(
-                "p1uhs0 load {} with voltage {} at time {} after {} iters".format(
-                    load, supply_voltage, currenttime, iters
-                )
-            )
+            logging.info("p1uhs0 load {} with voltage {} at time {} after {} iters".format(load, supply_voltage, currenttime, iters))
             t += 1
 
     # all other federates should have finished, so now you can close
@@ -120,6 +112,6 @@ def run_p1uhs_federate(fed_name, broker_address=None):
 
 
 if __name__ == "__main__":
-    fed_name = sys.argv[1] if len(sys.argv) >= 2 else "Test_Federate_p1uhs"
+    fed_name = sys.argv[1] if len(sys.argv) >= 2 else "p1uhs0"
     broker_address = sys.argv[2] if len(sys.argv) >= 3 else None
     run_p1uhs_federate(fed_name, broker_address)
