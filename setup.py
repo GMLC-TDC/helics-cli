@@ -24,7 +24,7 @@ setup(
     download_url="https://github.com/GMLC-TDC/helics-cli",
     author="Dheepak Krishnamurthy",
     license="BSD-compatible",
-    packages=["web"] + find_packages(),
+    packages=["web", "database"] + find_packages(),
     install_requires=["future", "six", "click", "jinja2", "helics", "flask"],
     keywords=["helics", "cosimulation"],
     include_package_data=True,

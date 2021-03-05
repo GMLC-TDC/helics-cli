@@ -3,28 +3,35 @@
 HELICS Runner command line interface
 """
 
-import logging
 import json
+import logging
 import os
+import shlex
 import shutil
 import subprocess
-import shlex
+from multiprocessing import Queue
 
 import click
 
+from helics_cli.SupportClasses.MessageHandler import MessageHandler
+from helics_cli.SupportClasses.ProcessPackage import ProcessPackage
+from . import observer
+from . import utils
 from ._version import __version__
-
+from .exceptions import HELICSRuntimeError
+from .server import startup
 # from .log import setup_logger
 from .status_checker import CheckStatusThread
-from .exceptions import HELICSRuntimeError
-from . import observer
-
-from . import utils
 from .utils import echo
 
-from .server import startup
-
 logger = logging.getLogger(__name__)
+
+process_package = ProcessPackage(
+    process_list=[],
+    output_list=[],
+    has_web=False,
+    message_handler=MessageHandler(Queue(), Queue(), False),
+    use_broker_process=False)
 
 
 @click.group()
@@ -83,12 +90,14 @@ def setup(name, path, purge):
 
 @cli.command()
 @click.option(
-    "--path", required=True, type=click.Path(file_okay=True, exists=True), help="Path to config.json that describes how to run a federation",
+    "--path", required=True, type=click.Path(file_okay=True, exists=True),
+    help="Path to config.json that describes how to run a federation",
 )
 @click.option("--silent", is_flag=True)
 @click.option("--no-log-files", is_flag=True, default=False)
 @click.option("--broker-loglevel", type=int, default=2)
-def run(path, silent, no_log_files, broker_loglevel):
+@click.option("--web", "-w", is_flag=True, default=False, help="Run the web interface on startup")
+def run(path, silent, no_log_files, broker_loglevel, web):
     """
     Run HELICS federation
     """
@@ -98,7 +107,8 @@ def run(path, silent, no_log_files, broker_loglevel):
 
     if not os.path.exists(path_to_config):
         echo(
-            "Unable to find file `config.json` in path: {path_to_config}".format(path_to_config=path_to_config), status="error",
+            "Unable to find file `config.json` in path: {path_to_config}".format(path_to_config=path_to_config),
+            status="error",
         )
         return None
 
@@ -110,27 +120,48 @@ def run(path, silent, no_log_files, broker_loglevel):
     if not silent:
         echo("Running federation: {name}".format(name=config["name"]), status="info")
 
-    process_list = []
-    output_list = []
+    if web and "broker" in config.keys() and "observer" in config["broker"].keys():
+        process_package.message_handler.set_enable(True)
 
-    broker_o = open(os.path.join(path, "broker.log"), "w")
-    if "broker" in config.keys() and config["broker"] is True:
-        broker_p = subprocess.Popen(
-            shlex.split("helics_broker -f {num_fed} --loglevel={log_level}".format(num_fed=len(config["federates"]), log_level=broker_loglevel)),
-            cwd=os.path.abspath(os.path.expanduser(path)),
-            stdout=broker_o,
-            stderr=broker_o,
-        )
-        process_list.append(broker_p)
-        output_list.append(broker_o)
+    if web:
+        process_package.run_web(target=startup, args=(False, path_to_config, process_package.message_handler,))
+        # process_package.run_web(target=startup, args=(False,))  # , process_package.message_handler,))
+
+    if "broker" in config.keys() and config["broker"] is not False:
+        if "observer" in config["broker"].keys():
+            process_package.run_broker(target=observer.run,
+                                       args=(
+                                           len(config["federates"]), path_to_config,
+                                           process_package.message_handler,))
+            # process_package.run_broker(target=observer.run,
+            #                            args=(
+            #                                len(config["federates"]), path_to_config,))
+                                           # process_package.message_handler,))
+            # process_package.broker_process = Process(target=observer.run,
+            #                                          args=(
+            #                                              len(config["federates"]), path_to_config,
+            #                                              process_package.message_handler,))
+            process_package.broker_process.name = "broker"
+        else:
+            broker_o = open(os.path.join(path, "broker.log"), "w")
+            broker_subprocess = subprocess.Popen(
+                shlex.split("helics_broker -f {num_fed} --loglevel={log_level}".format(num_fed=len(config["federates"]),
+                                                                                       log_level=broker_loglevel)),
+                cwd=os.path.abspath(os.path.expanduser(path)),
+                stdout=broker_o,
+                stderr=broker_o,
+            )
+            broker_subprocess.name = "broker"
+            process_package.process_list.append(broker_subprocess)
+            process_package.output_list.append(broker_o)
     else:
+        broker_o = open(os.path.join(path, "broker.log"), "w")
         broker_p = subprocess.Popen(
             shlex.split("""python -c 'print("Not starting broker.")'"""),
             cwd=os.path.abspath(os.path.expanduser(path)),
             stdout=broker_o,
             stderr=broker_o,
         )
-    broker_p.name = "broker"
 
     for f in config["federates"]:
         if not silent:
@@ -149,52 +180,50 @@ def run(path, silent, no_log_files, broker_loglevel):
             if "env" in f:
                 for k, v in f["env"].items():
                     env[k] = v
-            p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(directory)), stdout=o, stderr=o, env=env,)
+            p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(directory)), stdout=o,
+                                 stderr=o, env=env, )
 
             p.name = f["name"]
         except FileNotFoundError as e:
             raise click.ClickException("FileNotFoundError: {}".format(e))
-        process_list.append(p)
+        process_package.process_list.append(p)
         if o is not None:
-            output_list.append(o)
+            process_package.output_list.append(o)
 
-    t = CheckStatusThread(process_list)
+    t = CheckStatusThread(process_package.process_list)
 
     try:
         t.start()
         echo(
-            "Waiting for {} processes to finish ...".format(len(process_list)), status="info",
+            "Waiting for {} processes to finish ...".format(len(process_package.process_list)), status="info",
         )
-        for p in process_list:
+        for p in process_package.process_list:
             p.wait()
     except KeyboardInterrupt:
         echo("Warning: User interrupted processes. Terminating safely ...", status="info")
-        for p in process_list:
+        process_package.shutdown()
+        for o in process_package.output_list:
+            o.close()
+        for p in process_package.process_list:
             p.kill()
+
     except HELICSRuntimeError as e:
         click.echo("")
         click.echo(f"Error: {e}. Terminating ...")
-        for p in process_list:
+        for p in process_package.process_list:
             p.kill()
     finally:
-        for p in process_list:
+        for p in process_package.process_list:
             if p.returncode != 0 and p.returncode is not None:
                 echo(
                     "Process {} exited with return code {}".format(p.name, p.returncode), status="error",
                 )
 
-    broker_p.wait()
-    echo("Done!", status="info")
-
-    for o in output_list:
-        o.close()
-
-    broker_o.close()
-
 
 @cli.command()
 @click.option(
-    "--path", required=True, type=click.Path(exists=True), help="Path to config.json file that describes how to run a federation",
+    "--path", required=True, type=click.Path(exists=True),
+    help="Path to config.json file that describes how to run a federation",
 )
 def validate(path):
     """
@@ -205,18 +234,18 @@ def validate(path):
     with open(path) as f:
         config = json.loads(f.read())
 
-    if set(list(config.keys())) == set(["name", "broker", "federates"]):
+    if set(list(config.keys())) == {"name", "broker", "federates"}:
         echo("Missing or additional keys found in config.json", status="warning")
 
     echo(" - Valid keys in config.json", status="info")
 
     for i, f in enumerate(config["federates"]):
         assert "name" in f.keys(), "Missing name in federate number {i}".format(i=i)
-        assert set(list(f.keys())) == set(
-            ["name", "host", "exec", "directory"]
-        ), "Missing or additional keys found in federates {} in config.json".format(f["name"])
+        assert set(list(f.keys())) == {"name", "host", "exec", "directory"}, \
+            "Missing or additional keys found in federates {} in config.json".format(f["name"])
         echo("     - Valid keys in federate {}".format(f["name"]), status="info")
-        assert f["host"] == "localhost", "Multi machine support is currently not available. Please contact the developer."
+        assert f["host"] == "localhost", \
+            "Multi machine support is currently not available. Please contact the developer."
 
     return None
 
@@ -225,15 +254,19 @@ def validate(path):
 @click.option(
     "--n-federates", required=True, type=click.INT, help="Number of federates to observe",
 )
-def observe(n_federates: int) -> int:
-    return observer.run(n_federates)
+@click.option("--path", type=click.STRING, help="Internal path to config file used for filtering output")
+def observe(n_federates: int, path: str) -> int:
+    return observer.run(n_federates, path)
+
 
 @cli.command()
 @click.option(
-    "--web", required=False, type=click.BOOL, help="Open browser on startup",
+    "--browser", is_flag=True, default=False, help="Open browser on startup",
 )
-def server(web: bool):
-    startup(web)
+@click.option("--path", type=click.STRING, help="Path for database file")
+def server(browser: bool, path: str):
+    startup(browser, path)
+
 
 if __name__ == "__main__":
     cli()

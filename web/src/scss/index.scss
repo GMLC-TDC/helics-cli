@@ -12,6 +12,7 @@ body {
 
 .helics-table-container {
   max-width: 75em;
+  outline: 1px solid;
 }
 
 .helics-float-container {
@@ -19,9 +20,24 @@ body {
 }
 
 .helics-float-child {
-  width: 25em;
+  width: 95%;
   //float: left;
   padding: 0.25em;
+}
+
+#nav-debug {
+  height: 100%;
+}
+
+.helics-query-response-block {
+  width: 95%;
+  padding: 0.25em;
+  outline: solid 1px;
+}
+
+#queryResponseWindow {
+  height: 75vh;
+  overflow-y: scroll;
 }
 
 @import "~bootstrap/scss/bootstrap";

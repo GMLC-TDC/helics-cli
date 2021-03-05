@@ -1,4 +1,14 @@
 {
+  "broker": {
+    "federates": 3,
+    "observer": {
+      "directory": "../../",
+      "host": "localhost",
+      "name": "observer",
+      "include": ["Circuit.feeder_p1u.p1uhs0.p1ux.voltage", "Circuit.feeder_p1u.p1uhs0.p1ux.TotalPower.E", "full_network.voltage"],
+      "exclude": []
+    }
+  },
   "federates": [
     {
       "directory": ".",
@@ -17,12 +27,6 @@
       "exec": "python -u Test_Federate_sub_trans.py",
       "host": "localhost",
       "name": "Test_Federate_sub_trans"
-    },
-    {
-      "directory": "../../",
-      "exec": "helics observe --n-federates 3",
-      "host": "localhost",
-      "name": "observer"
     }
   ],
   "name": "IterationFederation"
