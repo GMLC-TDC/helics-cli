@@ -1,8 +1,8 @@
 CREATE TABLE Publications
 (
-    key       VARCHAR(64),
-    sender    VARCHAR(128),
-    pub_time  DECIMAL(32),
-    pub_value DECIMAL(32),
+    key       VARCHAR,
+    sender    VARCHAR,
+    pub_time  DECIMAL,
+    pub_value DECIMAL,
     new_value BOOLEAN DEFAULT FALSE
 )

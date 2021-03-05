@@ -1,2 +1,3 @@
 include web/notfound.html
 recursive-include web/dist *
+recursive-include database/Schema *.sql

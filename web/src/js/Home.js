@@ -3,7 +3,6 @@ export default class {
 // Button click handler events.
         $('#fastForwardFederation').on('click', () => this.signal('fast-forward-federation', this.reloadCharts));
         $('#stopFederation').on('click', () => this.signal('stop-federation', this.reloadCharts));
-        $('#signalFederation').on('click', () => this.signal('signal-federation', this.reloadCharts, $('#nextTimeStep').val()));
         this.reloadCharts();
 // Bootstrap-table cell highlighting logic.
         window.cellStyle = function (value) {

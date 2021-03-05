@@ -60,17 +60,6 @@
     <!-- Tab Body Content -->
     <div class="tab-content" id="nav-tabContent">
         <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-            <!--            <button type="button" class="btn btn-primary btn-controls" id="loadFile">Load Configuration File</button>-->
-            <!--            <br/>-->
-            <button type="button" class="btn btn-primary btn-controls" id="fastForwardFederation">
-                <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                Run To End
-            </button>
-            <button type="button" class="btn btn-primary btn-controls" id="stopFederation">
-                <i class="fa fa-stop" aria-hidden="true"></i>
-                Stop Simulation
-            </button>
-
             <div id="federateList" class="helics-table-container">
                 <h3>Federate Configuration</h3>
                 <table
@@ -120,97 +109,121 @@
                     </thead>
                 </table>
             </div>
+
+            <!--            <div id="messageList" class="helics-table-container">-->
+            <!--                <h3>Messages</h3>-->
+            <!--                <table-->
+            <!--                        id="messageListTable"-->
+            <!--                        data-toggle="table"-->
+            <!--                        data-filter-control="true"-->
+            <!--                        data-flat="true"-->
+            <!--                        data-search="true"-->
+            <!--                        data-show-refresh="true"-->
+            <!--                        data-show-pagination-switch="true"-->
+            <!--                        data-pagination="true"-->
+            <!--                        data-page-list="[10, 25, 50, 100, all]"-->
+            <!--                        data-side-pagination="client"-->
+            <!--                        class="table table-bordered table-striped table-responsive-sm"-->
+            <!--                        data-url="api/message-data">-->
+            <!--                    <thead>-->
+            <!--                    <tr>-->
+            <!--                        <th data-field="sender" data-filter-control="input" data-sortable="true">sender</th>-->
+            <!--                        <th data-field="destination" data-filter-control="input" data-sortable="true">destination</th>-->
+            <!--                        <th data-field="send_time" data-filter-control="input" data-sortable="true">send_time</th>-->
+            <!--                        <th data-field="receive_time" data-filter-control="input" data-sortable="true">receive_time</th>-->
+            <!--                        <th data-field="value" data-filter-control="input" data-sortable="true"-->
+            <!--                            data-cell-style="cellStyle">-->
+            <!--                            value-->
+            <!--                        </th>-->
+            <!--                    </tr>-->
+            <!--                    </thead>-->
+            <!--                </table>-->
+            <!--            </div>-->
         </div>
 
-        <div id="messageList" class="helics-table-container">
-            <h3>Messages</h3>
-            <table
-                    id="messageListTable"
-                    data-toggle="table"
-                    data-filter-control="true"
-                    data-flat="true"
-                    data-search="true"
-                    data-show-refresh="true"
-                    data-show-pagination-switch="true"
-                    data-pagination="true"
-                    data-page-list="[10, 25, 50, 100, all]"
-                    data-side-pagination="client"
-                    class="table table-bordered table-striped table-responsive-sm"
-                    data-url="api/message-data">
-                <thead>
-                <tr>
-                    <th data-field="fieldOne" data-filter-control="input" data-sortable="true">TODO</th>
-                    <th data-field="fieldTwo" data-filter-control="input" data-sortable="true">TODO</th>
-                    <th data-field="fieldThree" data-filter-control="input" data-sortable="true">TODO</th>
-                    <th data-field="fieldFour" data-filter-control="input" data-sortable="true">TODO</th>
-                    <th data-field="fieldFive" data-filter-control="input" data-sortable="true"
-                        data-cell-style="cellStyle">TODO
-                    </th>
-                </tr>
-                </thead>
-            </table>
-        </div>gi
 
-    <div class="tab-pane fade helics-float-container" id="nav-debug" role="tabpanel"
-         aria-labelledby="nav-debug-tab">
-        <!-- TODO: high-precision time -->
-        <br/>
-        <!-- TODO: current/granted time -->
-        <br/>
-        <label for="nextTimeStep">Next Time Step:</label> <input id="nextTimeStep">
-        <button type="button" class="btn btn-primary btn-controls" id="signalFederation">
-            <i class="fa fa-play" aria-hidden="true"></i>
-            <i class="fa fa-pause" aria-hidden="true"></i>
-            Run to Time
-        </button>
+        <div class="tab-pane fade helics-float-container container-lg" id="nav-debug" role="tabpanel"
+             aria-labelledby="nav-debug-tab">
+            <div class="row">
+                <div class="col-md-5">
+                    <!-- TODO: high-precision time -->
+                    <!--            <button type="button" class="btn btn-primary btn-controls" id="loadFile">Load Configuration File</button>-->
+                    <!--            <br/>-->
+                    <button type="button" class="btn btn-primary btn-controls" id="fastForwardFederation">
+                        <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                        Run To End
+                    </button>
+                    <button type="button" class="btn btn-primary btn-controls" id="stopFederation">
+                        <i class="fa fa-stop" aria-hidden="true"></i>
+                        Stop Simulation
+                    </button>
+                    <!-- TODO: current/granted time -->
+                    <br/>
+                    <br/>
+                    <label for="nextTimeStep">Next Time Step:</label> <input id="nextTimeStep">
+                    <button type="button" class="btn btn-primary btn-controls" id="signalFederation">
+                        <i class="fa fa-play" aria-hidden="true"></i>
+                        <i class="fa fa-pause" aria-hidden="true"></i>
+                        Run to Time
+                    </button>
 
-        <h3>HELICS Query:</h3>
-        <div class="form-group helics-float-child helics-federate-selector helics-core-selector">
-            <label for="queryTargetSelect">Query Target</label>
-            <select class="form-control helics-debug-dropdown" id="queryTargetSelect">
-                <option disabled selected value="empty"> -- select an option --</option>
-                <option>Federation Core</option>
-                <option>Named Federate</option>
-            </select>
-        </div>
+                    <br/>
 
-        <div id="queryTargetDiv" class="form-group helics-float-child helics-federate-selector" style="display: none;">
-            <label for="queryTargetName">Target Name</label>
-            <select class="form-control helics-debug-dropdown" id="queryTargetName">
-                <option disabled selected value="empty"> -- select an option --</option>
-            </select>
-        </div>
+                    <h3>HELICS Query:</h3>
+                    <div class="form-group helics-float-child helics-federate-selector helics-core-selector">
+                        <label for="queryTargetSelect">Query Target</label>
+                        <select class="form-control helics-debug-dropdown" id="queryTargetSelect" autocomplete="off">
+                            <option disabled selected value="empty"> -- select an option --</option>
+                            <option value="CORE">Federation Core</option>
+                            <option value="FEDERATE">Named Federate</option>
+                        </select>
+                    </div>
 
-        <div id="queryTargetTopicDiv" class="form-group helics-float-child helics-core-selector" style="display: none;">
-            <label for="queryTargetTopic">Target Topic</label>
-            <select class="form-control helics-debug-dropdown" id="queryTargetTopic">
-                <option disabled selected value="empty"> -- select an option --</option>
-                <option>Global Time</option>
-                <option>Federate State</option>
-            </select>
+                    <div id="queryTargetDiv" class="form-group helics-float-child helics-federate-selector"
+                         style="display: none;">
+                        <label for="queryTargetName">Target Name</label>
+                        <select class="form-control helics-debug-dropdown" id="queryTargetName" autocomplete="off">
+                            <option disabled selected value="empty"> -- select an option --</option>
+                        </select>
+                    </div>
+
+                    <div id="queryTargetTopicDiv" class="form-group helics-float-child helics-core-selector"
+                         style="display: none;">
+                        <label for="queryTargetTopic">Target Topic</label>
+                        <select class="form-control helics-debug-dropdown" id="queryTargetTopic" autocomplete="off">
+                            <option disabled selected value="empty"> -- select an option --</option>
+                            <option value="GLOBAL_TIME">Global Time</option>
+                            <option value="FEDERATION_STATE">Federation State</option>
+                        </select>
+                    </div>
+                    <div id="queryFederateSpecificDiv" class="form-group helics-float-child helics-federate-selector"
+                         style="display: none;">
+                        <label for="queryFederateSpecific">Federate Specific</label>
+                        <select class="form-control helics-debug-dropdown" id="queryFederateSpecific" autocomplete="off">
+                            <option disabled selected value="empty"> -- select an option --</option>
+<!--                            <option value="VALUE">Signal Value</option>-->
+                            <option value="GRANTED_TIME">Granted Time</option>
+                            <option value="PUBS">Publications</option>
+                            <option value="SUBS">Subscriptions</option>
+                            <option value="INPUTS">Named Inputs</option>
+                            <option value="ENDPOINTS">Endpoints</option>
+                            <option value="FILTERS">Endpoint Filters</option>
+                            <option value="STATE">Execution State</option>
+                        </select>
+                    </div>
+                    <button disabled type="button" class="btn btn-primary btn-controls" id="sendQuery">
+                        <i class="fa fa-question" aria-hidden="true"></i>
+                        Query
+                    </button>
+                    <!-- TODO: generate content div for each query and store output on screen (close button, save button, etc.) -->
+                </div>
+                <div class="col-md-7 overflow-auto" id="queryResponseWindow">
+                    <h1>Query Results:</h1>
+                </div>
+            </div>
+
         </div>
-        <div id="queryFederateSpecificDiv" class="form-group helics-float-child helics-federate-selector"
-             style="display: none;">
-            <label for="queryFederateSpecific">Federate Specific</label>
-            <select class="form-control helics-debug-dropdown" id="queryFederateSpecific">
-                <option disabled selected value="empty"> -- select an option --</option>
-                <option>Signal Value</option>
-                <option>Granted Time</option>
-                <option>Publications</option>
-                <option>Subscrioptions</option>
-                <option>Named Inputs</option>
-                <option>Endpoints</option>
-                <option>Endpoint Filters</option>
-                <option>Execution State</option>
-            </select>
-        </div>
-        <button disabled type="button" class="btn btn-primary btn-controls" id="sendQuery">
-            <i class="fa fa-question" aria-hidden="true"></i>
-            Query
-        </button>
-        <!-- TODO: generate content div for each query and store output on screen (close button, save button, etc.) -->
-    </div>
-    <!--    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>-->
+        <!--    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>-->
     </div>
 </main>
 </body>
