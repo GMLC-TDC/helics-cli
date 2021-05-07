@@ -20,22 +20,29 @@ class ProcessPackage:
         self.use_broker_process = use_broker_process
 
     def shutdown(self):
+        print("in shutdown...")
         if self.use_broker_process and self.broker_process.is_alive():
-            self.broker_process.kill()
+            self.broker_process.terminate()
+            # self.broker_process.kill()
             self.broker_process.close()
 
+        print("shutdown broker")
+
         if self.has_web and self.web_process.is_alive():
-            self.web_process.kill()
+            self.web_process.terminate()
+            # self.web_process.kill()
             self.web_process.close()
 
-    def run_broker(self, target, args):
+        print("shutdown web")
+
+    def run_broker(self, target, args, daemon=False):
         self.use_broker_process = True
         self.broker_process = Process(target=target,
-                                      args=args)
+                                      args=args, daemon=daemon)
         self.broker_process.start()
 
-    def run_web(self, target, args):
+    def run_web(self, target, args, daemon=False):
         self.has_web = True
         self.web_process = Process(target=target,
-                                   args=args)
+                                   args=args, daemon=daemon)
         self.web_process.start()

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import json
 import logging
 import os
 import time
+from decimal import Decimal
 
 import helics as h
 
@@ -47,6 +49,7 @@ def init_combination_federate(
     fedinfo.core_init = core_init
     fedinfo.broker_init = broker_init
     fedinfo.property[h.HELICS_PROPERTY_TIME_DELTA] = time_delta
+    fedinfo.property[h.HELICS_PROPERTY_TIME_PERIOD] = time_delta
     fedinfo.flag[h.HELICS_FLAG_TERMINATE_ON_ERROR] = True
 
     # fedinfo.flag[h.HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING] = True
@@ -60,7 +63,7 @@ def init_combination_federate(
 def write_database_data(db, federate: h.HelicsFederate, subscriptions=[], current_time=0.0):
     logger.debug("Making query ...")
 
-    federates = federate.query("root", "federates")  # .replace("[", "").replace("]", "").split(";")
+    federates = [name for name in federate.query("root", "federates") if name != "__observer__"]
 
     for name in federates:
         logger.debug(f"Query for exists: {name}")
@@ -98,9 +101,18 @@ def write_database_data(db, federate: h.HelicsFederate, subscriptions=[], curren
                 logger.info("ERROR: multiple subscriptions to same publication.")
             elif len(pub_str) > 0 and len(subs) == 1:
                 db.execute("UPDATE Publications SET new_value=0;")
+                publication_type = subs[0].publication_type
+                if publication_type == "double":
+                    value = subs[0].double
+                elif publication_type == "integer":
+                    value = subs[0].integer
+                else:
+                    value = subs[0].string
+
+                logger.info(f"Publication value is {value} of type {type}")
                 db.execute(
                     "INSERT INTO Publications(key, sender, pub_time, pub_value, new_value) VALUES (?,?,?,?,?);",
-                    (pub_str, name, granted_time, subs[0].string, 1),
+                    (pub_str, name, granted_time, value, 1),
                 )
 
     db.commit()
@@ -144,38 +156,50 @@ def process_message(message: SimpleMessage):
         return SimpleMessage("ERROR_RESPONSE", "{}")
 
 
-def ingest_messages(current_time):
+def check_first_message():
     if server_message_handler.Enabled:
-        logger.info(f"Processing messages from server")
+        logger.info("Processing pre-start messages from server")
         while True:
             message = server_message_handler.get_server()
             logger.debug(f"Received message {message}")
             response = process_message(message)
             server_message_handler.send_server(response)
-            if server_message_handler.ToHelics.empty() and time_control["requested_time"] > current_time or \
+            if server_message_handler.ToHelics.empty() and time_control["requested_time"] > 0.0 or \
                     time_control["nonstop"]:
                 break
 
 
-def run(n_federates: int, config_path: str, message_handler: MessageHandler = None):
+def ingest_messages():
+    if server_message_handler.Enabled:
+        logger.info(f"Processing messages from server")
+        while not server_message_handler.ToHelics.empty():  # action event was new message
+            message = server_message_handler.get_server()
+            logger.debug(f"Received message {message}")
+            response = process_message(message)
+            server_message_handler.send_server(response)
+
+
+def run(n_federates: int, config_path: str, log_level: int, message_handler: MessageHandler = None):
     global server_message_handler
     server_message_handler = message_handler
     if server_message_handler.Enabled:
         time_control["nonstop"] = False
 
     try:
-        _run(n_federates, config_path)
+        asyncio.run(_run(n_federates, config_path, log_level))
+    except KeyboardInterrupt:
+        logger.info("User canceled operation")
     except h.HelicsException:
         logger.error("Failed and threw HelicsException")
         h.helicsCloseLibrary()
         return 1
     finally:
-        logger.error("In finally")
+        logger.debug("In finally")
         h.helicsCloseLibrary()
     return 0
 
 
-def _run(n_federates: int, config_path: str):
+async def _run(n_federates: int, config_path: str, log_level: int = 2):
     global fed
     global server_message_handler
     global broker
@@ -190,14 +214,14 @@ def _run(n_federates: int, config_path: str):
     logger.info("Loading HELICS Library")
 
     logger.info("Initializing database")
-    db = initialize_database(path + "/helics-cli.db", logger)
+    db = initialize_database(path + "/helics-cli.db", logger, do_init=True)
     metadata = MetaData(db)
 
     metadata["version"] = h.helicsGetVersion()
     metadata["n_federates"] = n_federates
 
     logger.info("Creating broker")
-    broker = h.helicsCreateBroker("zmq", "", f"-f{n_federates + 1} --loglevel=7")
+    broker = h.helicsCreateBroker("zmq", "", f"-f{n_federates + 1} --loglevel={log_level}")
 
     logger.info("Creating observer federate")
 
@@ -205,10 +229,10 @@ def _run(n_federates: int, config_path: str):
 
     logger.info("Entering initializing mode")
 
-    if not time_control["nonstop"]:
-        h.helicsBrokerSetTimeBarrier(broker, 0.0)
-    else:
-        time.sleep(5)
+    # if not time_control["nonstop"]:
+    #     h.helicsBrokerSetTimeBarrier(broker, 0.0)
+    # else:
+    time.sleep(2)
 
     federates = fed.query("root", "federates")  # .replace("[", "").replace("]", "").split(";")
     federates = [name for name in federates if name != "__observer__"]
@@ -238,49 +262,74 @@ def _run(n_federates: int, config_path: str):
             subscriptions.append(fed.register_subscription(pub))
     # TODO: message clones
 
-    logger.info("calling exec")
-    ingest_messages(0.0)
-    fed.enter_executing_mode()
+    h.helicsBrokerSetTimeBarrier(broker, 0.0)
 
-    logger.info("entered executing mode")
-    brokers = fed.query("root", "brokers")
-    logger.info(brokers)
+    try:
+        logger.info("calling exec")
 
-    current_time = 0.0
-    while True:
-        logger.info(f"Current time is {current_time} and nonstop mode is {'ON' if time_control['nonstop'] else 'OFF'}")
-        current_time = fed.request_next_step()
-        # fed.request_time_async(9223372036.3)
-        logger.info(f"Granted time {current_time}, calling DB Write")
-        write_database_data(db, fed, subscriptions, current_time)
+        check_first_message()
 
-        if not time_control["exited"]:
-            ingest_messages(current_time)
-        # current_time = fed.request_time_complete()
-        logger.debug(f"granted time {current_time}")
+        fed.enter_executing_mode()
+        logger.info("called exec")
 
-        logger.info("State ...")
-        if not time_control["nonstop"] or current_time >= 9223372036.3:
-            continue
-        if all(fed.query(name, "state") == "disconnected" for name in federates if
-               name != "__observer__") or current_time >= 9223372036.3:
-            break
+        logger.info("entered executing mode")
+        brokers = fed.query("root", "brokers")
+        logger.info(brokers)
 
-    logger.info("Finished observe.")
-    logger.info("Closing database ...")
-    db.close()
+        current_time = 0.0
+        get_next_step = True
+        while True:
+            if get_next_step:
+                fed.request_time_async(0.0)
+                get_next_step = False
 
-    logger.info("Finalizing federate ...")
-    fed.finalize()
-    logger.info("Deleting federate ...")
-    del fed
+            if fed.is_async_operation_completed() or not server_message_handler.ToHelics.empty():
+                if not server_message_handler.ToHelics.empty():
+                    ingest_messages()
+                elif fed.is_async_operation_completed():
+                    current_time = fed.request_time_complete()
+                    logger.debug(f"Granted time {current_time}, calling DB Write")
+                    write_database_data(db, fed, subscriptions, current_time)
+                    get_next_step = True
+                    continue
+            else:
+                await asyncio.sleep(
+                    0.001)  # There's probably a better way to do this, but this is the solution for now.
+                # time.sleep(1)  # There's probably a better way to do this, but this is the solution for now.
+            # if not time_control["exited"]:
+            #     ingest_messages(current_time)
 
-    logger.info("Broker disconnect ...")
-    broker.disconnect()
-    logger.info("Waiting for broker to disconnect ...")
-    broker.wait_for_disconnect()
+            if not time_control["nonstop"] or current_time >= 9223372036.3:
+                continue
+            if all(fed.query(name, "state") == "disconnected" for name in federates if
+                   name != "__observer__") or current_time >= 9223372036.3:
+                break
 
-    logger.info("Closing helics library ...")
-    h.helicsCloseLibrary()
+        logger.info("Finished observe.")
+        logger.info("finalizing monitoring task")
+        # message_handler.cancel()
+        # try:
+        #     await message_handler
+        # except asyncio.CancelledError:
+        #     logger.info("Monitor shutdown")
+        logger.info("Closing database ...")
+        db.close()
 
+    except KeyboardInterrupt:
+        logger.debug("Observer got keyboard interrupt")
+        raise
+    finally:
+        logger.debug("Observer finalizing")
+        logger.info("Finalizing federate ...")
+        fed.finalize()
+        logger.info("Deleting federate ...")
+        del fed
+
+        logger.info("Broker disconnect ...")
+        broker.disconnect()
+        logger.info("Waiting for broker to disconnect ...")
+        broker.wait_for_disconnect()
+
+        logger.info("Closing helics library ...")
+        h.helicsCloseLibrary()
     return 0

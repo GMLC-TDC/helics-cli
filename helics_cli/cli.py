@@ -20,7 +20,6 @@ from . import utils
 from ._version import __version__
 from .exceptions import HELICSRuntimeError
 from .server import startup
-# from .log import setup_logger
 from .status_checker import CheckStatusThread
 from .utils import echo
 
@@ -95,7 +94,7 @@ def setup(name, path, purge):
 )
 @click.option("--silent", is_flag=True)
 @click.option("--no-log-files", is_flag=True, default=False)
-@click.option("--broker-loglevel", type=int, default=2)
+@click.option("--broker-loglevel", "--loglevel", "-l", type=int, default=2, help="Log level for HELICS broker",)
 @click.option("--web", "-w", is_flag=True, default=False, help="Run the web interface on startup")
 def run(path, silent, no_log_files, broker_loglevel, web):
     """
@@ -124,23 +123,15 @@ def run(path, silent, no_log_files, broker_loglevel, web):
         process_package.message_handler.set_enable(True)
 
     if web:
-        process_package.run_web(target=startup, args=(False, path_to_config, process_package.message_handler,))
-        # process_package.run_web(target=startup, args=(False,))  # , process_package.message_handler,))
+        process_package.run_web(target=startup, args=(False, path_to_config, process_package.message_handler,),
+                                daemon=True)
 
     if "broker" in config.keys() and config["broker"] is not False:
         if "observer" in config["broker"].keys():
             process_package.run_broker(target=observer.run,
                                        args=(
-                                           len(config["federates"]), path_to_config,
-                                           process_package.message_handler,))
-            # process_package.run_broker(target=observer.run,
-            #                            args=(
-            #                                len(config["federates"]), path_to_config,))
-                                           # process_package.message_handler,))
-            # process_package.broker_process = Process(target=observer.run,
-            #                                          args=(
-            #                                              len(config["federates"]), path_to_config,
-            #                                              process_package.message_handler,))
+                                           len(config["federates"]), path_to_config,broker_loglevel,
+                                           process_package.message_handler,), daemon=True)
             process_package.broker_process.name = "broker"
         else:
             broker_o = open(os.path.join(path, "broker.log"), "w")
@@ -200,16 +191,21 @@ def run(path, silent, no_log_files, broker_loglevel, web):
         for p in process_package.process_list:
             p.wait()
     except KeyboardInterrupt:
-        echo("Warning: User interrupted processes. Terminating safely ...", status="info")
+        click.echo("Warning: User interrupted processes. Terminating safely ...", status="info")
         process_package.shutdown()
+        logger.debug("Closing output")
         for o in process_package.output_list:
             o.close()
+        logger.debug("Shutting down Processes")
         for p in process_package.process_list:
             p.kill()
 
     except HELICSRuntimeError as e:
         click.echo("")
         click.echo(f"Error: {e}. Terminating ...")
+        process_package.shutdown()
+        for o in process_package.output_list:
+            o.close()
         for p in process_package.process_list:
             p.kill()
     finally:
@@ -222,7 +218,7 @@ def run(path, silent, no_log_files, broker_loglevel, web):
 
 @cli.command()
 @click.option(
-    "--path", required=True, type=click.Path(exists=True),
+    "--path", required=True, type=click.Path(exists=True), default="./",
     help="Path to config.json file that describes how to run a federation",
 )
 def validate(path):
@@ -254,16 +250,18 @@ def validate(path):
 @click.option(
     "--n-federates", required=True, type=click.INT, help="Number of federates to observe",
 )
-@click.option("--path", type=click.STRING, help="Internal path to config file used for filtering output")
-def observe(n_federates: int, path: str) -> int:
-    return observer.run(n_federates, path)
+@click.option("--path", type=click.Path(exists=True), default="./",
+              help="Internal path to config file used for filtering output")
+@click.option("--broker_loglevel", "--loglevel", "-l", type=click.INT, default=2, help="Log level for HELICS broker")
+def observe(n_federates: int, path: str, log_level) -> int:
+    return observer.run(n_federates, path, log_level)
 
 
 @cli.command()
 @click.option(
     "--browser", is_flag=True, default=False, help="Open browser on startup",
 )
-@click.option("--path", type=click.STRING, help="Path for database file")
+@click.option("--path", type=click.Path(exists=True), default="./", help="Path for database file")
 def server(browser: bool, path: str):
     startup(browser, path)
 

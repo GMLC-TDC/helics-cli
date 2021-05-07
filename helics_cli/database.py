@@ -8,21 +8,22 @@ import logging
 DATABASE_DIRECTORY = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent / "database"
 
 
-def initialize_database(filename: str, logger: logging.Logger = logging.getLogger(__name__)):
+def initialize_database(filename: str, logger: logging.Logger = logging.getLogger(__name__), do_init: bool = False, check_thread: bool = True):
 
     logger.info(filename)
     logger.info(DATABASE_DIRECTORY)
-    db = sqlite3.connect(str(filename))
-    for filename in glob.glob(str(DATABASE_DIRECTORY / "Schema/*.sql")):
-        filename = filename
-        with open(filename) as f:
-            sql_file = f.read()
-        logger.info(f"read file {filename} to SQL")
-        logger.info(f"SQL: {sql_file}")
-        try:
-            db.execute(sql_file)
-        except sqlite3.OperationalError as e:
-            logger.error(e)
+    db = sqlite3.connect(str(filename), check_same_thread=check_thread)
+    if do_init:
+        for filename in glob.glob(str(DATABASE_DIRECTORY / "Schema/*.sql")):
+            filename = filename
+            with open(filename) as f:
+                sql_file = f.read()
+            logger.info(f"read file {filename} to SQL")
+            logger.info(f"SQL: {sql_file}")
+            try:
+                db.execute(sql_file)
+            except sqlite3.OperationalError as e:
+                logger.error(e)
 
     return db
 
