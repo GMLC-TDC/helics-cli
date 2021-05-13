@@ -21,7 +21,6 @@ jobs:
         python -m pip install -U pip install wheel setuptools cffi
     - name: Download dependencies
       run: |
-        python setup.py download
         pip install -e ".[tests,docs]"
     # - name: Run pytests
     #   run: |
