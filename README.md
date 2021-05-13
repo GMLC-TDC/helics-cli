@@ -18,7 +18,7 @@ Usage: helics [OPTIONS] COMMAND [ARGS]...
 
 Options:
   --version                Show the version and exit.
-  --verbose / -no-verbose
+  --verbose / --no-verbose
   --help                   Show this message and exit.
 
 Commands:
