@@ -9,7 +9,7 @@ import click
 
 logger = logging.getLogger(__name__)
 
-VERBOSE = False
+VERBOSE = True
 
 extra = {"_filename": "utils.py"}
 extra = {"_lineno": 98}
