@@ -2,7 +2,7 @@
 
 CLI for running Hierarchical Engine for Large-scale Infrastructure Co-Simulations (HELICS).
 
-![](./docs/img/screenshot-configure-run.png)
+![](https://user-images.githubusercontent.com/1813121/118163708-8bd4f380-b3df-11eb-8e18-99e9de81836f.png)
 
 - Supports configurations of federates using plugins
 - Allows running of federation using a runner configuration
