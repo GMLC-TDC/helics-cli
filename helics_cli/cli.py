@@ -26,11 +26,8 @@ from .utils import echo
 logger = logging.getLogger(__name__)
 
 process_package = ProcessPackage(
-    process_list=[],
-    output_list=[],
-    has_web=False,
-    message_handler=MessageHandler(Queue(), Queue(), False),
-    use_broker_process=False)
+    process_list=[], output_list=[], has_web=False, message_handler=MessageHandler(Queue(), Queue(), False), use_broker_process=False
+)
 
 
 @click.group()
@@ -89,12 +86,13 @@ def setup(name, path, purge):
 
 @cli.command()
 @click.option(
-    "--path", required=True, type=click.Path(file_okay=True, exists=True),
-    help="Path to config.json that describes how to run a federation",
+    "--path", required=True, type=click.Path(file_okay=True, exists=True), help="Path to config.json that describes how to run a federation",
 )
 @click.option("--silent", is_flag=True)
 @click.option("--no-log-files", is_flag=True, default=False)
-@click.option("--broker-loglevel", "--loglevel", "-l", type=int, default=2, help="Log level for HELICS broker",)
+@click.option(
+    "--broker-loglevel", "--loglevel", "-l", type=int, default=2, help="Log level for HELICS broker",
+)
 @click.option("--web", "-w", is_flag=True, default=False, help="Run the web interface on startup")
 def run(path, silent, no_log_files, broker_loglevel, web):
     """
@@ -106,8 +104,7 @@ def run(path, silent, no_log_files, broker_loglevel, web):
 
     if not os.path.exists(path_to_config):
         echo(
-            "Unable to find file `config.json` in path: {path_to_config}".format(path_to_config=path_to_config),
-            status="error",
+            "Unable to find file `config.json` in path: {path_to_config}".format(path_to_config=path_to_config), status="error",
         )
         return None
 
@@ -123,21 +120,18 @@ def run(path, silent, no_log_files, broker_loglevel, web):
         process_package.message_handler.set_enable(True)
 
     if web:
-        process_package.run_web(target=startup, args=(False, path_to_config, process_package.message_handler,),
-                                daemon=True)
+        process_package.run_web(target=startup, args=(False, path_to_config, process_package.message_handler,), daemon=True)
 
     if "broker" in config.keys() and config["broker"] is not False:
-        if "observer" in config["broker"].keys():
-            process_package.run_broker(target=observer.run,
-                                       args=(
-                                           len(config["federates"]), path_to_config,broker_loglevel,
-                                           process_package.message_handler,), daemon=True)
+        if config["broker"] is not True and "observer" in config["broker"].keys():
+            process_package.run_broker(
+                target=observer.run, args=(len(config["federates"]), path_to_config, broker_loglevel, process_package.message_handler,), daemon=True
+            )
             process_package.broker_process.name = "broker"
         else:
             broker_o = open(os.path.join(path, "broker.log"), "w")
             broker_subprocess = subprocess.Popen(
-                shlex.split("helics_broker -f {num_fed} --loglevel={log_level}".format(num_fed=len(config["federates"]),
-                                                                                       log_level=broker_loglevel)),
+                shlex.split("helics_broker -f {num_fed} --loglevel={log_level}".format(num_fed=len(config["federates"]), log_level=broker_loglevel)),
                 cwd=os.path.abspath(os.path.expanduser(path)),
                 stdout=broker_o,
                 stderr=broker_o,
@@ -147,7 +141,7 @@ def run(path, silent, no_log_files, broker_loglevel, web):
             process_package.output_list.append(broker_o)
     else:
         broker_o = open(os.path.join(path, "broker.log"), "w")
-        broker_p = subprocess.Popen(
+        _ = subprocess.Popen(
             shlex.split("""python -c 'print("Not starting broker.")'"""),
             cwd=os.path.abspath(os.path.expanduser(path)),
             stdout=broker_o,
@@ -171,8 +165,7 @@ def run(path, silent, no_log_files, broker_loglevel, web):
             if "env" in f:
                 for k, v in f["env"].items():
                     env[k] = v
-            p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(directory)), stdout=o,
-                                 stderr=o, env=env, )
+            p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(directory)), stdout=o, stderr=o, env=env,)
 
             p.name = f["name"]
         except FileNotFoundError as e:
@@ -218,8 +211,7 @@ def run(path, silent, no_log_files, broker_loglevel, web):
 
 @cli.command()
 @click.option(
-    "--path", required=True, type=click.Path(exists=True), default="./",
-    help="Path to config.json file that describes how to run a federation",
+    "--path", required=True, type=click.Path(exists=True), default="./", help="Path to config.json file that describes how to run a federation",
 )
 def validate(path):
     """
@@ -237,11 +229,11 @@ def validate(path):
 
     for i, f in enumerate(config["federates"]):
         assert "name" in f.keys(), "Missing name in federate number {i}".format(i=i)
-        assert set(list(f.keys())) == {"name", "host", "exec", "directory"}, \
-            "Missing or additional keys found in federates {} in config.json".format(f["name"])
+        assert set(list(f.keys())) == {"name", "host", "exec", "directory"}, "Missing or additional keys found in federates {} in config.json".format(
+            f["name"]
+        )
         echo("     - Valid keys in federate {}".format(f["name"]), status="info")
-        assert f["host"] == "localhost", \
-            "Multi machine support is currently not available. Please contact the developer."
+        assert f["host"] == "localhost", "Multi machine support is currently not available. Please contact the developer."
 
     return None
 
@@ -250,8 +242,7 @@ def validate(path):
 @click.option(
     "--n-federates", required=True, type=click.INT, help="Number of federates to observe",
 )
-@click.option("--path", type=click.Path(exists=True), default="./",
-              help="Internal path to config file used for filtering output")
+@click.option("--path", type=click.Path(exists=True), default="./", help="Internal path to config file used for filtering output")
 @click.option("--broker_loglevel", "--loglevel", "-l", type=click.INT, default=2, help="Log level for HELICS broker")
 def observe(n_federates: int, path: str, log_level) -> int:
     return observer.run(n_federates, path, log_level)
