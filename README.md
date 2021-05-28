@@ -93,7 +93,8 @@ pip install git+git://github.com/GMLC-TDC/helics-cli.git@main
 ```
 
 ## Release
-HELICS-cli is distributed under the terms of the BSD-3 clause license. All new
+
+`helics-cli` is distributed under the terms of the BSD-3 clause license. All new
 contributions must be made under this license. [LICENSE](LICENSE)
 
 SPDX-License-Identifier: BSD-3-Clause
