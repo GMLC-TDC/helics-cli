@@ -207,6 +207,9 @@ def run(path, silent, no_log_files, broker_loglevel, web):
                 echo(
                     "Process {} exited with return code {}".format(p.name, p.returncode), status="error",
                 )
+    echo(
+        "Done.", status="info",
+    )
 
 
 @cli.command()
