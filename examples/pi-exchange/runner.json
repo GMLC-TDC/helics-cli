@@ -1,4 +1,5 @@
 {
+  "broker": true,
   "federates": [
     {
       "directory": ".",
