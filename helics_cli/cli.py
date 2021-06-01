@@ -13,19 +13,19 @@ from multiprocessing import Queue
 
 import click
 
-from helics_cli.SupportClasses.MessageHandler import MessageHandler
-from helics_cli.SupportClasses.ProcessPackage import ProcessPackage
+from .utils.message_handler import MessageHandler
+from .utils.process import ProcessHandler
 from . import observer
-from . import utils
 from ._version import __version__
 from .exceptions import HELICSRuntimeError
 from .server import startup
 from .status_checker import CheckStatusThread
-from .utils import echo
+from .utils import extra
+from .utils.extra import echo
 
 logger = logging.getLogger(__name__)
 
-process_package = ProcessPackage(
+process_handler = ProcessHandler(
     process_list=[], output_list=[], has_web=False, message_handler=MessageHandler(Queue(), Queue(), False), use_broker_process=False
 )
 
@@ -41,7 +41,7 @@ def cli(ctx, verbose):
     ctx.obj = {}
     ctx.obj["verbose"] = verbose
     if verbose != 0:
-        utils.VERBOSE = verbose
+        extra.VERBOSE = verbose
 
 
 @cli.command()
@@ -117,17 +117,17 @@ def run(path, silent, no_log_files, broker_loglevel, web):
         echo("Running federation: {name}".format(name=config["name"]), status="info")
 
     if web and "broker" in config.keys() and "observer" in config["broker"].keys():
-        process_package.message_handler.set_enable(True)
+        process_handler.message_handler.set_enable(True)
 
     if web:
-        process_package.run_web(target=startup, args=(False, path_to_config, process_package.message_handler,), daemon=True)
+        process_handler.run_web(target=startup, args=(False, path_to_config, process_handler.message_handler,), daemon=True)
 
     if "broker" in config.keys() and config["broker"] is not False:
         if config["broker"] is not True and "observer" in config["broker"].keys():
-            process_package.run_broker(
-                target=observer.run, args=(len(config["federates"]), path_to_config, broker_loglevel, process_package.message_handler,), daemon=True
+            process_handler.run_broker(
+                target=observer.run, args=(len(config["federates"]), path_to_config, broker_loglevel, process_handler.message_handler,), daemon=True
             )
-            process_package.broker_process.name = "broker"
+            process_handler.broker_process.name = "broker"
         else:
             broker_o = open(os.path.join(path, "broker.log"), "w")
             broker_subprocess = subprocess.Popen(
@@ -137,8 +137,8 @@ def run(path, silent, no_log_files, broker_loglevel, web):
                 stderr=broker_o,
             )
             broker_subprocess.name = "broker"
-            process_package.process_list.append(broker_subprocess)
-            process_package.output_list.append(broker_o)
+            process_handler.process_list.append(broker_subprocess)
+            process_handler.output_list.append(broker_o)
     else:
         broker_o = open(os.path.join(path, "broker.log"), "w")
         _ = subprocess.Popen(
@@ -170,39 +170,39 @@ def run(path, silent, no_log_files, broker_loglevel, web):
             p.name = f["name"]
         except FileNotFoundError as e:
             raise click.ClickException("FileNotFoundError: {}".format(e))
-        process_package.process_list.append(p)
+        process_handler.process_list.append(p)
         if o is not None:
-            process_package.output_list.append(o)
+            process_handler.output_list.append(o)
 
-    t = CheckStatusThread(process_package.process_list)
+    t = CheckStatusThread(process_handler.process_list)
 
     try:
         t.start()
         echo(
-            "Waiting for {} processes to finish ...".format(len(process_package.process_list)), status="info",
+            "Waiting for {} processes to finish ...".format(len(process_handler.process_list)), status="info",
         )
-        for p in process_package.process_list:
+        for p in process_handler.process_list:
             p.wait()
     except KeyboardInterrupt:
         click.echo("Warning: User interrupted processes. Terminating safely ...", status="info")
-        process_package.shutdown()
+        process_handler.shutdown()
         logger.debug("Closing output")
-        for o in process_package.output_list:
+        for o in process_handler.output_list:
             o.close()
         logger.debug("Shutting down Processes")
-        for p in process_package.process_list:
+        for p in process_handler.process_list:
             p.kill()
 
     except HELICSRuntimeError as e:
         click.echo("")
         click.echo(f"Error: {e}. Terminating ...")
-        process_package.shutdown()
-        for o in process_package.output_list:
+        process_handler.shutdown()
+        for o in process_handler.output_list:
             o.close()
-        for p in process_package.process_list:
+        for p in process_handler.process_list:
             p.kill()
     finally:
-        for p in process_package.process_list:
+        for p in process_handler.process_list:
             if p.returncode != 0 and p.returncode is not None:
                 echo(
                     "Process {} exited with return code {}".format(p.name, p.returncode), status="error",

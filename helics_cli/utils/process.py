@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
 from multiprocessing import Process
 
-from helics_cli.SupportClasses.MessageHandler import MessageHandler
+from .message_handler import MessageHandler
 
 
-class ProcessPackage:
+class ProcessHandler:
     process_list: list
     output_list: list
     has_web: bool = False
@@ -37,12 +38,10 @@ class ProcessPackage:
 
     def run_broker(self, target, args, daemon=False):
         self.use_broker_process = True
-        self.broker_process = Process(target=target,
-                                      args=args, daemon=daemon)
+        self.broker_process = Process(target=target, args=args, daemon=daemon)
         self.broker_process.start()
 
     def run_web(self, target, args, daemon=False):
         self.has_web = True
-        self.web_process = Process(target=target,
-                                   args=args, daemon=daemon)
+        self.web_process = Process(target=target, args=args, daemon=daemon)
         self.web_process.start()
