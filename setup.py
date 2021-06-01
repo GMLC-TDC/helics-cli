@@ -25,13 +25,13 @@ setup(
     author="Dheepak Krishnamurthy",
     license="BSD-compatible",
     packages=["web", "database"] + find_packages(),
-    install_requires=["future", "six", "click", "jinja2", "helics", "flask"],
+    install_requires=["future", "six", "click", "jinja2", "helics>=2.7.0", "flask"],
     keywords=["helics", "cosimulation"],
     include_package_data=True,
     entry_points={"console_scripts": ["helics = helics_cli.cli:cli"]},
     extras_require={
         "tests": ["pytest", "pytest-ordering", "pytest-cov"],
-        "docs": ["mkdocs", "inari[mkdocs]", "mkdocs-material", "black", "pygments", "pymdown-extensions"]
+        "docs": ["mkdocs", "inari[mkdocs]", "mkdocs-material", "black", "pygments", "pymdown-extensions"],
     },
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
