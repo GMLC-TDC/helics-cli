@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 VERBOSE = True
 
-extra = {"_filename": "utils.py"}
+extra = {"_filename": "extra.py"}
 extra = {"_lineno": 98}
 
 logger = logging.LoggerAdapter(logger, extra)

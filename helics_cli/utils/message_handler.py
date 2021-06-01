@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 from multiprocessing import Queue
+
 
 class SimpleMessage:
     def __init__(self, message_type: str, message: str):

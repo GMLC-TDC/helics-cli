@@ -8,35 +8,25 @@ import webbrowser
 import flask
 from flask import jsonify, request
 
-from helics_cli.SupportClasses.MessageHandler import MessageHandler, SimpleMessage
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-file_out = logging.FileHandler("server.log", mode='w')
-file_out.setLevel(logging.DEBUG)
-stream_out = logging.StreamHandler()
-stream_out.setLevel(logging.ERROR)
-logger.addHandler(file_out)
-logger.addHandler(stream_out)
+from .utils.message_handler import MessageHandler, SimpleMessage
 
 server_message_handler = MessageHandler(None, None, False)
+
+logger = logging.getLogger(__name__)
 
 try:
     from .database import initialize_database as db_init
 except ImportError:
-    try:
-        from helics_cli.database import initialize_database as db_init
-    except ImportError:
-        def db_init(filename: str, db_logger: logging.Logger):
-            logger.error("Module Load Error: initialize_database not found.")
+
+    def db_init(filename: str, db_logger: logging.Logger):
+        logger.error("Module Load Error: initialize_database not found.")
+
 
 DATABASE_DIRECTORY = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent / "database"
 WEB_DIRECTORY = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent / "web"
 db_path: str
 
-app = flask.Flask(__name__,
-                  static_url_path='',
-                  static_folder=str(WEB_DIRECTORY / 'dist'))
+app = flask.Flask(__name__, static_url_path="", static_folder=str(WEB_DIRECTORY / "dist"))
 app.config["DEBUG"] = True
 app.config["PORT"] = 8000
 
@@ -63,8 +53,7 @@ def federate_time():
 @app.route("/api/named-federate-target-name", methods=["GET"])
 def named_federate_target_name():
     db = sqlite3.connect(db_path)
-    result = db.execute("SELECT value from MetaData WHERE name = 'federates' "
-                        "ORDER BY ROWID DESC LIMIT 1").fetchone()
+    result = db.execute("SELECT value from MetaData WHERE name = 'federates' " "ORDER BY ROWID DESC LIMIT 1").fetchone()
     feds = result[0].split(",")
     return jsonify(feds)
 
@@ -84,9 +73,7 @@ def message_data():
 
     arr = []
     for row in db.execute("SELECT sender, destination, send_time, receive_time, value, new_value FROM Messages"):
-        arr.append(
-            {"sender": row[0], "destination": row[1], "send_time": row[2], "receive_time": row[3], "value": row[4],
-             "new_value": row[5]})
+        arr.append({"sender": row[0], "destination": row[1], "send_time": row[2], "receive_time": row[3], "value": row[4], "new_value": row[5]})
     return jsonify(arr)
 
 
@@ -115,12 +102,10 @@ def stop_federation():
 @app.route("/api/signal-federation", methods=["GET"])
 def signal_federation():
     global server_message_handler
-    target_time = request.args.get('target_time', '')
+    target_time = request.args.get("target_time", "")
     if server_message_handler.Enabled:
         logger.debug("sending signal to helics")
-        server_message_handler.send_helics(
-            SimpleMessage("SIGNAL", f'{{"operation": "RUNTO", "target_time": {target_time}}}')
-        )
+        server_message_handler.send_helics(SimpleMessage("SIGNAL", f'{{"operation": "RUNTO", "target_time": {target_time}}}'))
         logger.debug("retrieving response from helics")
         result = server_message_handler.get_helics()
         return str(result)
@@ -131,47 +116,37 @@ def signal_federation():
 @app.route("/api/query-federation", methods=["GET"])
 def query_federation():
     global server_message_handler
-    target = request.args.get('target', '')
-    topic = request.args.get('topic', '')
-    name = request.args.get('name', '')
-    fedSpec = request.args.get('fedSpec', '')
+    target = request.args.get("target", "")
+    topic = request.args.get("topic", "")
+    name = request.args.get("name", "")
+    fedSpec = request.args.get("fedSpec", "")
 
     result = ""
 
     if server_message_handler.Enabled:
         if target == "CORE":
             if topic == "GLOBAL_TIME":
-                server_message_handler.send_helics(
-                    SimpleMessage("QUERY", '{"target":"root", "query": "global_time"}'))
+                server_message_handler.send_helics(SimpleMessage("QUERY", '{"target":"root", "query": "global_time"}'))
             elif topic == "FEDERATION_STATE":
-                server_message_handler.send_helics(
-                    SimpleMessage("QUERY", '{"target":"root", "query": "current_state"}'))
+                server_message_handler.send_helics(SimpleMessage("QUERY", '{"target":"root", "query": "current_state"}'))
             result = server_message_handler.get_helics()
         elif target == "FEDERATE":
             if fedSpec == "VALUE":
-                server_message_handler.send_helics(
-                    SimpleMessage("QUERY", '{"target":"' + name + '", "query": "values"}'))
+                server_message_handler.send_helics(SimpleMessage("QUERY", '{"target":"' + name + '", "query": "values"}'))
             elif fedSpec == "GRANTED_TIME":
-                server_message_handler.send_helics(
-                    SimpleMessage("QUERY", '{"target":"' + name + '", "query": "current_time"}'))
+                server_message_handler.send_helics(SimpleMessage("QUERY", '{"target":"' + name + '", "query": "current_time"}'))
             elif fedSpec == "PUBS":
-                server_message_handler.send_helics(
-                    SimpleMessage("QUERY", '{"target":"' + name + '", "query": "publications"}'))
+                server_message_handler.send_helics(SimpleMessage("QUERY", '{"target":"' + name + '", "query": "publications"}'))
             elif fedSpec == "SUBS":
-                server_message_handler.send_helics(
-                    SimpleMessage("QUERY", '{"target":"' + name + '", "query": "subscriptions"}'))
+                server_message_handler.send_helics(SimpleMessage("QUERY", '{"target":"' + name + '", "query": "subscriptions"}'))
             elif fedSpec == "INPUTS":
-                server_message_handler.send_helics(
-                    SimpleMessage("QUERY", '{"target":"' + name + '", "query": "inputs"}'))
+                server_message_handler.send_helics(SimpleMessage("QUERY", '{"target":"' + name + '", "query": "inputs"}'))
             elif fedSpec == "ENDPOINTS":
-                server_message_handler.send_helics(
-                    SimpleMessage("QUERY", '{"target":"' + name + '", "query": "endpoints"}'))
+                server_message_handler.send_helics(SimpleMessage("QUERY", '{"target":"' + name + '", "query": "endpoints"}'))
             elif fedSpec == "FILTERS":
-                server_message_handler.send_helics(
-                    SimpleMessage("QUERY", '{"target":"' + name + '", "query": "filters"}'))
+                server_message_handler.send_helics(SimpleMessage("QUERY", '{"target":"' + name + '", "query": "filters"}'))
             elif fedSpec == "STATE":
-                server_message_handler.send_helics(
-                    SimpleMessage("QUERY", '{"target":"' + name + '", "query": "state"}'))
+                server_message_handler.send_helics(SimpleMessage("QUERY", '{"target":"' + name + '", "query": "state"}'))
             result = server_message_handler.get_helics()
         else:
             return jsonify({"success": False}), 400
@@ -199,4 +174,12 @@ def startup(browser: bool, config_path: str = str(DATABASE_DIRECTORY), message_h
 
 
 if __name__ == "__main__":
+    logger.setLevel(logging.DEBUG)
+    file_out = logging.FileHandler("server.log", mode="w")
+    file_out.setLevel(logging.DEBUG)
+    stream_out = logging.StreamHandler()
+    stream_out.setLevel(logging.ERROR)
+    logger.addHandler(file_out)
+    logger.addHandler(stream_out)
+
     startup(True)
