@@ -76,12 +76,14 @@ def setup(name, path, purge):
         "name": name,
         "broker": False,
         "federates": [
-            {"name": "Federate1", "host": "localhost", "exec": "python federate1.py", "directory": path},
-            {"name": "Federate2", "host": "localhost", "exec": "python federate2.py", "directory": path},
+            {"name": "Federate1", "host": "localhost", "exec": """python -c 'print("hello")'""", "directory": path},
+            {"name": "Federate2", "host": "localhost", "exec": """python -c 'print("hello")'""", "directory": path},
         ],
     }
     with open(os.path.join(path, "config.json"), "w") as f:
         f.write(json.dumps(config, indent=4, sort_keys=True, separators=(",", ":")))
+
+    print(os.path.join(path, "config.json"))
 
 
 @cli.command()
