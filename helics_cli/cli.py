@@ -93,7 +93,7 @@ def setup(name, path, purge):
 @click.option("--silent", is_flag=True)
 @click.option("--no-log-files", is_flag=True, default=False)
 @click.option(
-    "--broker-loglevel", "--loglevel", "-l", type=int, default=2, help="Log level for HELICS broker",
+    "--broker-loglevel", "--loglevel", "-l", type=int, default=3, help="Log level for HELICS broker",
 )
 @click.option("--web", "-w", is_flag=True, default=False, help="Run the web interface on startup")
 def run(path, silent, no_log_files, broker_loglevel, web):
