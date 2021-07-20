@@ -44,8 +44,6 @@ def run_sub_trans(fed_name, feeders, broker_address):
 
     # Create value federate #
     vfed = h.helicsCreateValueFederate(fed_name, fedinfo)
-    print("this is a test print")
-    # time.sleep(100)
     logger.info("Value federate created")
 
     # Register the publication #

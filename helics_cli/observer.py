@@ -10,10 +10,21 @@ import helics as h
 from .utils.message_handler import MessageHandler, SimpleMessage
 from .database import initialize_database, MetaData
 
+import signal
+
+
+def signal_handler(signal, frame):
+    h.helicsCloseLibrary()
+    h.helicsCleanupLibrary()
+    raise KeyboardInterrupt
+
+
+signal.signal(signal.SIGINT, signal_handler)
 logger = logging.getLogger(__name__)
 
 OBSERVER_BROKER: h.HelicsBroker = None
 OBSERVER_FEDERATE: h.HelicsCombinationFederate = None
+OBSERVER_ENDPOINT: h.HelicsEndpoint = None
 SERVER_MESSAGE_HANDLER: MessageHandler = None
 time_control = {"nonstop": True, "requested_time": 0.0, "exited": False}
 
@@ -47,10 +58,12 @@ def init_combination_federate(
     OBSERVER_FEDERATE = h.helicsCreateCombinationFederate(core_name, fedinfo)
 
 
-def write_database_data(db, federate: h.HelicsFederate, subscriptions=[], current_time=0.0):
+def write_database_data(db, federate: h.HelicsFederate, subscriptions=None, current_time=0.0):
+    if subscriptions is None:
+        subscriptions = []
     logger.debug("Making query ...")
 
-    federates = [name for name in federate.query("root", "federates") if name != "__observer__"]
+    federates = [name for name in federate.query("root", "federates") if not name.startswith("__observer__") and not name.endswith("_filters")]
 
     for name in federates:
         logger.debug(f"Query for exists: {name}")
@@ -58,9 +71,8 @@ def write_database_data(db, federate: h.HelicsFederate, subscriptions=[], curren
         if federate.query(name, "state") == "disconnected":
             continue
 
-        logger.debug(f"Query for current_time: {name}")
         data = federate.query(name, "current_time")
-        logger.debug(f"data is: {data}")
+        logger.debug(f"Query for current_time: {name}, data is: {data}")
         try:
             granted_time = data["granted_time"]
             requested_time = data["requested_time"]
@@ -76,7 +88,7 @@ def write_database_data(db, federate: h.HelicsFederate, subscriptions=[], curren
         if federate.query(name, "state") == "disconnected":
             continue
         logger.debug(f"Query for publications: {name}")
-        publications = federate.query(name, "publications")  # .replace("[", "").replace("]", "").split(";")
+        publications = federate.query(name, "publications")
         logger.debug(f"{name} publishes: {publications}")
 
         for pub_str in publications:
@@ -99,6 +111,28 @@ def write_database_data(db, federate: h.HelicsFederate, subscriptions=[], curren
                 db.execute(
                     "INSERT INTO Publications(key, sender, pub_time, pub_value, new_value) VALUES (?,?,?,?,?);",
                     (pub_str, name, granted_time, value, 1),
+                )
+
+    logger.debug("checking for messages on observer clone endpoint")
+    if OBSERVER_ENDPOINT and OBSERVER_ENDPOINT.has_message():
+        logger.debug("found messages")
+        db.execute("UPDATE Messages SET new_value=0;")
+        while OBSERVER_ENDPOINT.has_message():
+            message = OBSERVER_ENDPOINT.get_message()
+            logger.debug("reading messages")
+            if message.is_valid():
+                logger.debug("writing messages to database")
+                db.execute(
+                    "INSERT INTO Messages(sender, destination, send_time, receive_time, value, new_value)"
+                    " VALUES (?,?,?,?,?,?);",
+                    (
+                        message.original_source,
+                        message.original_destination,
+                        message.time,
+                        granted_time,
+                        message.data,
+                        1
+                    ),
                 )
 
     db.commit()
@@ -126,7 +160,7 @@ def process_message(message: SimpleMessage):
         if signal_data["operation"] == "STOP":
             logger.info("got STOP")
             time_control["exited"] = True
-            OBSERVER_FEDERATE.finalize()  # TODO: see if this is the right way to exit.
+            OBSERVER_FEDERATE.disconnect()
             h.helicsBrokerDisconnect(OBSERVER_BROKER)
             # h.helicsBrokerClearTimeBarrier(OBSERVER_BROKER)
             return SimpleMessage("SIGNAL_RESPONSE", "{}")
@@ -163,7 +197,7 @@ def ingest_messages():
             SERVER_MESSAGE_HANDLER.send_server(response)
 
 
-def run(n_federates: int, config_path: str, log_level: int, message_handler: MessageHandler = None):
+def run(n_federates: int, config_path: str, log_level: str, message_handler: MessageHandler = None):
 
     file_out = logging.FileHandler("observer.log", mode="w")
     file_out.setLevel(logging.DEBUG)
@@ -177,23 +211,15 @@ def run(n_federates: int, config_path: str, log_level: int, message_handler: Mes
     if SERVER_MESSAGE_HANDLER.Enabled:
         time_control["nonstop"] = False
 
-    try:
-        asyncio.run(_run(n_federates, config_path, log_level))
-    except KeyboardInterrupt:
-        logger.info("User canceled operation")
-    except h.HelicsException:
-        logger.error("Failed and threw HelicsException")
-        h.helicsCloseLibrary()
-        return 1
-    finally:
-        logger.debug("In finally")
-        h.helicsCloseLibrary()
-    return 0
+    return asyncio.run(_run(n_federates, config_path, log_level))
 
 
-async def _run(n_federates: int, config_path: str, log_level: int = 2):
+async def _run(n_federates: int, config_path: str, log_level: str = "warning"):
     path_to_config = os.path.abspath(config_path)
     path = os.path.dirname(path_to_config)
+
+    if log_level == "debug":
+        logger.setLevel(logging.DEBUG)
 
     with open(path_to_config) as f:
         config = json.loads(f.read())
@@ -215,16 +241,15 @@ async def _run(n_federates: int, config_path: str, log_level: int = 2):
     logger.info("Creating observer federate")
 
     init_combination_federate("__observer__")
+    global OBSERVER_ENDPOINT
+    OBSERVER_ENDPOINT = OBSERVER_FEDERATE.register_global_endpoint("__observer_clone__")
 
     logger.info("Entering initializing mode")
 
-    # if not time_control["nonstop"]:
-    #     h.helicsBrokerSetTimeBarrier(broker, 0.0)
-    # else:
     time.sleep(2)
 
-    federates = OBSERVER_FEDERATE.query("root", "federates")  # .replace("[", "").replace("]", "").split(";")
-    federates = [name for name in federates if name != "__observer__"]
+    federates = OBSERVER_FEDERATE.query("root", "federates")
+    federates = [name for name in federates if not name.startswith("__")]
 
     logger.info(f"federates: {federates}")
 
@@ -236,22 +261,41 @@ async def _run(n_federates: int, config_path: str, log_level: int = 2):
         time.sleep(1)
 
     # Assuming all federates have connected.
-
-    logger.info("Querying all topics")
-
     metadata["federates"] = ",".join([f for f in federates if not f.startswith("__")])
 
-    publications = OBSERVER_FEDERATE.query("root", "publications")  # .replace("[", "").replace("]", "").split(";")
+    publications = OBSERVER_FEDERATE.query("root", "publications")
     subscriptions = []
+    logger.info(f"publications: {publications}")
+
     # TODO: improve subscription filtering to be a bit more friendly
     for pub in publications:
         if "include" in config["broker"]["observer"].keys() and pub not in config["broker"]["observer"]["include"]:
             continue
         else:
             subscriptions.append(OBSERVER_FEDERATE.register_subscription(pub))
-    # TODO: message clones
 
-    h.helicsBrokerSetTimeBarrier(OBSERVER_BROKER, 0.0)
+    endpoints = OBSERVER_FEDERATE.query("root", "endpoints")
+    logger.info(f"endpoints: {endpoints}")
+
+    if "message_source" in config["broker"]["observer"].keys():
+        message_source = config["broker"]["observer"]["message_source"]
+        message_destination = config["broker"]["observer"]["message_destination"]
+
+        try:
+            # clone_filter = OBSERVER_FEDERATE.register_global_cloning_filter("__observer_clone__")
+            clone_filter = OBSERVER_FEDERATE.register_global_filter(h.HELICS_FILTER_TYPE_CLONE, f"__observer_clone__")
+            for endpoint in endpoints:
+                if endpoint in message_source or endpoint in message_destination:
+                    logger.debug(f"registering clone for {endpoint}")
+                    if endpoint in message_source:
+                        clone_filter.add_source_target(endpoint)
+                    if endpoint in message_destination:
+                        clone_filter.add_destination_target(endpoint)
+        except h.HelicsException as ex:
+            logger.error(f"{ex}")
+
+    if not time_control["nonstop"]:
+        h.helicsBrokerSetTimeBarrier(OBSERVER_BROKER, 0.0)
 
     try:
         logger.info("calling exec")
@@ -283,9 +327,6 @@ async def _run(n_federates: int, config_path: str, log_level: int = 2):
                     continue
             else:
                 await asyncio.sleep(0.001)  # There's probably a better way to do this, but this is the solution for now.
-                # time.sleep(1)  # There's probably a better way to do this, but this is the solution for now.
-            # if not time_control["exited"]:
-            #     ingest_messages(current_time)
 
             if not time_control["nonstop"] or current_time >= 9223372036.3:
                 continue
@@ -297,17 +338,14 @@ async def _run(n_federates: int, config_path: str, log_level: int = 2):
 
         logger.info("Finished observe.")
         logger.info("finalizing monitoring task")
-        # message_handler.cancel()
-        # try:
-        #     await message_handler
-        # except asyncio.CancelledError:
-        #     logger.info("Monitor shutdown")
+
         logger.info("Closing database ...")
         db.close()
-
     except KeyboardInterrupt:
         logger.debug("Observer got keyboard interrupt")
         raise
+    except h.HelicsException as ex:
+        logger.debug(f"Caught HelicsException: {ex}")
     finally:
         logger.debug("Observer finalizing")
         logger.info("Finalizing federate ...")

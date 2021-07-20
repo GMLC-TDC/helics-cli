@@ -93,7 +93,7 @@ def setup(name, path, purge):
 @click.option("--silent", is_flag=True)
 @click.option("--no-log-files", is_flag=True, default=False)
 @click.option(
-    "--broker-loglevel", "--loglevel", "-l", type=int, default=3, help="Log level for HELICS broker",
+    "--broker-loglevel", "--loglevel", "-l", type=click.STRING, default="warning", help="Log level for HELICS broker",
 )
 @click.option("--web", "-w", is_flag=True, default=False, help="Run the web interface on startup")
 def run(path, silent, no_log_files, broker_loglevel, web):
@@ -186,7 +186,7 @@ def run(path, silent, no_log_files, broker_loglevel, web):
         for p in process_handler.process_list:
             p.wait()
     except KeyboardInterrupt:
-        click.echo("Warning: User interrupted processes. Terminating safely ...", status="info")
+        click.echo("Warning: User interrupted processes. Terminating safely ...")
         process_handler.shutdown()
         logger.debug("Closing output")
         for o in process_handler.output_list:
@@ -248,7 +248,7 @@ def validate(path):
     "--n-federates", required=True, type=click.INT, help="Number of federates to observe",
 )
 @click.option("--path", type=click.Path(exists=True), default="./", help="Internal path to config file used for filtering output")
-@click.option("--broker_loglevel", "--loglevel", "-l", type=click.INT, default=2, help="Log level for HELICS broker")
+@click.option("--broker_loglevel", "--loglevel", "-l", type=click.STRING, default="warning", help="Log level for HELICS broker")
 def observe(n_federates: int, path: str, log_level) -> int:
     return observer.run(n_federates, path, log_level)
 
