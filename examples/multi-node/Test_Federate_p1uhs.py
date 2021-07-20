@@ -53,8 +53,11 @@ def run_p1uhs_federate(fed_name, broker_address=None):
     h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, deltat)
 
     # Create value federate #
-    vfed = h.helicsCreateValueFederate(fed_name, fedinfo)
+    vfed = h.helicsCreateCombinationFederate(fed_name, fedinfo)
     print("Value federate created")
+
+    # Register global endpoint
+    h.helicsFederateRegisterGlobalEndpoint(vfed, "p1uhs_global_status", "string")
 
     # Register the publications #
     pub_name = f"Circuit.feeder_p1u.{fed_name}.p1ux.TotalPower.E"

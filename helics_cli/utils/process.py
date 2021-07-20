@@ -23,16 +23,18 @@ class ProcessHandler:
     def shutdown(self):
         print("in shutdown...")
         if self.use_broker_process and self.broker_process.is_alive():
-            self.broker_process.terminate()
-            # self.broker_process.kill()
-            self.broker_process.close()
+            # self.broker_process.terminate()
+            self.broker_process.kill()
+            # self.broker_process.close()
+            # self.web_process.join(3)
 
         print("shutdown broker")
 
         if self.has_web and self.web_process.is_alive():
-            self.web_process.terminate()
-            # self.web_process.kill()
-            self.web_process.close()
+            # self.web_process.terminate()
+            self.web_process.kill()
+            # self.web_process.close()
+            # self.web_process.join(3)
 
         print("shutdown web")
 

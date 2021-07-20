@@ -1,12 +1,13 @@
 {
-  "broker": {
+ "broker": {
     "federates": 3,
     "observer": {
       "directory": "../../",
       "host": "localhost",
-      "name": "observer",
+      "name": "broker",
       "include": ["Circuit.feeder_p1u.p1uhs0.p1ux.voltage", "Circuit.feeder_p1u.p1uhs0.p1ux.TotalPower.E", "full_network.voltage"],
-      "exclude": []
+      "message_source": ["p1u/p1u_status"],
+      "message_destination": ["p1u/p1u_status", "p1u_global_status"]
     }
   },
   "federates": [

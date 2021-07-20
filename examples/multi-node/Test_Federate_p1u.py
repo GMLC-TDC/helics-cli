@@ -9,7 +9,8 @@ logger.setLevel(logging.DEBUG)
 
 
 # logger.setLoggingLevel(logging.DEBUG)
-
+GLOBAL_ENDPOINT: h.HelicsEndpoint
+LOCAL_ENDPOINT: h.HelicsEndpoint
 
 def pub_and_sub_calc(supply_voltage, last_loads, sub_loads, pub_voltages):
     # calculate the voltage fed to feeders below
@@ -27,6 +28,11 @@ def pub_and_sub_calc(supply_voltage, last_loads, sub_loads, pub_voltages):
         logger.debug(f"Circuit {feeders[i]} active power demand: {new_loads[i]} at voltage: {feeder_voltage[i]}")
         load_diff[i] = abs(last_loads[i] - new_loads[i])
     logger.debug(f"total load difference: {load_diff}")
+
+    # Send some silly messages
+    h.helicsEndpointSendBytesTo(GLOBAL_ENDPOINT, "inner loop okay".encode("utf-8"), "p1u/p1u_status")
+    h.helicsEndpointSendBytesTo(GLOBAL_ENDPOINT, "inner loop okay".encode("utf-8"), "p1u_global_status")
+    h.helicsEndpointSendBytesTo(LOCAL_ENDPOINT, "local endpoint okay".encode("utf-8"), "p1u/p1u_status")
 
     return new_loads
 
@@ -56,8 +62,14 @@ def run_p1u_federate(fed_name, broker_address, feeders):
     h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, deltat)
 
     # Create value federate
-    vfed = h.helicsCreateValueFederate(fed_name, fedinfo)
+    vfed = h.helicsCreateCombinationFederate(fed_name, fedinfo)
     print("Value federate created")
+
+    # Register a local endpoint
+    global GLOBAL_ENDPOINT
+    global LOCAL_ENDPOINT
+    LOCAL_ENDPOINT = h.helicsFederateRegisterEndpoint(vfed, "p1u_status", "string")
+    GLOBAL_ENDPOINT = h.helicsFederateRegisterGlobalEndpoint(vfed, "p1u_global_status", "string")
 
     # Register the publications
     pub_load = h.helicsFederateRegisterGlobalTypePublication(vfed, "Circuit.full_network.TotalPower.E", "double", "kW")
@@ -113,12 +125,16 @@ def run_p1u_federate(fed_name, broker_address, feeders):
                 last_loads = new_loads
                 iters += 1
 
+            # Send some silly messages
+            h.helicsEndpointSendBytesTo(GLOBAL_ENDPOINT, "outer loop okay".encode("utf-8"), "p1u/p1u_status")
+            h.helicsEndpointSendBytesTo(GLOBAL_ENDPOINT, "outer loop okay".encode("utf-8"), "p1u_global_status")
+
             h.helicsPublicationPublishDouble(pub_load, sum(last_loads))
             logger.info(f"feeder loads {last_loads} at time {currenttime} after {iters} iters")
             t += 1
 
     # all other federates should have finished, so now you can close
-    h.helicsFederateFinalize(vfed)
+    h.helicsFederateDisconnect(vfed)
     print(f"{fed_name}: Test Federate finalized")
 
     h.helicsFederateDestroy(vfed)
