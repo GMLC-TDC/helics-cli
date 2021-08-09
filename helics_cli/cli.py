@@ -186,7 +186,7 @@ def run(path, silent, no_log_files, broker_loglevel, web):
         for p in process_handler.process_list:
             p.wait()
     except KeyboardInterrupt:
-        click.echo("Warning: User interrupted processes. Terminating safely ...", status="info")
+        echo("Warning: User interrupted processes. Terminating safely ...", status="info")
         process_handler.shutdown()
         logger.debug("Closing output")
         for o in process_handler.output_list:
