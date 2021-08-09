@@ -144,7 +144,7 @@ def run(path, silent, no_log_files, broker_loglevel, web):
     else:
         broker_o = open(os.path.join(path, "broker.log"), "w")
         _ = subprocess.Popen(
-            shlex.split("""python -c 'print("Not starting broker.")'"""),
+            shlex.split("""python -c 'print("helics-cli not auto-generating broker.")'"""),
             cwd=os.path.abspath(os.path.expanduser(path)),
             stdout=broker_o,
             stderr=broker_o,
