@@ -10,8 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class CheckStatusThread(threading.Thread):
-    def __init__(self, process_list):
+    def __init__(self, process_list, should_kill):
         threading.Thread.__init__(self)
+        self.should_kill = should_kill
         self._process_list = process_list
         self._status = {}
 
@@ -23,11 +24,11 @@ class CheckStatusThread(threading.Thread):
         while True:
             time.sleep(1)
             for p in self._process_list:
-                if has_failed is True:
+                if has_failed is True and self.should_kill is True:
                     p.kill()
                 if p.poll() is not None and p.returncode != 0:
                     self._status[p.name] = p.returncode
-                    if has_failed is False:
+                    if has_failed is False and self.should_kill is True:
                         click.echo("Error: Process {} has failed, killing other processes".format(p.name))
                     has_failed = True
 

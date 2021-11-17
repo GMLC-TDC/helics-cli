@@ -94,7 +94,7 @@ def setup(name, path, purge):
 @click.option("--no-log-files", is_flag=True, default=False)
 @click.option("--no-kill-on-error", is_flag=True, default=False, help="Do not kill all federates on error")
 @click.option(
-    "--broker-loglevel", "--loglevel", "-l", type=int, default=3, help="Log level for HELICS broker",
+    "--broker-loglevel", "--loglevel", "-l", type=str, default="error", help="Log level for HELICS broker",
 )
 @click.option("--web", "-w", is_flag=True, default=False, help="Run the web interface on startup")
 def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
@@ -178,7 +178,7 @@ def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
         if o is not None:
             process_handler.output_list.append(o)
 
-    t = CheckStatusThread(process_handler.process_list)
+    t = CheckStatusThread(process_handler.process_list, kill_on_error)
 
     try:
         t.start()
