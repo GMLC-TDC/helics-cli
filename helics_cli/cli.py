@@ -92,15 +92,17 @@ def setup(name, path, purge):
 )
 @click.option("--silent", is_flag=True)
 @click.option("--no-log-files", is_flag=True, default=False)
+@click.option("--no-kill-on-error", is_flag=True, default=False, help="Do not kill all federates on error")
 @click.option(
     "--broker-loglevel", "--loglevel", "-l", type=int, default=3, help="Log level for HELICS broker",
 )
 @click.option("--web", "-w", is_flag=True, default=False, help="Run the web interface on startup")
-def run(path, silent, no_log_files, broker_loglevel, web):
+def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
     """
     Run HELICS federation
     """
     log = not no_log_files
+    kill_on_error = not no_kill_on_error
     path_to_config = os.path.abspath(path)
     path = os.path.dirname(path_to_config)
 
@@ -198,11 +200,12 @@ def run(path, silent, no_log_files, broker_loglevel, web):
     except HELICSRuntimeError as e:
         click.echo("")
         click.echo(f"Error: {e}. Terminating ...")
-        process_handler.shutdown()
-        for o in process_handler.output_list:
-            o.close()
-        for p in process_handler.process_list:
-            p.kill()
+        if kill_on_error:
+            process_handler.shutdown()
+            for o in process_handler.output_list:
+                o.close()
+            for p in process_handler.process_list:
+                p.kill()
     finally:
         for p in process_handler.process_list:
             if p.returncode != 0 and p.returncode is not None:
