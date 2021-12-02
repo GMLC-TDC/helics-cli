@@ -16,6 +16,9 @@ h.helicsFederateInfoSetCoreInitString(fedinfo, "--federates=1")
 h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, 0.01)
 
 vfed = h.helicsCreateValueFederate(federate_name, fedinfo)
+
+h.helicsFederateSetFlagOption(vfed, h.HELICS_FLAG_PROFILING, True)
+
 print(f"{federate_name}: Value federate created")
 
 sub = h.helicsFederateRegisterSubscription(vfed, f"globaltopic{sys.argv[1]}", "")
