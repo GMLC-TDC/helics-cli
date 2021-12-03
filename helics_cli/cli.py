@@ -98,8 +98,14 @@ def setup(name, path, purge):
     type=click.Path(file_okay=True, exists=True),
     help="Path to profile.txt that describes profiling results of a federation",
 )
-def profile_plot(path):
-    p.plot(p.profile(path), kind="realtime")
+@click.option(
+    "--invert",
+    is_flag=True,
+    default=True,
+    help="Invert plot",
+)
+def profile_plot(path, invert):
+    p.plot(p.profile(path, invert), kind="realtime")
 
 
 @cli.command()

@@ -24,7 +24,7 @@ PATTERN = re.compile(
 )
 
 
-def profile(filename):
+def profile(filename, invert=True):
     with open(filename) as f:
         data = f.read()
     data = data.replace(r"<PROFILING>", "").replace(r"</PROFILING>", "")
@@ -56,12 +56,21 @@ def profile(filename):
     for name in set(names):
         profile[name] = []
 
+    if invert:
+        for name in set(names):
+            profile[name].append({})
+
     for (name, state, message, simtime, realtime) in zip(names, states, messages, simtimes, realtimes):
         if state == "created":
             continue
-        if "ENTRY" in message:
+        if "ENTRY" in message and not invert:
             profile[name].append({"s_enter": simtime, "r_enter": realtime})
-        if "EXIT" in message:
+        elif "EXIT" in message and not invert:
+            profile[name][-1]["s_end"] = simtime
+            profile[name][-1]["r_end"] = realtime
+        elif "EXIT" in message and invert:
+            profile[name].append({"s_enter": simtime, "r_enter": realtime})
+        elif "ENTRY" in message and invert:
             profile[name][-1]["s_end"] = simtime
             profile[name][-1]["r_end"] = realtime
 
@@ -94,7 +103,7 @@ def plot(profile, kind="simulation", **kwargs):
     fig, axs = plt.subplots(1, 1, figsize=(16, 9))
     ax = axs
 
-    cmap = matplotlib.cm.get_cmap('seismic')
+    cmap = matplotlib.cm.get_cmap("seismic")
 
     values = list(d[end] - d[enter] for d in profiles)
     norm = matplotlib.colors.Normalize(vmin=min(values), vmax=max(values))
@@ -106,7 +115,7 @@ def plot(profile, kind="simulation", **kwargs):
     for d in profiles:
         d[enter] = d[enter] - m_enter
         d[end] = d[end] - m_enter
-        ax.barh(names[d["name"]], d[end] - d[enter], left=d[enter], edgecolor = d["color"], color = d["color"], **kwargs)
+        ax.barh(names[d["name"]], d[end] - d[enter], left=d[enter], edgecolor=d["color"], color=d["color"], **kwargs)
 
     if kind == "Simulation":
         ax.set_xlabel("Simulation Time (s)")
@@ -114,10 +123,10 @@ def plot(profile, kind="simulation", **kwargs):
         ax.set_xlabel("Real Time (s)")
     ax.set_yticks([i for i in range(0, len(names))])
     ax.set_yticklabels(sorted(names.keys()))
-    ax.set_facecolor('#f0f0f0')
-    fig.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, location = "top")
+    ax.set_facecolor("#f0f0f0")
+    fig.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, location="top")
     plt.show()
 
 
 if __name__ == "__main__":
-    plot(profile(os.path.abspath(os.path.join(CURRENT_DIR, "../examples/pi-exchange/profile.txt"))), kind = "realtime")
+    plot(profile(os.path.abspath(os.path.join(CURRENT_DIR, "../examples/pi-exchange/profile.txt"))), kind="realtime")
