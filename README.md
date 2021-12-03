@@ -5,7 +5,8 @@ CLI for running Hierarchical Engine for Large-scale Infrastructure Co-Simulation
 - Supports configurations of federates using plugins
 - Allows running of federation using a runner configuration
 
-![Screen Shot 2021-12-03 at 12 55 42 PM](https://user-images.githubusercontent.com/1813121/144665548-7e90255e-8ecc-43f0-a7f9-8e34fc1fecf9.png)
+![Screen Shot 2021-12-03 at 1 01 24 PM](https://user-images.githubusercontent.com/1813121/144665647-c95e653b-dbc6-410d-b653-2c7510294a76.png)
+
 
 ### Documentation
 
