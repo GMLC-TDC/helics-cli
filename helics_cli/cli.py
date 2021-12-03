@@ -22,6 +22,7 @@ from .server import startup
 from .status_checker import CheckStatusThread
 from .utils import extra
 from .utils.extra import echo
+from . import profile as p
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +89,14 @@ def setup(name, path, purge):
 
 @cli.command()
 @click.option(
+    "--path", required=True, type=click.Path(file_okay=True, exists=True), help="Path to profile.txt that describes profiling results of a federation",
+)
+def profile(path):
+    p.plot(p.profile(path), kind = "realtime")
+
+
+@cli.command()
+@click.option(
     "--path", required=True, type=click.Path(file_okay=True, exists=True), help="Path to config.json that describes how to run a federation",
 )
 @click.option("--silent", is_flag=True)
@@ -96,8 +105,11 @@ def setup(name, path, purge):
 @click.option(
     "--broker-loglevel", "--loglevel", "-l", type=str, default="error", help="Log level for HELICS broker",
 )
+@click.option(
+    "--profile", is_flag=True, default=False, help="Profile flag",
+)
 @click.option("--web", "-w", is_flag=True, default=False, help="Run the web interface on startup")
-def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
+def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error, profile):
     """
     Run HELICS federation
     """
@@ -133,9 +145,15 @@ def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
             )
             process_handler.broker_process.name = "broker"
         else:
+            cmd = "helics_broker -f {num_fed} --loglevel={log_level}"
+            if profile:
+                profiler_txt = os.path.join(os.path.abspath(os.path.expanduser(path)), "profile.txt")
+                if os.path.exists(profiler_txt):
+                    os.remove(profiler_txt)
+                cmd += " --profiler=profile.txt"
             broker_o = open(os.path.join(path, "broker.log"), "w")
             broker_subprocess = subprocess.Popen(
-                shlex.split("helics_broker -f {num_fed} --loglevel={log_level}".format(num_fed=len(config["federates"]), log_level=broker_loglevel)),
+                shlex.split(cmd.format(num_fed=len(config["federates"]), log_level=broker_loglevel)),
                 cwd=os.path.abspath(os.path.expanduser(path)),
                 stdout=broker_o,
                 stderr=broker_o,

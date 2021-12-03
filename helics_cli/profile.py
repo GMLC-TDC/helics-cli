@@ -6,6 +6,7 @@ import re
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import numpy as np
 
 CURRENT_DIR = os.path.realpath(os.path.basename(__file__))
 
@@ -90,7 +91,7 @@ def plot(profile, kind="simulation", **kwargs):
                 i[end] = i[end] / scaling
                 profiles.append(i)
 
-    _, axs = plt.subplots(1, 1, figsize=(16, 9))
+    fig, axs = plt.subplots(1, 1, figsize=(16, 9))
     ax = axs
 
     cmap = matplotlib.cm.get_cmap('seismic')
@@ -113,6 +114,8 @@ def plot(profile, kind="simulation", **kwargs):
         ax.set_xlabel("Real Time (s)")
     ax.set_yticks([i for i in range(0, len(names))])
     ax.set_yticklabels(sorted(names.keys()))
+    ax.set_facecolor('#f0f0f0')
+    fig.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, location = "top")
     plt.show()
 
 
