@@ -98,7 +98,7 @@ def setup(name, path, purge):
     type=click.Path(file_okay=True, exists=True),
     help="Path to profile.txt that describes profiling results of a federation",
 )
-def profile(path):
+def profile_plot(path):
     p.plot(p.profile(path), kind="realtime")
 
 

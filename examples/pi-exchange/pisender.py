@@ -19,12 +19,9 @@ h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, 0.01)
 
 vfed = h.helicsCreateValueFederate(federate_name, fedinfo)
 
-h.helicsFederateSetFlagOption(vfed, h.HELICS_FLAG_PROFILING, True)
-
 print(f"{federate_name}: Value federate created")
 
 pub = h.helicsFederateRegisterGlobalTypePublication(vfed, f"globaltopic{sys.argv[1]}", "double", "")
-pub = h.helicsFederateRegisterTypePublication(vfed, f"localtopic{sys.argv[1]}", "double", "")
 
 print(f"{federate_name}: Publication registered")
 
@@ -34,14 +31,16 @@ print(f"{federate_name}: Entering execution mode")
 this_time = 0.0
 value = pi
 
-for t in range(0, 100):
+for t in range(0, 10):
     val = value
 
-    if bool(random.getrandbits(1)):
-        currenttime = h.helicsFederateRequestTime(vfed, t)
+    currenttime = h.helicsFederateRequestTime(vfed, t)
 
-        h.helicsPublicationPublishDouble(pub, val)
-        print(f"{federate_name}: Sending value pi = {val} at time {currenttime}")
+    h.helicsPublicationPublishDouble(pub, val)
+    print(f"{federate_name}: Sending value pi = {val} at time {currenttime}")
+
+    # Computing user needs
+    time.sleep(float(sys.argv[1]) * (1 + (0.5 - random.random()) / 10))
 
 h.helicsFederateFinalize(vfed)
 print(f"{federate_name}: Federate finalized")
