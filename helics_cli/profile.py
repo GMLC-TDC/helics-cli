@@ -77,7 +77,7 @@ def profile(filename, invert=True):
     return profile
 
 
-def plot(profile, kind="simulation", **kwargs):
+def plot(profile, save=None, kind="simulation", **kwargs):
     profiles = []
     names = {k: i for i, k in enumerate(sorted(profile.keys()))}
 
@@ -125,7 +125,10 @@ def plot(profile, kind="simulation", **kwargs):
     ax.set_yticklabels(sorted(names.keys()))
     ax.set_facecolor("#f0f0f0")
     fig.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, location="top")
-    plt.show()
+    if save is None:
+        plt.show()
+    else:
+        plt.savefig(save, dpi=300)
 
 
 if __name__ == "__main__":

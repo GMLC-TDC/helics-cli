@@ -104,8 +104,9 @@ def setup(name, path, purge):
     default=True,
     help="Invert plot",
 )
-def profile_plot(path, invert):
-    p.plot(p.profile(path, invert), kind="realtime")
+@click.option("--save", prompt=True, prompt_required=False, type=click.Path(), default=None, help="Path to save the plot")
+def profile_plot(path, save, invert):
+    p.plot(p.profile(path, invert), save=save, kind="realtime")
 
 
 @cli.command()
