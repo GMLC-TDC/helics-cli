@@ -22,6 +22,7 @@ from .server import startup
 from .status_checker import CheckStatusThread
 from .utils import extra
 from .utils.extra import echo
+from . import profile as p
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +47,10 @@ def cli(ctx, verbose):
 
 @cli.command()
 @click.option(
-    "--name", type=click.STRING, default="HELICSFederation", help="Name of the folder that contains the config.json",
+    "--name",
+    type=click.STRING,
+    default="HELICSFederation",
+    help="Name of the folder that contains the config.json",
 )
 @click.option("--path", type=click.Path(), default="./", help="Path to the folder")
 @click.option("--purge/--no-purge", default=False, help="Delete folder if it exists")
@@ -67,7 +71,8 @@ def setup(name, path, purge):
         os.makedirs(path)
     else:
         echo(
-            "The following path already exists: {path}".format(path=path), status="error",
+            "The following path already exists: {path}".format(path=path),
+            status="error",
         )
         echo("Please remove the directory and try again.", status="error")
         return None
@@ -88,16 +93,41 @@ def setup(name, path, purge):
 
 @cli.command()
 @click.option(
-    "--path", required=True, type=click.Path(file_okay=True, exists=True), help="Path to config.json that describes how to run a federation",
+    "--path",
+    required=True,
+    type=click.Path(file_okay=True, exists=True),
+    help="Path to profile.txt that describes profiling results of a federation",
+)
+def profile_plot(path):
+    p.plot(p.profile(path), kind="realtime")
+
+
+@cli.command()
+@click.option(
+    "--path",
+    required=True,
+    type=click.Path(file_okay=True, exists=True),
+    help="Path to config.json that describes how to run a federation",
 )
 @click.option("--silent", is_flag=True)
 @click.option("--no-log-files", is_flag=True, default=False)
 @click.option("--no-kill-on-error", is_flag=True, default=False, help="Do not kill all federates on error")
 @click.option(
-    "--broker-loglevel", "--loglevel", "-l", type=str, default="error", help="Log level for HELICS broker",
+    "--broker-loglevel",
+    "--loglevel",
+    "-l",
+    type=str,
+    default="error",
+    help="Log level for HELICS broker",
+)
+@click.option(
+    "--profile",
+    is_flag=True,
+    default=False,
+    help="Profile flag",
 )
 @click.option("--web", "-w", is_flag=True, default=False, help="Run the web interface on startup")
-def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
+def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error, profile):
     """
     Run HELICS federation
     """
@@ -108,7 +138,8 @@ def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
 
     if not os.path.exists(path_to_config):
         echo(
-            "Unable to find file `config.json` in path: {path_to_config}".format(path_to_config=path_to_config), status="error",
+            "Unable to find file `config.json` in path: {path_to_config}".format(path_to_config=path_to_config),
+            status="error",
         )
         return None
 
@@ -124,18 +155,40 @@ def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
         process_handler.message_handler.set_enable(True)
 
     if web:
-        process_handler.run_web(target=startup, args=(False, path_to_config, process_handler.message_handler,), daemon=True)
+        process_handler.run_web(
+            target=startup,
+            args=(
+                False,
+                path_to_config,
+                process_handler.message_handler,
+            ),
+            daemon=True,
+        )
 
     if "broker" in config.keys() and config["broker"] is not False:
         if config["broker"] is not True and "observer" in config["broker"].keys():
             process_handler.run_broker(
-                target=observer.run, args=(len(config["federates"]), path_to_config, broker_loglevel, process_handler.message_handler,), daemon=True
+                target=observer.run,
+                args=(
+                    len(config["federates"]),
+                    path_to_config,
+                    broker_loglevel,
+                    process_handler.message_handler,
+                ),
+                daemon=True,
             )
             process_handler.broker_process.name = "broker"
         else:
+            cmd = "helics_broker -f {num_fed} --loglevel={log_level}"
+            if profile:
+                profiler_txt = os.path.join(os.path.abspath(os.path.expanduser(path)), "profile.txt")
+                if os.path.exists(profiler_txt):
+                    os.remove(profiler_txt)
+                cmd += " --profiler=profile.txt"
             broker_o = open(os.path.join(path, "broker.log"), "w")
+            cmd = cmd.format(num_fed=len(config["federates"]), log_level=broker_loglevel)
             broker_subprocess = subprocess.Popen(
-                shlex.split("helics_broker -f {num_fed} --loglevel={log_level}".format(num_fed=len(config["federates"]), log_level=broker_loglevel)),
+                shlex.split(cmd),
                 cwd=os.path.abspath(os.path.expanduser(path)),
                 stdout=broker_o,
                 stderr=broker_o,
@@ -155,7 +208,8 @@ def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
     for f in config["federates"]:
         if not silent:
             echo(
-                "Running federate {name} as a background process".format(name=f["name"]), status="info",
+                "Running federate {name} as a background process".format(name=f["name"]),
+                status="info",
             )
 
         if log is True:
@@ -169,7 +223,13 @@ def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
             if "env" in f:
                 for k, v in f["env"].items():
                     env[k] = v
-            p = subprocess.Popen(shlex.split(f["exec"]), cwd=os.path.abspath(os.path.expanduser(directory)), stdout=o, stderr=o, env=env,)
+            p = subprocess.Popen(
+                shlex.split(f["exec"]),
+                cwd=os.path.abspath(os.path.expanduser(directory)),
+                stdout=o,
+                stderr=o,
+                env=env,
+            )
 
             p.name = f["name"]
         except FileNotFoundError as e:
@@ -183,7 +243,8 @@ def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
     try:
         t.start()
         echo(
-            "Waiting for {} processes to finish ...".format(len(process_handler.process_list)), status="info",
+            "Waiting for {} processes to finish ...".format(len(process_handler.process_list)),
+            status="info",
         )
         for p in process_handler.process_list:
             p.wait()
@@ -210,16 +271,22 @@ def run(path, silent, no_log_files, broker_loglevel, web, no_kill_on_error):
         for p in process_handler.process_list:
             if p.returncode != 0 and p.returncode is not None:
                 echo(
-                    "Process {} exited with return code {}".format(p.name, p.returncode), status="error",
+                    "Process {} exited with return code {}".format(p.name, p.returncode),
+                    status="error",
                 )
     echo(
-        "Done.", status="info",
+        "Done.",
+        status="info",
     )
 
 
 @cli.command()
 @click.option(
-    "--path", required=True, type=click.Path(exists=True), default="./", help="Path to config.json file that describes how to run a federation",
+    "--path",
+    required=True,
+    type=click.Path(exists=True),
+    default="./",
+    help="Path to config.json file that describes how to run a federation",
 )
 def validate(path):
     """
@@ -248,7 +315,10 @@ def validate(path):
 
 @cli.command()
 @click.option(
-    "--n-federates", required=True, type=click.INT, help="Number of federates to observe",
+    "--n-federates",
+    required=True,
+    type=click.INT,
+    help="Number of federates to observe",
 )
 @click.option("--path", type=click.Path(exists=True), default="./", help="Internal path to config file used for filtering output")
 @click.option("--broker_loglevel", "--loglevel", "-l", type=click.INT, default=2, help="Log level for HELICS broker")
@@ -258,7 +328,10 @@ def observe(n_federates: int, path: str, log_level) -> int:
 
 @cli.command()
 @click.option(
-    "--browser", is_flag=True, default=False, help="Open browser on startup",
+    "--browser",
+    is_flag=True,
+    default=False,
+    help="Open browser on startup",
 )
 @click.option("--path", type=click.Path(exists=True), default="./", help="Path for database file")
 def server(browser: bool, path: str):

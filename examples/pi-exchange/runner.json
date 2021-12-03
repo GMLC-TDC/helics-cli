@@ -21,6 +21,48 @@
     },
     {
       "directory": ".",
+      "exec": "python -u pisender.py 4",
+      "host": "localhost",
+      "name": "pisender4"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pisender.py 5",
+      "host": "localhost",
+      "name": "pisender5"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pisender.py 6",
+      "host": "localhost",
+      "name": "pisender6"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pisender.py 7",
+      "host": "localhost",
+      "name": "pisender7"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pisender.py 8",
+      "host": "localhost",
+      "name": "pisender8"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pisender.py 9",
+      "host": "localhost",
+      "name": "pisender9"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pisender.py 10",
+      "host": "localhost",
+      "name": "pisender10"
+    },
+    {
+      "directory": ".",
       "exec": "python -u pireceiver.py 1",
       "host": "localhost",
       "name": "pireceiver1"
@@ -36,6 +78,48 @@
       "exec": "python -u pireceiver.py 3",
       "host": "localhost",
       "name": "pireceiver3"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pireceiver.py 4",
+      "host": "localhost",
+      "name": "pireceiver4"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pireceiver.py 5",
+      "host": "localhost",
+      "name": "pireceiver5"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pireceiver.py 6",
+      "host": "localhost",
+      "name": "pireceiver6"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pireceiver.py 7",
+      "host": "localhost",
+      "name": "pireceiver7"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pireceiver.py 8",
+      "host": "localhost",
+      "name": "pireceiver8"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pireceiver.py 9",
+      "host": "localhost",
+      "name": "pireceiver9"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u pireceiver.py 10",
+      "host": "localhost",
+      "name": "pireceiver10"
     }
   ],
   "name": "pi-exchange"

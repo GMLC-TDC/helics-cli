@@ -2,8 +2,6 @@
 
 CLI for running Hierarchical Engine for Large-scale Infrastructure Co-Simulations (HELICS).
 
-![](https://user-images.githubusercontent.com/1813121/118163708-8bd4f380-b3df-11eb-8e18-99e9de81836f.png)
-
 - Supports configurations of federates using plugins
 - Allows running of federation using a runner configuration
 
@@ -48,9 +46,16 @@ Usage: helics run [OPTIONS]
   Run HELICS federation
 
 Options:
-  --path PATH
+  --path PATH                     Path to config.json that describes how to
+                                  run a federation  [required]
   --silent
-  --help       Show this message and exit.
+  --no-log-files
+  --no-kill-on-error              Do not kill all federates on error
+  -l, --broker-loglevel, --loglevel TEXT
+                                  Log level for HELICS broker
+  --profile                       Profile flag
+  -w, --web                       Run the web interface on startup
+  --help                          Show this message and exit.
 ```
 
 ```bash
@@ -62,6 +67,17 @@ Usage: helics validate [OPTIONS]
 
 Options:
   --path PATH
+  --help       Show this message and exit.
+```
+
+```bash
+$ helics profile-plot --help
+
+Usage: helics profile-plot [OPTIONS]
+
+Options:
+  --path PATH  Path to profile.txt that describes profiling results of a
+               federation  [required]
   --help       Show this message and exit.
 ```
 
@@ -84,6 +100,11 @@ Hello from Federate 1
 Hello from Federate 2
   [####################################]  100%
 
+```
+
+```bash
+helics run --path examples/pi-exchange/runner.json --profile
+helics profile-plot examples/pi-exchange/profile.txt
 ```
 
 ### Installation

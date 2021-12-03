@@ -16,6 +16,7 @@ h.helicsFederateInfoSetCoreInitString(fedinfo, "--federates=1")
 h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, 0.01)
 
 vfed = h.helicsCreateValueFederate(federate_name, fedinfo)
+
 print(f"{federate_name}: Value federate created")
 
 sub = h.helicsFederateRegisterSubscription(vfed, f"globaltopic{sys.argv[1]}", "")
@@ -28,9 +29,9 @@ prevtime = 0
 
 currenttime = -1
 
-while currenttime <= 100:
+while currenttime <= 10:
 
-    currenttime = h.helicsFederateRequestTime(vfed, 100)
+    currenttime = h.helicsFederateRequestTime(vfed, 10)
 
     value = h.helicsInputGetString(sub)
     print(f"{federate_name}: Received value = {value} at time {currenttime}")
