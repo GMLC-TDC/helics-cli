@@ -3,6 +3,7 @@
 import os
 import re
 
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
@@ -15,7 +16,7 @@ PATTERN = re.compile(
             \[(\d+)\]                               # [131074]
             \((?P<state>\w+)\)                      # (initializing)
             (?P<message>(?:\w|\s)+)                 # HELICS CODE ENTRY
-            \<(?P<realtime>\d+(?:\|\d+)?)\>          # <4570827706580384>
+            \<(?P<realtime>\d+(?:\|\d+)?)\>         # <4570827706580384|534534523453>
             \[t=(?P<simtime>-?\d*\.{0,1}\d+)\]      # [t=-1000000]
             """,
     re.X,
@@ -31,6 +32,7 @@ def profile(filename):
     messages = []
     simtimes = []
     realtimes = []
+    time_marker = {}
     for line in data.splitlines():
         m = PATTERN.match(line)
         name = m.group("name")
@@ -39,13 +41,15 @@ def profile(filename):
         simtime = float(m.group("simtime"))
         try:
             realtime = float(m.group("realtime"))
-            names.append(name)
-            states.append(state)
-            messages.append(message)
-            simtimes.append(simtime)
-            realtimes.append(realtime)
         except:
-            pass
+            realtime, markertime = m.group("realtime").split("|")
+            time_marker[name] = float(markertime)
+            realtime = float(realtime)
+        names.append(name)
+        states.append(state)
+        messages.append(message)
+        simtimes.append(simtime)
+        realtimes.append(realtime)
 
     profile = {}
     for name in set(names):
@@ -63,9 +67,9 @@ def profile(filename):
     return profile
 
 
-def plot(profile, kind="simulation"):
+def plot(profile, kind="simulation", **kwargs):
     profiles = []
-    names = {k: i for i, k in enumerate(profile.keys())}
+    names = {k: i for i, k in enumerate(sorted(profile.keys()))}
 
     if kind == "simulation":
         end = "s_end"
@@ -74,41 +78,43 @@ def plot(profile, kind="simulation"):
     elif kind == "realtime":
         end = "r_end"
         enter = "r_enter"
-        scaling = 1
+        scaling = 1e9
     else:
         raise Exception("unknown kind")
-
-    m_end = 0
-    for k in profile.keys():
-        for i in profile[k]:
-            if end in i.keys():
-                m_end = max(m_end, i[end])
-
-    m_enter = m_end
-    for k in profile.keys():
-        for i in profile[k]:
-            if enter in i.keys():
-                m_enter = min(m_enter, i[enter])
 
     for k in profile.keys():
         for i in profile[k]:
             if end in i.keys() and enter in i.keys():
                 i["name"] = k
-                i[enter] = (max(i[enter], 0) - m_enter) / scaling
-                i[end] = (max(i[end], 0) - m_enter) / scaling
+                i[enter] = i[enter] / scaling
+                i[end] = i[end] / scaling
                 profiles.append(i)
 
     _, axs = plt.subplots(1, 1, figsize=(16, 9))
     ax = axs
 
-    for d in profiles:
-        ax.barh(names[d["name"]], d[end] - d[enter], left=d[enter])
+    cmap = matplotlib.cm.get_cmap('seismic')
 
-    ax.set_xlabel("Time (s)")
+    values = list(d[end] - d[enter] for d in profiles)
+    norm = matplotlib.colors.Normalize(vmin=min(values), vmax=max(values))
+
+    m_enter = min(d[enter] for d in profiles)
+    for i, d in enumerate(profiles):
+        d["color"] = cmap(norm(values[i]))
+
+    for d in profiles:
+        d[enter] = d[enter] - m_enter
+        d[end] = d[end] - m_enter
+        ax.barh(names[d["name"]], d[end] - d[enter], left=d[enter], edgecolor = d["color"], color = d["color"], **kwargs)
+
+    if kind == "Simulation":
+        ax.set_xlabel("Simulation Time (s)")
+    else:
+        ax.set_xlabel("Real Time (s)")
     ax.set_yticks([i for i in range(0, len(names))])
-    ax.set_yticklabels(names.keys())
+    ax.set_yticklabels(sorted(names.keys()))
     plt.show()
 
 
 if __name__ == "__main__":
-    plot(profile(os.path.abspath(os.path.join(CURRENT_DIR, "../examples/pi-exchange/profile.txt"))))
+    plot(profile(os.path.abspath(os.path.join(CURRENT_DIR, "../examples/pi-exchange/profile.txt"))), kind = "realtime")
