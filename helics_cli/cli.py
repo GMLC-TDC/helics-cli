@@ -43,7 +43,7 @@ def _get_version():
 
         helics_apps_version = "HELICS Apps version {}".format(ha.__version__)
     except ImportError:
-        helics_apps_version = "Python HELICS interface not installed. Install using `pip install helics --upgrade`."
+        helics_apps_version = "Python HELICS interface not installed. Install using `pip install helics-apps --upgrade`."
 
     return """{}
 
