@@ -25,7 +25,7 @@ setup(
     author="Dheepak Krishnamurthy",
     license="BSD-compatible",
     packages=["web", "database"] + find_packages(),
-    install_requires=["future", "six", "click", "jinja2", "helics>=2.7.0", "flask", "matplotlib", "numpy"],
+    install_requires=["future", "six", "click>=8", "jinja2", "helics>=2.7.0", "flask", "matplotlib", "numpy"],
     keywords=["helics", "cosimulation"],
     include_package_data=True,
     entry_points={"console_scripts": ["helics = helics_cli.cli:cli"]},
