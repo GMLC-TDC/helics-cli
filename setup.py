@@ -28,7 +28,7 @@ setup(
     install_requires=["future", "six", "click>=8", "jinja2", "helics>=2.7.0", "flask", "matplotlib", "numpy"],
     keywords=["helics", "cosimulation"],
     include_package_data=True,
-    entry_points={"console_scripts": ["helics = helics_cli.cli:cli"]},
+    entry_points={"console_scripts": ["helics-cli = helics_cli.cli:cli", "helics = helics_cli.cli:cli"]},
     extras_require={
         "tests": ["pytest", "pytest-ordering", "pytest-cov"],
         "docs": ["mkdocs", "inari[mkdocs]", "mkdocs-material", "black", "pygments", "pymdown-extensions"],
