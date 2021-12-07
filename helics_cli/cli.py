@@ -31,8 +31,35 @@ process_handler = ProcessHandler(
 )
 
 
+def _get_version():
+    try:
+        import helics as h
+
+        helics_version = "Python HELICS version {}\n\nHELICS Library version {}".format(h.__version__, h.helicsGetVersion())
+    except ImportError:
+        helics_version = "Python HELICS interface not installed. Install using `pip install helics --upgrade`."
+    try:
+        import helics_apps as ha
+
+        helics_apps_version = "HELICS Apps version {}".format(ha.__version__)
+    except ImportError:
+        helics_apps_version = "Python HELICS interface not installed. Install using `pip install helics --upgrade`."
+
+    return """{}
+
+{}
+
+{}
+""".format(
+        __version__, helics_version, helics_apps_version
+    ).strip()
+
+
+VERSION = _get_version()
+
+
 @click.group()
-@click.version_option(__version__, "--version")
+@click.version_option(VERSION, "--version")
 @click.option("--verbose", "-v", count=True)
 @click.pass_context
 def cli(ctx, verbose):
