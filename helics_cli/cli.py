@@ -37,13 +37,13 @@ def _get_version():
 
         helics_version = "Python HELICS version {}\n\nHELICS Library version {}".format(h.__version__, h.helicsGetVersion())
     except ImportError:
-        helics_version = "Python HELICS interface not installed. Install using `pip install helics --upgrade`."
+        helics_version = "Python `helics` package not installed. Install using `pip install helics --upgrade`."
     try:
         import helics_apps as ha
 
         helics_apps_version = "HELICS Apps version {}".format(ha.__version__)
     except ImportError:
-        helics_apps_version = "Python HELICS interface not installed. Install using `pip install helics-apps --upgrade`."
+        helics_apps_version = "Python `helics-apps` package not installed. Install using `pip install helics-apps --upgrade`."
 
     return """{}
 
