@@ -41,11 +41,19 @@ def _get_version():
     try:
         import helics_apps as ha
 
-        helics_apps_version = "HELICS Apps version {}\n\nIf your `helics` and `helics-apps` versions don't match, you may want to run `pip install helics helics-apps --upgrade`.".format(
-            ha.__version__
-        )
+        helics_apps_version = "HELICS Apps version {}".format(ha.__version__)
+
     except ImportError:
         helics_apps_version = "Python `helics-apps` package not installed. Install using `pip install helics-apps --upgrade`."
+
+    try:
+        import helics as h
+        import helics_apps as ha
+
+        if not h.helicsGetVersion().startswith(ha.__version__.strip("v")):
+            echo("`helics` and `helics-apps` versions don't match. You may want to run `pip install helics helics-apps --upgrade`.", status="error")
+    except ImportError:
+        pass
 
     return """{}
 
