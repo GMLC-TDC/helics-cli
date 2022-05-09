@@ -113,7 +113,7 @@ helics profile-plot examples/pi-exchange/profile.txt
 ### Installation
 
 ```
-pip install git+git://github.com/GMLC-TDC/helics-cli.git@main
+pip install git+https://github.com/GMLC-TDC/helics-cli.git@main
 ```
 
 ## Release
